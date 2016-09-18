@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING</licenseUrl>
+    <projectUrl>http://github.com/Syroot/BinaryData</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>WTFPL</copyright>
+    <tags>binary data io binaryreader binarywriter</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\Syroot.IO.BinaryData.dll" target="lib\net45\Syroot.IO.BinaryData.dll" />
+    <file src="bin\Release\Syroot.IO.BinaryData.pdb" target="lib\net45\Syroot.IO.BinaryData.pdb" />
+    <file src="bin\Release\Syroot.IO.BinaryData.xml" target="lib\net45\Syroot.IO.BinaryData.xml" />
+  </files>
+</package>
