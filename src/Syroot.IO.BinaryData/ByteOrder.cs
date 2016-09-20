@@ -19,29 +19,29 @@ namespace Syroot.IO
     }
 
     /// <summary>
-    /// Represents extension methods for the <see cref="ByteOrder"/> enumeration.
+    /// Represents helper methods to handle data byte order.
     /// </summary>
-    public static class ByteOrderExtensions
+    public static class ByteOrderHelper
     {
         // ---- MEMBERS ------------------------------------------------------------------------------------------------
 
         private static ByteOrder _systemByteOrder;
 
-        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
+        // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Gets the <see cref="ByteOrder"/> of the system executing the assembly.
         /// </summary>
-        /// <returns>The <see cref="ByteOrder"/> of the sytem executing the assembly.</returns>
-        public static ByteOrder GetSystemByteOrder(this ByteOrder byteOrder)
+        public static ByteOrder SystemByteOrder
         {
-            if (_systemByteOrder == 0)
+            get
             {
-                // The BitConverter.IsLittleEndian field is only set after its static constructor has been run.
-                BitConverter.GetBytes(0);
-                _systemByteOrder = BitConverter.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian;
+                if (_systemByteOrder == 0)
+                {
+                    _systemByteOrder = BitConverter.IsLittleEndian ? ByteOrder.LittleEndian : ByteOrder.BigEndian;
+                }
+                return _systemByteOrder;
             }
-            return _systemByteOrder;
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Syroot.IO
             : base(output, encoding, leaveOpen)
         {
             Encoding = encoding;
-            ByteOrder = ByteOrder.GetSystemByteOrder();
+            ByteOrder = ByteOrderHelper.SystemByteOrder;
         }
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace Syroot.IO
             set
             {
                 _byteOrder = value;
-                _needsReversion = _byteOrder != ByteOrder.GetSystemByteOrder();
+                _needsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
             }
         }
 
