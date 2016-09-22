@@ -1,5 +1,5 @@
 # BinaryData
-.NET classes extending binary reading and writing functionality.
+.NET library extending binary reading and writing functionality.
 
 ## Introduction
 
