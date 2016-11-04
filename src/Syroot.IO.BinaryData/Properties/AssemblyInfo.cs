@@ -1,15 +1,10 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("BinaryData")]
-[assembly: AssemblyDescription(".NET classes extending binary reading and writing functionality.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Syroot")]
-[assembly: AssemblyProduct("Syroot.IO.BinaryData")]
-[assembly: AssemblyCopyright("WTFPL")]
+[assembly: AssemblyProduct("Syroot.BinaryData")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+
 [assembly: ComVisible(false)]
-[assembly: Guid("ce7420bd-bf6f-43dc-8701-a7fa41e065b8")]
+[assembly: Guid("593ff574-a6a2-4a4a-925f-830ed462cbf5")]

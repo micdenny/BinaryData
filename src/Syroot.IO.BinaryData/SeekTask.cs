@@ -1,8 +1,8 @@
-﻿namespace Syroot.IO
-{
-    using System;
-    using System.IO;
+﻿using System;
+using System.IO;
 
+namespace Syroot.IO
+{
     /// <summary>
     /// Represents a temporary seek to another position which is undone after the task has been disposed.
     /// </summary>
