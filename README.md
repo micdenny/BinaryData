@@ -7,7 +7,7 @@ When parsing or storing data in binary file formats, the functionality offered b
 
 Further, navigating in binary files is slightly tedious when it becomes required to skip to another chunk in the file and then navigate back. Also, aligning to specific block sizes might be a common task.
 
-This NuGet package adds all this functionality by offering two new .NET Standard 1.1 classes, `BinaryDataReader` and  `BinaryDataWriter`, which extend the aforementioned .NET reader and writer, usable in a similar way so that they are easy to implement into existing projects - in fact, they can be used directly without requiring any changes to existing code.
+This NuGet package adds all this functionality by offering two new .NET 4.5 and .NET Standard 1.1 compatible classes, `BinaryDataReader` and  `BinaryDataWriter`, which extend the aforementioned .NET reader and writer, usable in a similar way so that they are easy to implement into existing projects - in fact, they can be used directly without requiring any changes to existing code.
 
 The usage is described in detail [on the wiki](https://github.com/Syroot/BinaryData/wiki).
 

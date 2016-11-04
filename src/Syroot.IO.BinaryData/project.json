@@ -4,9 +4,10 @@
     "description": ".NET classes extending binary reading and writing functionality.",
     "language": "en-US",
     "title": "BinaryData",
-    "version": "1.0.2-*",
+    "version": "1.0.3-*",
 
     "frameworks": {
+        "net45": {},
         "netstandard1.1": {
             "dependencies": {
                 "NETStandard.Library": "1.6.0"
@@ -32,7 +33,7 @@
         "licenseUrl": "https://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING",
         "owners": [ "Syroot" ],
         "projectUrl": "https://github.com/Syroot/BinaryData",
-        "releaseNotes": "Initial .NET Standard 1.1 capable version.",
+        "releaseNotes": "Added plain .NET 4.5 target.",
         "repository": {
             "type": "git",
             "url": "https://github.com/Syroot/BinaryData"
