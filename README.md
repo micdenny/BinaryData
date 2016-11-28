@@ -11,6 +11,8 @@ This NuGet package adds all this functionality by offering two new .NET 4.5 and 
 
 The usage is described in detail [on the wiki](https://github.com/Syroot/BinaryData/wiki).
 
+The library is available as a [NuGet package](https://www.nuget.org/packages/Syroot.IO.BinaryData).
+
 ## License
 
 <a href="http://www.wtfpl.net/"><img src="http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl.svg" height="20" alt="WTFPL" /></a> WTFPL
