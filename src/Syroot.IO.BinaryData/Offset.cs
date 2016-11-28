@@ -41,10 +41,19 @@
         /// </summary>
         public void Satisfy()
         {
-            // Temporarily seek back to the allocation offset and write the previous address there, then seek back.
+            Satisfy((int)Writer.Position);
+        }
+
+        /// <summary>
+        /// Satisfies the offset by writing the given value of the underlying stream at the reserved
+        /// <see cref="Position"/>, then seeking back to the current position.
+        /// </summary>
+        public void Satisfy(int value)
+        {
+            // Temporarily seek back to the allocation offset and write the given value there, then seek back.
             uint oldPosition = (uint)Writer.Position;
             Writer.Position = Position;
-            Writer.Write(oldPosition);
+            Writer.Write(value);
             Writer.Position = oldPosition;
         }
     }

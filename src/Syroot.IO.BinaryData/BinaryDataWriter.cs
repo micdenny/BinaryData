@@ -122,7 +122,22 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Aligns the reader to the next given byte multiple..
+        /// Allocates space for a given number of <see cref="Offset"/> instances which can be satisfied later on.
+        /// </summary>
+        /// <param name="count">The number of <see cref="Offset"/> instances to reserve.</param>
+        /// <returns>An array of <see cref="Offset"/> instances to satisfy later on.</returns>
+        public Offset[] ReserveOffset(int count)
+        {
+            Offset[] offsets = new Offset[count];
+            for (int i = 0; i < count; i++)
+            {
+                offsets[i] = ReserveOffset();
+            }
+            return offsets;
+        }
+
+        /// <summary>
+        /// Aligns the reader to the next given byte multiple.
         /// </summary>
         /// <param name="alignment">The byte multiple.</param>
         public void Align(int alignment)

@@ -4,7 +4,21 @@
     "description": ".NET classes extending binary reading and writing functionality.",
     "language": "en-US",
     "title": "BinaryData",
-    "version": "1.0.3-*",
+    "version": "1.1.0-*",
+
+    "packOptions": {
+        "iconUrl": "https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png",
+        "licenseUrl": "https://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING",
+        "owners": [ "Syroot" ],
+        "projectUrl": "https://github.com/Syroot/BinaryData",
+        "releaseNotes": "Added a few functions to Offset functionality.",
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/Syroot/BinaryData"
+        },
+        "summary": ".NET library extending binary reading and writing functionality.",
+        "tags": [ "binary", "data", "io", "binaryreader", "binarywriter" ]
+    },
 
     "frameworks": {
         "net45": {},
@@ -26,19 +40,5 @@
         "postcompile": [
             "dotnet pack --no-build --configuration %compile:Configuration%"
         ]
-    },
-
-    "packOptions": {
-        "iconUrl": "https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png",
-        "licenseUrl": "https://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING",
-        "owners": [ "Syroot" ],
-        "projectUrl": "https://github.com/Syroot/BinaryData",
-        "releaseNotes": "Added plain .NET 4.5 target.",
-        "repository": {
-            "type": "git",
-            "url": "https://github.com/Syroot/BinaryData"
-        },
-        "summary": ".NET library extending binary reading and writing functionality.",
-        "tags": [ "binary", "data", "io", "binaryreader", "binarywriter" ]
     }
 }
