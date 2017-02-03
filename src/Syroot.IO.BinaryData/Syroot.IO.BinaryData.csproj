@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>.NET classes extending binary reading and writing functionality.</Description>
+    <Copyright>WTFPL</Copyright>
+    <AssemblyName>Syroot.IO.BinaryData</AssemblyName>
+    <AssemblyTitle>BinaryData</AssemblyTitle>
+    <Authors>Syroot</Authors>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    
+    <PackageId>Syroot.IO.BinaryData</PackageId>
+    <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
+    <PackageReleaseNotes>Added a few functions to Offset functionality.</PackageReleaseNotes>
+    <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
+    
+    <TargetFrameworks>netstandard1.1</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  
+  <Target Name="PostcompileScript" AfterTargets="Build">
+    <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
+  </Target>
+  
+</Project>
