@@ -335,9 +335,9 @@ namespace Syroot.IO
             }
 
             // Validate the value to be defined in the enum.
-            if (strict && !Enum.IsDefined(enumType, value))
+            if (strict && !EnumExtensions.IsValid(enumType, value))
             {
-                throw new ArgumentOutOfRangeException("Read value is not defined in the given enum type.");
+                throw new InvalidDataException("Read value is not defined in the given enum type.");
             }
 
             return (T)value;

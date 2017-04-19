@@ -355,9 +355,9 @@ namespace Syroot.IO
             Type enumType = typeof(T);
 
             // Validate the value to be defined in the enum.
-            if (strict && !Enum.IsDefined(enumType, value))
+            if (strict && !EnumExtensions.IsValid(enumType, value))
             {
-                throw new ArgumentOutOfRangeException("Enum value to write is not defined in the given enum type.");
+                throw new InvalidDataException("Enum value to write is not defined in the given enum type.");
             }
 
             switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
