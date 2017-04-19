@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Syroot.IO
@@ -192,10 +193,59 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes a <see cref="DateTime"/> to this stream. The <see cref="DateTime"/> will be available in the
+        /// Writes a <see cref="Boolean"/> value in the given format to the current stream, with 0 representing
+        /// <c>false</c> and 1 representing <c>true</c>.
+        /// </summary>
+        /// <param name="value">The <see cref="Boolean"/> value to write.</param>
+        /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
+        public void Write(bool value, BinaryBooleanFormat format)
+        {
+            switch (format)
+            {
+                case BinaryBooleanFormat.NonZeroByte:
+                    base.Write(value);
+                    break;
+                case BinaryBooleanFormat.NonZeroWord:
+                    Write(value ? (Int16)1 : (Int16)0);
+                    break;
+                case BinaryBooleanFormat.NonZeroDword:
+                    Write(value ? 1 : 0);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary boolean format is invalid.");
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="Boolean"/> values to the current stream, with 0 representing <c>false</c> and
+        /// 1 representing <c>true</c>.
+        /// </summary>
+        /// <param name="values">The <see cref="Boolean"/> values to write.</param>
+        public void Write(bool[] values)
+        {
+            WriteMultiple(values, base.Write);
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="Boolean"/> values in the given format to the current stream, with 0
+        /// representing <c>false</c> and 1 representing <c>true</c>.
+        /// </summary>
+        /// <param name="values">The <see cref="Boolean"/> values to write.</param>
+        /// <param name="format">The binary format in which the <see cref="Boolean"/> values will be written.</param>
+        public void Write(bool[] values, BinaryBooleanFormat format)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                Write(values[i], format);
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="DateTime"/> value to this stream. The <see cref="DateTime"/> will be available in the
         /// specified binary format.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="DateTime"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> will be written.</param>
         public void Write(DateTime value, BinaryDateTimeFormat format)
         {
@@ -208,7 +258,22 @@ namespace Syroot.IO
                     Write(value.Ticks);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("format", "The specified binary datetime format is invalid.");
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary date time format is invalid.");
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="DateTime"/> values to this stream. The <see cref="DateTime"/> values will be
+        /// available in the specified binary format.
+        /// </summary>
+        /// <param name="values">The <see cref="DateTime"/> values to write.</param>
+        /// <param name="format">The binary format in which the <see cref="DateTime"/> values will be written.</param>
+        public void Write(DateTime[] values, BinaryDateTimeFormat format)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                Write(values[i], format);
             }
         }
 
@@ -216,7 +281,7 @@ namespace Syroot.IO
         /// Writes an 16-byte floating point value to this stream and advances the current position of the stream by
         /// sixteen bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Decimal"/> value to write.</param>
         public override void Write(Decimal value)
         {
             if (_needsReversion)
@@ -231,8 +296,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Decimal"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Decimal"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Decimal"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Decimal"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Decimal"/> values to write.</param>
         public void Write(Decimal[] values)
@@ -244,7 +309,7 @@ namespace Syroot.IO
         /// Writes an 8-byte floating point value to this stream and advances the current position of the stream by
         /// eight bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Double"/> value to write.</param>
         public override void Write(Double value)
         {
             if (_needsReversion)
@@ -259,8 +324,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Double"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Double"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Double"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Double"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Double"/> values to write.</param>
         public void Write(Double[] values)
@@ -269,9 +334,81 @@ namespace Syroot.IO
         }
 
         /// <summary>
+        /// Writes an enum value to this stream and advances the current position of the stream by the size of the
+        /// underlying enum type size.
+        /// </summary>
+        /// <param name="value">The enum value to write.</param>
+        public void Write<T>(T value) where T : struct, IComparable, IFormattable
+        {
+            Write(value, false);
+        }
+
+        /// <summary>
+        /// Writes an enum value to this stream and advances the current position of the stream by the size of the
+        /// underlying enum type size. Optionally validates the value to be defined in the enum type.
+        /// </summary>
+        /// <param name="value">The enum value to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        public void Write<T>(T value, bool strict) where T : struct, IComparable, IFormattable
+        {
+            Type enumType = typeof(T);
+
+            // Validate the value to be defined in the enum.
+            if (strict && !Enum.IsDefined(enumType, value))
+            {
+                throw new ArgumentOutOfRangeException("Enum value to write is not defined in the given enum type.");
+            }
+
+            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
+            {
+                case sizeof(Byte):
+                    Write((Byte)(object)value);
+                    break;
+                case sizeof(Int16):
+                    Write((Int16)(object)value);
+                    break;
+                case sizeof(Int32):
+                    Write((Int32)(object)value);
+                    break;
+                case sizeof(Int64):
+                    Write((Int64)(object)value);
+                    break;
+                default:
+                    throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of enum values to this stream and advances the current position of the stream by the size of
+        /// the underlying enum type size multiplied by the number of values.
+        /// </summary>
+        /// <param name="values">The enum values to write.</param>
+        public void Write<T>(T[] values) where T : struct, IComparable, IFormattable
+        {
+            WriteMultiple(values, Write);
+        }
+
+        /// <summary>
+        /// Writes an array of enum values to this stream and advances the current position of the stream by the size
+        /// of the underlying enum type size multiplied by the number of values. Optionally validates the values to be
+        /// defined in the enum type.
+        /// </summary>
+        /// <param name="values">The enum values to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        public void Write<T>(T[] values, bool strict) where T : struct, IComparable, IFormattable
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                Write(values[i], strict);
+            }
+        }
+
+        /// <summary>
         /// Writes an 2-byte signed integer to this stream and advances the current position of the stream by two bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Int16"/> value to write.</param>
         public override void Write(Int16 value)
         {
             if (_needsReversion)
@@ -286,8 +423,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Int16"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Int16"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Int16"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Int16"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int16"/> values to write.</param>
         public void Write(Int16[] values)
@@ -299,7 +436,7 @@ namespace Syroot.IO
         /// Writes an 4-byte signed integer to this stream and advances the current position of the stream by four
         /// bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Int32"/> value to write.</param>
         public override void Write(Int32 value)
         {
             if (_needsReversion)
@@ -314,8 +451,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Int32"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Int32"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Int32"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Int32"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int32"/> values to write.</param>
         public void Write(Int32[] values)
@@ -327,7 +464,7 @@ namespace Syroot.IO
         /// Writes an 8-byte signed integer to this stream and advances the current position of the stream by eight
         /// bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Int64"/> value to write.</param>
         public override void Write(Int64 value)
         {
             if (_needsReversion)
@@ -342,8 +479,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Int64"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Int64"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Int64"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Int64"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
         public void Write(Int64[] values)
@@ -355,7 +492,7 @@ namespace Syroot.IO
         /// Writes an 4-byte floating point value to this stream and advances the current position of the stream by four
         /// bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="Single"/> value to write.</param>
         public override void Write(Single value)
         {
             if (_needsReversion)
@@ -370,8 +507,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="Single"/> values into the current stream and advances the current
-        /// position by that number of <see cref="Single"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="Single"/> values to the current stream and advances the current position by
+        /// that number of <see cref="Single"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Single"/> values to write.</param>
         public void Write(Single[] values)
@@ -384,7 +521,7 @@ namespace Syroot.IO
         /// the current position of the stream in accordance with the encoding used and the specific characters being
         /// written to the stream. The string will be available in the specified binary format.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="String"/> value to write.</param>
         /// <param name="format">The binary format in which the string will be written.</param>
         public void Write(String value, BinaryStringFormat format)
         {
@@ -396,7 +533,7 @@ namespace Syroot.IO
         /// accordance with the encoding used and the specific characters being written to the stream. The string will
         /// be available in the specified binary format.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="String"/> value to write.</param>
         /// <param name="format">The binary format in which the string will be written.</param>
         /// <param name="encoding">The encoding used for converting the string.</param>
         public void Write(String value, BinaryStringFormat format, Encoding encoding)
@@ -412,6 +549,9 @@ namespace Syroot.IO
                 case BinaryStringFormat.DwordLengthPrefix:
                     WriteDwordLengthPrefixString(value, encoding);
                     break;
+                case BinaryStringFormat.VariableLengthPrefix:
+                    WriteVariableLengthPrefixString(value, encoding);
+                    break;
                 case BinaryStringFormat.ZeroTerminated:
                     WriteZeroTerminatedString(value, encoding);
                     break;
@@ -419,7 +559,47 @@ namespace Syroot.IO
                     WriteNoPrefixOrTerminationString(value, encoding);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("format", "The specified binary string format is invalid");
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary string format is invalid.");
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="String"/> values to this in the current encoding of the
+        /// <see cref="BinaryDataWriter"/>.
+        /// </summary>
+        /// <param name="values">The <see cref="String"/> value to write.</param>
+        public void Write(String[] values)
+        {
+            WriteMultiple(values, base.Write);
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="String"/> values to this stream in the current encoding of the
+        /// <see cref="BinaryDataWriter"/>. The strings will be available in the specified binary format.
+        /// </summary>
+        /// <param name="values">The <see cref="String"/> values to write.</param>
+        /// <param name="format">The binary format in which the strings will be written.</param>
+        public void Write(String[] values, BinaryStringFormat format)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                Write(values[i], format);
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="String"/> values to this stream with the given encoding. The strings will be
+        /// available in the specified binary format.
+        /// </summary>
+        /// <param name="values">The <see cref="String"/> values to write.</param>
+        /// <param name="format">The binary format in which the strings will be written.</param>
+        /// <param name="encoding">The encoding used for converting the strings.</param>
+        public void Write(String[] values, BinaryStringFormat format, Encoding encoding)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                Write(values[i], format, encoding);
             }
         }
 
@@ -427,7 +607,7 @@ namespace Syroot.IO
         /// Writes an 2-byte unsigned integer value to this stream and advances the current position of the stream by
         /// two bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="UInt16"/> value to write.</param>
         public override void Write(UInt16 value)
         {
             if (_needsReversion)
@@ -442,8 +622,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="UInt16"/> values into the current stream and advances the current
-        /// position by that number of <see cref="UInt16"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="UInt16"/> values to the current stream and advances the current position by
+        /// that number of <see cref="UInt16"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt16"/> values to write.</param>
         public void Write(UInt16[] values)
@@ -455,7 +635,7 @@ namespace Syroot.IO
         /// Writes an 4-byte unsigned integer value to this stream and advances the current position of the stream by
         /// four bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="UInt32"/> value to write.</param>
         public override void Write(UInt32 value)
         {
             if (_needsReversion)
@@ -470,8 +650,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="UInt32"/> values into the current stream and advances the current
-        /// position by that number of <see cref="UInt32"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="UInt32"/> values to the current stream and advances the current position by
+        /// that number of <see cref="UInt32"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt32"/> values to write.</param>
         public void Write(UInt32[] values)
@@ -483,7 +663,7 @@ namespace Syroot.IO
         /// Writes an 8-byte unsigned integer value to this stream and advances the current position of the stream by
         /// eight bytes.
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The <see cref="UInt64"/> value to write.</param>
         public override void Write(UInt64 value)
         {
             if (_needsReversion)
@@ -498,8 +678,8 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes the specified number of <see cref="UInt64"/> values into the current stream and advances the current
-        /// position by that number of <see cref="UInt64"/> values multiplied with the size of a single value.
+        /// Writes an array of <see cref="UInt64"/> values to the current stream and advances the current position by
+        /// that number of <see cref="UInt64"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt64"/> values to write.</param>
         public void Write(UInt64[] values)
@@ -538,6 +718,12 @@ namespace Syroot.IO
         private void WriteDwordLengthPrefixString(string value, Encoding encoding)
         {
             Write(value.Length);
+            Write(encoding.GetBytes(value));
+        }
+
+        private void WriteVariableLengthPrefixString(string value, Encoding encoding)
+        {
+            Write7BitEncodedInt(value.Length);
             Write(encoding.GetBytes(value));
         }
 

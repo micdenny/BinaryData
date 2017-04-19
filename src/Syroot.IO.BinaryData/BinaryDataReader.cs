@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Syroot.IO
@@ -140,6 +141,56 @@ namespace Syroot.IO
         {
             Seek((-Position % alignment + alignment) % alignment);
         }
+        
+        /// <summary>
+        /// Reads a <see cref="Boolean"/> value from the current stream. The <see cref="Boolean"/> is available in the
+        /// specified binary format.
+        /// </summary>
+        /// <param name="format">The binary format, in which the <see cref="Boolean"/> will be read.</param>
+        /// <returns>The <see cref="Boolean"/> read from the current stream.</returns>
+        public Boolean ReadBoolean(BinaryBooleanFormat format)
+        {
+            switch (format)
+            {
+                case BinaryBooleanFormat.NonZeroByte:
+                    return base.ReadBoolean();
+                case BinaryBooleanFormat.NonZeroDword:
+                    return ReadInt16() != 0;
+                case BinaryBooleanFormat.NonZeroWord:
+                    return ReadInt32() != 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary boolean format is invalid.");
+            }
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="Boolean"/> values from the current stream into a
+        /// <see cref="Boolean"/> array.
+        /// </summary>
+        /// <param name="count">The number of <see cref="Boolean"/> values to read.</param>
+        /// <returns>The <see cref="Boolean"/> array read from the current stream.</returns>
+        public Boolean[] ReadBooleans(int count)
+        {
+            return ReadMultiple(count, base.ReadBoolean);
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="Boolean"/> values from the current stream into a
+        /// <see cref="Boolean"/> array. The <see cref="Boolean"/> values are available in the specified binary format.
+        /// </summary>
+        /// <param name="count">The number of <see cref="Boolean"/> values to read.</param>
+        /// <param name="format">The binary format, in which the <see cref="Boolean"/> values will be read.</param>
+        /// <returns>The <see cref="Boolean"/> array read from the current stream.</returns>
+        public Boolean[] ReadBooleans(int count, BinaryBooleanFormat format)
+        {
+            Boolean[] values = new Boolean[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadBoolean(format);
+            }
+            return values;
+        }
 
         /// <summary>
         /// Reads a <see cref="DateTime"/> from the current stream. The <see cref="DateTime"/> is available in the
@@ -156,8 +207,27 @@ namespace Syroot.IO
                 case BinaryDateTimeFormat.NetTicks:
                     return new DateTime(ReadInt64());
                 default:
-                    throw new ArgumentOutOfRangeException("format", "The specified binary datetime format is invalid");
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary date time format is invalid.");
             }
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="DateTime"/> values from the current stream into a
+        /// <see cref="DateTime"/> array. The <see cref="DateTime"/> values are available in the specified binary
+        /// format.
+        /// </summary>
+        /// <param name="count">The number of <see cref="DateTime"/> values to read.</param>
+        /// <param name="format">The binary format, in which the <see cref="DateTime"/> values will be read.</param>
+        /// <returns>The <see cref="DateTime"/> array read from the current stream.</returns>
+        public DateTime[] ReadDateTimes(int count, BinaryDateTimeFormat format)
+        {
+            DateTime[] values = new DateTime[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadDateTime(format);
+            }
+            return values;
         }
 
         /// <summary>
@@ -185,8 +255,7 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Decimal"/> values to read.</param>
-        /// <returns>The <see cref="Decimal"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Decimal"/> array read from the current stream.</returns>
         public Decimal[] ReadDecimals(int count)
         {
             return ReadMultiple(count, ReadDecimal);
@@ -217,13 +286,98 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Double"/> values to read.</param>
-        /// <returns>The <see cref="Double"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Double"/> array read from the current stream.</returns>
         public Double[] ReadDoubles(int count)
         {
             return ReadMultiple(count, ReadDouble);
         }
+        
+        /// <summary>
+        /// Reads the specified enum value from the current stream and advances the current position by the size of the
+        /// underlying enum type.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <returns>The enum value read from the current stream.</returns>
+        public T ReadEnum<T>() where T : struct, IComparable, IFormattable
+        {
+            return ReadEnum<T>(false);
+        }
 
+        /// <summary>
+        /// Reads the specified enum value from the current stream and advances the current position by the size of the
+        /// underlying enum type. Optionally validates the value to be defined in the enum type.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        /// <returns>The enum value read from the current stream.</returns>
+        public T ReadEnum<T>(bool strict) where T : struct, IComparable, IFormattable
+        {
+            Type enumType = typeof(T);
+
+            object value;
+            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
+            {
+                case sizeof(Byte):
+                    value = ReadByte();
+                    break;
+                case sizeof(Int16):
+                    value = ReadInt16();
+                    break;
+                case sizeof(Int32):
+                    value = ReadInt32();
+                    break;
+                case sizeof(Int64):
+                    value = ReadInt64();
+                    break;
+                default:
+                    throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
+            }
+
+            // Validate the value to be defined in the enum.
+            if (strict && !Enum.IsDefined(enumType, value))
+            {
+                throw new ArgumentOutOfRangeException("Read value is not defined in the given enum type.");
+            }
+
+            return (T)value;
+        }
+
+        /// <summary>
+        /// Reads the specified number of enum values from the current stream into an array of the enum type.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="count">The number of enum values to read.</param>
+        /// <returns>The enum value read from the current stream.</returns>
+        public T[] ReadEnums<T>(int count) where T : struct, IComparable, IFormattable
+        {
+            T[] values = new T[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadEnum<T>();
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Reads the specified number of enum values from the current stream into an array of the enum type. Optionally
+        /// validates values to be defined in the enum type.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="count">The number of enum values to read.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <returns>The enum values array read from the current stream.</returns>
+        public T[] ReadEnums<T>(int count, bool strict) where T : struct, IComparable, IFormattable
+        {
+            T[] values = new T[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadEnum<T>(strict);
+            }
+            return values;
+        }
+        
         /// <summary>
         /// Reads a 2-byte signed integer from the current stream and advances the current position of the stream by two
         /// bytes.
@@ -249,8 +403,7 @@ namespace Syroot.IO
         /// size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Int16"/> values to read.</param>
-        /// <returns>The <see cref="Int16"/> array containing data read from the current stream. This might be less than
-        /// the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Int16"/> array read from the current stream.</returns>
         public Int16[] ReadInt16s(int count)
         {
             return ReadMultiple(count, ReadInt16);
@@ -281,8 +434,7 @@ namespace Syroot.IO
         /// size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Int32"/> values to read.</param>
-        /// <returns>The <see cref="Int32"/> array containing data read from the current stream. This might be less than
-        /// the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Int32"/> array read from the current stream.</returns>
         public Int32[] ReadInt32s(int count)
         {
             return ReadMultiple(count, ReadInt32);
@@ -313,8 +465,7 @@ namespace Syroot.IO
         /// size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Int64"/> values to read.</param>
-        /// <returns>The <see cref="Int64"/> array containing data read from the current stream. This might be less than
-        /// the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Int64"/> array read from the current stream.</returns>
         public Int64[] ReadInt64s(int count)
         {
             return ReadMultiple(count, ReadInt64);
@@ -326,8 +477,7 @@ namespace Syroot.IO
         /// size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="SByte"/> values to read.</param>
-        /// <returns>The <see cref="SByte"/> array containing data read from the current stream. This might be less than
-        /// the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="SByte"/> array read from the current stream.</returns>
         public SByte[] ReadSBytes(int count)
         {
             return ReadMultiple(count, ReadSByte);
@@ -358,8 +508,7 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="Single"/> values to read.</param>
-        /// <returns>The <see cref="Single"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="Single"/> array read from the current stream.</returns>
         public Single[] ReadSingles(int count)
         {
             return ReadMultiple(count, ReadSingle);
@@ -386,18 +535,21 @@ namespace Syroot.IO
             switch (format)
             {
                 case BinaryStringFormat.ByteLengthPrefix:
-                    return ReadByteLengthPrefixString(encoding);
+                    return ReadStringInternal(ReadByte(), encoding);
                 case BinaryStringFormat.WordLengthPrefix:
-                    return ReadWordLengthPrefixString(encoding);
+                    return ReadStringInternal(ReadInt16(), encoding);
                 case BinaryStringFormat.DwordLengthPrefix:
-                    return ReadDwordLengthPrefixString(encoding);
+                    return ReadStringInternal(ReadInt32(), encoding);
+                case BinaryStringFormat.VariableLengthPrefix:
+                    return ReadStringInternal(Read7BitEncodedInt(), encoding);
                 case BinaryStringFormat.ZeroTerminated:
                     return ReadZeroTerminatedString(encoding);
                 case BinaryStringFormat.NoPrefixOrTermination:
                     throw new ArgumentException("NoPrefixOrTermination cannot be used for read operations if no length "
-                        + "has been specified.", "format");
+                        + "has been specified.", nameof(format));
                 default:
-                    throw new ArgumentOutOfRangeException("format", "The specified binary string format is invalid");
+                    throw new ArgumentOutOfRangeException(nameof(format),
+                        "The specified binary string format is invalid.");
             }
         }
 
@@ -418,10 +570,97 @@ namespace Syroot.IO
         /// </summary>
         /// <param name="length">The length of the string.</param>
         /// <param name="encoding">The encoding to use for reading the string.</param>
-        /// <returns>The string read from the current stream.</returns>
+        /// <returns>The <see cref="String"/> read from the current stream.</returns>
         public String ReadString(int length, Encoding encoding)
         {
             return encoding.GetString(ReadBytes(length));
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
+        /// array.
+        /// </summary>
+        /// <param name="count">The number of <see cref="String"/> values to read.</param>
+        /// <returns>The <see cref="String"/> array read from the current stream.</returns>
+        public String[] ReadStrings(int count)
+        {
+            String[] values = new String[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadString();
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
+        /// array. The strings are available in the specified binary format.
+        /// </summary>
+        /// <param name="count">The number of <see cref="String"/> values to read.</param>
+        /// <param name="format">The binary format, in which the string will be read.</param>
+        /// <returns>The <see cref="String"/> array read from the current stream.</returns>
+        public String[] ReadStrings(int count, BinaryStringFormat format)
+        {
+            String[] values = new String[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadString(format);
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
+        /// array. The strings are available in the specified binary format and encoding.
+        /// </summary>
+        /// <param name="count">The number of <see cref="String"/> values to read.</param>
+        /// <param name="format">The binary format, in which the string will be read.</param>
+        /// <param name="encoding">The encoding used for converting the string.</param>
+        /// <returns>The <see cref="String"/> array read from the current stream.</returns>
+        public String[] ReadStrings(int count, BinaryStringFormat format, Encoding encoding)
+        {
+            String[] values = new String[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadString(format, encoding);
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
+        /// array. The strings have neither a prefix or postfix, the length has to be specified manually.
+        /// </summary>
+        /// <param name="count">The number of <see cref="String"/> values to read.</param>
+        /// <param name="length">The length of the string.</param>
+        /// <returns>The <see cref="String"/> array read from the current stream.</returns>
+        public String[] ReadStrings(int count, int length)
+        {
+            String[] values = new String[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadString(length);
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
+        /// array. The strings have neither a prefix or postfix, the length has to be specified manually. The strings
+        /// are available in the specified encoding.
+        /// </summary>
+        /// <param name="count">The number of <see cref="String"/> values to read.</param>
+        /// <param name="length">The length of the string.</param>
+        /// <param name="encoding">The encoding to use for reading the string.</param>
+        /// <returns>The <see cref="String"/> array read from the current stream.</returns>
+        public String[] ReadStrings(int count, int length, Encoding encoding)
+        {
+            String[] values = new String[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadString(length, Encoding);
+            }
+            return values;
         }
 
         /// <summary>
@@ -449,8 +688,7 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="UInt16"/> values to read.</param>
-        /// <returns>The <see cref="UInt16"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="UInt16"/> array read from the current stream.</returns>
         public UInt16[] ReadUInt16s(int count)
         {
             return ReadMultiple(count, ReadUInt16);
@@ -481,8 +719,7 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="UInt32"/> values to read.</param>
-        /// <returns>The <see cref="UInt32"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="UInt32"/> array read from the current stream.</returns>
         public UInt32[] ReadUInt32s(int count)
         {
             return ReadMultiple(count, ReadUInt32);
@@ -513,8 +750,7 @@ namespace Syroot.IO
         /// multiplied with the size of a single value.
         /// </summary>
         /// <param name="count">The number of <see cref="UInt64"/> values to read.</param>
-        /// <returns>The <see cref="UInt64"/> array containing data read from the current stream. This might be less
-        /// than the number of bytes requested if the end of the stream is reached.</returns>
+        /// <returns>The <see cref="UInt64"/> array read from the current stream.</returns>
         public UInt64[] ReadUInt64s(int count)
         {
             return ReadMultiple(count, ReadUInt64);
@@ -587,34 +823,10 @@ namespace Syroot.IO
             return values;
         }
 
-        private string ReadByteLengthPrefixString(Encoding encoding)
+        private string ReadStringInternal(int length, Encoding encoding)
         {
-            int length = ReadByte();
-
             // This will not work for strings with differently sized characters depending on their code.
-            int charSize = encoding.GetByteCount("a");
-
-            return encoding.GetString(ReadBytes(length * charSize));
-        }
-
-        private string ReadWordLengthPrefixString(Encoding encoding)
-        {
-            int length = ReadInt16();
-
-            // This will not work for strings with differently sized characters depending on their code.
-            int charSize = encoding.GetByteCount("a");
-
-            return encoding.GetString(ReadBytes(length * charSize));
-        }
-
-        private string ReadDwordLengthPrefixString(Encoding encoding)
-        {
-            int length = ReadInt32();
-
-            // This will not work for strings with differently sized characters depending on their code.
-            int charSize = encoding.GetByteCount("a");
-
-            return encoding.GetString(ReadBytes(length * charSize));
+            return encoding.GetString(ReadBytes(length * encoding.GetByteCount("a")));
         }
 
         private string ReadZeroTerminatedString(Encoding encoding)
@@ -649,12 +861,12 @@ namespace Syroot.IO
             // Convert to string.
             return encoding.GetString(bytes.ToArray());
         }
-
+        
         private decimal DecimalFromBytes(byte[] bytes)
         {
             if (bytes.Length < sizeof(decimal))
             {
-                throw new ArgumentException("Not enough bytes to convert decimal from.");
+                throw new ArgumentException("Not enough bytes to convert decimal from.", nameof(bytes));
             }
 
             // Create 4 integers from the given bytes.

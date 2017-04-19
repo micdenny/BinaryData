@@ -3,7 +3,7 @@
 
 ## Introduction
 
-When parsing or storing data in binary file formats, the functionality offered by the default .NET `BinaryReader` and `BinaryWriter` classes is often not sufficient. It totally lacks support for a different byte order than the one of the system and specific string or date formats (most prominently, 0-terminated strings instead of the default Int32 prefixed .NET strings).
+When parsing or storing data in binary file formats, the functionality offered by the default .NET `BinaryReader` and `BinaryWriter` classes is often not sufficient. It lacks support for a different byte order than the one of the system and specific string or date formats (most prominently, 0-terminated strings instead of the default variable-length prefixed .NET strings).
 
 Further, navigating in binary files is slightly tedious when it becomes required to skip to another chunk in the file and then navigate back. Also, aligning to specific block sizes might be a common task.
 

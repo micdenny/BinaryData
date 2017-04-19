@@ -1,5 +1,26 @@
-﻿namespace Syroot.IO
+namespace Syroot.IO
 {
+    /// <summary>
+    /// Represents the set of formats of binary boolean encodings.
+    /// </summary>
+    public enum BinaryBooleanFormat
+    {
+        /// <summary>
+        /// The boolean is stored in 1 byte and is <c>true</c> when the value is not 0. This is the .NET default.
+        /// </summary>
+        NonZeroByte,
+
+        /// <summary>
+        /// The boolean is stored in 2 bytes and is <c>true</c> when the value is not 0.
+        /// </summary>
+        NonZeroWord,
+
+        /// <summary>
+        /// The boolean is stored in 4 bytes and is <c>true</c> when the value is not 0.
+        /// </summary>
+        NonZeroDword
+    }
+
     /// <summary>
     /// Represents the set of formats of binary date and time encodings.
     /// </summary>
@@ -45,6 +66,12 @@
         /// The string has neither prefix nor postfix. This format is only valid for writing strings. For reading
         /// strings, the length has to be specified manually.
         /// </summary>
-        NoPrefixOrTermination
+        NoPrefixOrTermination,
+
+        /// <summary>
+        /// The string has a prefix of variable size determining the length of the string and no postfix. This is the
+        /// .NET default.
+        /// </summary>
+        VariableLengthPrefix
     }
 }

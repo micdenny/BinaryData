@@ -1,27 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>.NET classes extending binary reading and writing functionality.</Description>
-    <Copyright>WTFPL</Copyright>
+    <Description>.NET library extending binary reading and writing functionality.</Description>
+    <Copyright>(c) Syroot, licensed under MIT</Copyright>
     <AssemblyName>Syroot.IO.BinaryData</AssemblyName>
     <AssemblyTitle>BinaryData</AssemblyTitle>
     <Authors>Syroot</Authors>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     
     <PackageId>Syroot.IO.BinaryData</PackageId>
     <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>Added a few functions to Offset functionality.</PackageReleaseNotes>
+    <PackageReleaseNotes>New methods to handle booleans and enum values aswell as multiple Strings and DateTime values at once.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/COPYING</PackageLicenseUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
     
-    <TargetFrameworks>netstandard1.1</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  
-  <Target Name="PostcompileScript" AfterTargets="Build">
-    <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
-  </Target>
-  
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 </Project>
