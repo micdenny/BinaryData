@@ -191,7 +191,7 @@ namespace Syroot.IO
         {
             return new SeekTask(BaseStream, offset, origin);
         }
-
+        
         /// <summary>
         /// Writes a <see cref="Boolean"/> value in the given format to the current stream, with 0 representing
         /// <c>false</c> and 1 representing <c>true</c>.
@@ -332,17 +332,7 @@ namespace Syroot.IO
         {
             WriteMultiple(values, Write);
         }
-
-        /// <summary>
-        /// Writes an enum value to this stream and advances the current position of the stream by the size of the
-        /// underlying enum type size.
-        /// </summary>
-        /// <param name="value">The enum value to write.</param>
-        public void Write<T>(T value) where T : struct, IComparable, IFormattable
-        {
-            Write(value, false);
-        }
-
+        
         /// <summary>
         /// Writes an enum value to this stream and advances the current position of the stream by the size of the
         /// underlying enum type size. Optionally validates the value to be defined in the enum type.
@@ -378,17 +368,7 @@ namespace Syroot.IO
                     throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
             }
         }
-
-        /// <summary>
-        /// Writes an array of enum values to this stream and advances the current position of the stream by the size of
-        /// the underlying enum type size multiplied by the number of values.
-        /// </summary>
-        /// <param name="values">The enum values to write.</param>
-        public void Write<T>(T[] values) where T : struct, IComparable, IFormattable
-        {
-            WriteMultiple(values, Write);
-        }
-
+        
         /// <summary>
         /// Writes an array of enum values to this stream and advances the current position of the stream by the size
         /// of the underlying enum type size multiplied by the number of values. Optionally validates the values to be

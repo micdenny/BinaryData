@@ -294,17 +294,6 @@ namespace Syroot.IO
         
         /// <summary>
         /// Reads the specified enum value from the current stream and advances the current position by the size of the
-        /// underlying enum type.
-        /// </summary>
-        /// <typeparam name="T">The type of the enum.</typeparam>
-        /// <returns>The enum value read from the current stream.</returns>
-        public T ReadEnum<T>() where T : struct, IComparable, IFormattable
-        {
-            return ReadEnum<T>(false);
-        }
-
-        /// <summary>
-        /// Reads the specified enum value from the current stream and advances the current position by the size of the
         /// underlying enum type. Optionally validates the value to be defined in the enum type.
         /// </summary>
         /// <typeparam name="T">The type of the enum.</typeparam>
@@ -342,23 +331,7 @@ namespace Syroot.IO
 
             return (T)value;
         }
-
-        /// <summary>
-        /// Reads the specified number of enum values from the current stream into an array of the enum type.
-        /// </summary>
-        /// <typeparam name="T">The type of the enum.</typeparam>
-        /// <param name="count">The number of enum values to read.</param>
-        /// <returns>The enum value read from the current stream.</returns>
-        public T[] ReadEnums<T>(int count) where T : struct, IComparable, IFormattable
-        {
-            T[] values = new T[count];
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i] = ReadEnum<T>();
-            }
-            return values;
-        }
-
+        
         /// <summary>
         /// Reads the specified number of enum values from the current stream into an array of the enum type. Optionally
         /// validates values to be defined in the enum type.
