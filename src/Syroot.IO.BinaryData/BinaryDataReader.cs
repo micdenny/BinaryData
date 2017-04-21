@@ -154,9 +154,9 @@ namespace Syroot.IO
             {
                 case BinaryBooleanFormat.NonZeroByte:
                     return base.ReadBoolean();
-                case BinaryBooleanFormat.NonZeroDword:
-                    return ReadInt16() != 0;
                 case BinaryBooleanFormat.NonZeroWord:
+                    return ReadInt16() != 0;
+                case BinaryBooleanFormat.NonZeroDword:
                     return ReadInt32() != 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format),
@@ -635,7 +635,7 @@ namespace Syroot.IO
             }
             return values;
         }
-
+        
         /// <summary>
         /// Reads a 2-byte unsigned integer from the current stream using little-endian encoding and advances the
         /// position of the stream by two bytes.
