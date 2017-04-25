@@ -12,25 +12,25 @@ namespace Syroot.IO
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
         /// <summary>
-        /// Returns whether <paramref name="value"/> is a defined value in the enum of the given
-        /// <paramref name="enumType"/> or a valid set of flags for enums decorated with the
-        /// <see cref="FlagsAttribute"/>.
+        /// Returns whether <paramref name="value"/> is a defined value in the enum of the given type
+        /// <typeparamref name="T"/> or a valid set of flags for enums decorated with the <see cref="FlagsAttribute"/>.
         /// </summary>
-        /// <param name="enumType">The enum type to check.</param>
+        /// <typeparam name="T">The type of the enum.</typeparam>
         /// <param name="value">The value to check against the enum type.</param>
         /// <returns><c>true</c> if the value is valid; otherwise <c>false</c>.</returns>
-        internal static bool IsValid(Type enumType, object value)
+        internal static bool IsValid<T>(object value)
         {
             // For enumerations decorated with the FlagsAttribute, allow sets of flags.
+            Type enumType = typeof(T);
             bool valid = Enum.IsDefined(enumType, value);
             if (!valid && enumType.GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true)?.Any() == true)
             {
                 long mask = 0;
                 foreach (object definedValue in Enum.GetValues(enumType))
                 {
-                    mask |= (long)definedValue;
+                    mask |= Convert.ToInt64(definedValue);
                 }
-                long longValue = (long)value;
+                long longValue = Convert.ToInt64(value);
                 valid = (mask & longValue) == longValue;
             }
             return valid;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,6 +10,7 @@ namespace Syroot.IO
     /// <summary>
     /// Represents an extended <see cref="BinaryReader"/> supporting special file format data types.
     /// </summary>
+    [DebuggerDisplay("BinaryDataReader, Position={Position}")]
     public class BinaryDataReader : BinaryReader
     {
         // ---- MEMBERS ------------------------------------------------------------------------------------------------
@@ -303,7 +305,6 @@ namespace Syroot.IO
         public T ReadEnum<T>(bool strict) where T : struct, IComparable, IFormattable
         {
             Type enumType = typeof(T);
-
             object value;
             switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
             {
@@ -324,9 +325,9 @@ namespace Syroot.IO
             }
 
             // Validate the value to be defined in the enum.
-            if (strict && !EnumExtensions.IsValid(enumType, value))
+            if (strict && !EnumExtensions.IsValid<T>(value))
             {
-                throw new InvalidDataException("Read value is not defined in the given enum type.");
+                throw new InvalidDataException($"Read value {value} is not defined in the given enum type.");
             }
 
             return (T)value;

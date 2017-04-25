@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Syroot.IO
     /// <summary>
     /// Represents an extended <see cref="BinaryWriter"/> supporting special file format data types.
     /// </summary>
+    [DebuggerDisplay("BinaryDataWriter, Position={Position}")]
     public class BinaryDataWriter : BinaryWriter
     {
         // ---- MEMBERS ------------------------------------------------------------------------------------------------
@@ -342,14 +344,13 @@ namespace Syroot.IO
         /// defined in the enum type.</param>
         public void Write<T>(T value, bool strict) where T : struct, IComparable, IFormattable
         {
-            Type enumType = typeof(T);
-
             // Validate the value to be defined in the enum.
-            if (strict && !EnumExtensions.IsValid(enumType, value))
+            if (strict && !EnumExtensions.IsValid<T>(value))
             {
-                throw new InvalidDataException("Enum value to write is not defined in the given enum type.");
+                throw new InvalidDataException($"Value {value} to write is not defined in the given enum type.");
             }
 
+            Type enumType = typeof(T);
             switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
             {
                 case sizeof(Byte):
