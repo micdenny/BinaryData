@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -220,26 +221,26 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Boolean"/> values to the current stream, with 0 representing <c>false</c> and
-        /// 1 representing <c>true</c>.
+        /// Writes an enumeration of <see cref="Boolean"/> values to the current stream, with 0 representing
+        /// <c>false</c> and 1 representing <c>true</c>.
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
-        public void Write(bool[] values)
+        public void Write(IEnumerable<bool> values)
         {
             WriteMultiple(values, base.Write);
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Boolean"/> values in the given format to the current stream, with 0
+        /// Writes an enumeration of <see cref="Boolean"/> values in the given format to the current stream, with 0
         /// representing <c>false</c> and 1 representing <c>true</c>.
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> values will be written.</param>
-        public void Write(bool[] values, BinaryBooleanFormat format)
+        public void Write(IEnumerable<bool> values, BinaryBooleanFormat format)
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (bool value in values)
             {
-                Write(values[i], format);
+                Write(value, format);
             }
         }
 
@@ -266,16 +267,16 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="DateTime"/> values to this stream. The <see cref="DateTime"/> values will be
-        /// available in the specified binary format.
+        /// Writes an enumeration of <see cref="DateTime"/> values to this stream. The <see cref="DateTime"/> values
+        /// will be available in the specified binary format.
         /// </summary>
         /// <param name="values">The <see cref="DateTime"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> values will be written.</param>
-        public void Write(DateTime[] values, BinaryDateTimeFormat format)
+        public void Write(IEnumerable<DateTime> values, BinaryDateTimeFormat format)
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (DateTime value in values)
             {
-                Write(values[i], format);
+                Write(value, format);
             }
         }
 
@@ -298,11 +299,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Decimal"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Decimal"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Decimal"/> values to the current stream and advances the current
+        /// position by that number of <see cref="Decimal"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Decimal"/> values to write.</param>
-        public void Write(Decimal[] values)
+        public void Write(IEnumerable<Decimal> values)
         {
             WriteMultiple(values, Write);
         }
@@ -326,11 +327,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Double"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Double"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Double"/> values to the current stream and advances the current position
+        /// by that number of <see cref="Double"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Double"/> values to write.</param>
-        public void Write(Double[] values)
+        public void Write(IEnumerable<Double> values)
         {
             WriteMultiple(values, Write);
         }
@@ -371,18 +372,18 @@ namespace Syroot.IO
         }
         
         /// <summary>
-        /// Writes an array of enum values to this stream and advances the current position of the stream by the size
-        /// of the underlying enum type size multiplied by the number of values. Optionally validates the values to be
-        /// defined in the enum type.
+        /// Writes an enumeration of enum values to this stream and advances the current position of the stream by the
+        /// size of the underlying enum type size multiplied by the number of values. Optionally validates the values to
+        /// be defined in the enum type.
         /// </summary>
         /// <param name="values">The enum values to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
-        public void Write<T>(T[] values, bool strict) where T : struct, IComparable, IFormattable
+        public void Write<T>(IEnumerable<T> values, bool strict) where T : struct, IComparable, IFormattable
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (T value in values)
             {
-                Write(values[i], strict);
+                Write(value, strict);
             }
         }
 
@@ -404,11 +405,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Int16"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Int16"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Int16"/> values to the current stream and advances the current position
+        /// by that number of <see cref="Int16"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int16"/> values to write.</param>
-        public void Write(Int16[] values)
+        public void Write(IEnumerable<Int16> values)
         {
             WriteMultiple(values, Write);
         }
@@ -432,11 +433,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Int32"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Int32"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Int32"/> values to the current stream and advances the current position
+        /// by that number of <see cref="Int32"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int32"/> values to write.</param>
-        public void Write(Int32[] values)
+        public void Write(IEnumerable<Int32> values)
         {
             WriteMultiple(values, Write);
         }
@@ -460,11 +461,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Int64"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Int64"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Int64"/> values to the current stream and advances the current position
+        /// by that number of <see cref="Int64"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
-        public void Write(Int64[] values)
+        public void Write(IEnumerable<Int64> values)
         {
             WriteMultiple(values, Write);
         }
@@ -488,11 +489,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="Single"/> values to the current stream and advances the current position by
-        /// that number of <see cref="Single"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="Single"/> values to the current stream and advances the current position
+        /// by that number of <see cref="Single"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="Single"/> values to write.</param>
-        public void Write(Single[] values)
+        public void Write(IEnumerable<Single> values)
         {
             WriteMultiple(values, Write);
         }
@@ -546,41 +547,41 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="String"/> values to this in the current encoding of the
+        /// Writes an enumeration of <see cref="String"/> values to this in the current encoding of the
         /// <see cref="BinaryDataWriter"/>.
         /// </summary>
         /// <param name="values">The <see cref="String"/> value to write.</param>
-        public void Write(String[] values)
+        public void Write(IEnumerable<String> values)
         {
             WriteMultiple(values, base.Write);
         }
 
         /// <summary>
-        /// Writes an array of <see cref="String"/> values to this stream in the current encoding of the
+        /// Writes an enumeration of <see cref="String"/> values to this stream in the current encoding of the
         /// <see cref="BinaryDataWriter"/>. The strings will be available in the specified binary format.
         /// </summary>
         /// <param name="values">The <see cref="String"/> values to write.</param>
         /// <param name="format">The binary format in which the strings will be written.</param>
-        public void Write(String[] values, BinaryStringFormat format)
+        public void Write(IEnumerable<String> values, BinaryStringFormat format)
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (String value in values)
             {
-                Write(values[i], format);
+                Write(value, format);
             }
         }
 
         /// <summary>
-        /// Writes an array of <see cref="String"/> values to this stream with the given encoding. The strings will be
-        /// available in the specified binary format.
+        /// Writes an enumeration of <see cref="String"/> values to this stream with the given encoding. The strings
+        /// will be available in the specified binary format.
         /// </summary>
         /// <param name="values">The <see cref="String"/> values to write.</param>
         /// <param name="format">The binary format in which the strings will be written.</param>
         /// <param name="encoding">The encoding used for converting the strings.</param>
-        public void Write(String[] values, BinaryStringFormat format, Encoding encoding)
+        public void Write(IEnumerable<String> values, BinaryStringFormat format, Encoding encoding)
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (String value in values)
             {
-                Write(values[i], format, encoding);
+                Write(value, format, encoding);
             }
         }
 
@@ -603,11 +604,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="UInt16"/> values to the current stream and advances the current position by
-        /// that number of <see cref="UInt16"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="UInt16"/> values to the current stream and advances the current position
+        /// by that number of <see cref="UInt16"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt16"/> values to write.</param>
-        public void Write(UInt16[] values)
+        public void Write(IEnumerable<UInt16> values)
         {
             WriteMultiple(values, Write);
         }
@@ -631,11 +632,11 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="UInt32"/> values to the current stream and advances the current position by
-        /// that number of <see cref="UInt32"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="UInt32"/> values to the current stream and advances the current position
+        /// by that number of <see cref="UInt32"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt32"/> values to write.</param>
-        public void Write(UInt32[] values)
+        public void Write(IEnumerable<UInt32> values)
         {
             WriteMultiple(values, Write);
         }
@@ -659,22 +660,22 @@ namespace Syroot.IO
         }
 
         /// <summary>
-        /// Writes an array of <see cref="UInt64"/> values to the current stream and advances the current position by
-        /// that number of <see cref="UInt64"/> values multiplied with the size of a single value.
+        /// Writes an enumeration of <see cref="UInt64"/> values to the current stream and advances the current position
+        /// by that number of <see cref="UInt64"/> values multiplied with the size of a single value.
         /// </summary>
         /// <param name="values">The <see cref="UInt64"/> values to write.</param>
-        public void Write(UInt64[] values)
+        public void Write(IEnumerable<UInt64> values)
         {
             WriteMultiple(values, Write);
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
-        private void WriteMultiple<T>(T[] values, Action<T> writeFunc)
+        private void WriteMultiple<T>(IEnumerable<T> values, Action<T> writeFunc)
         {
-            for (int i = 0; i < values.Length; i++)
+            foreach (T value in values)
             {
-                writeFunc.Invoke(values[i]);
+                writeFunc.Invoke(value);
             }
         }
 
@@ -723,7 +724,7 @@ namespace Syroot.IO
         {
             // Get the bytes of the decimal.
             byte[] bytes = new byte[sizeof(decimal)];
-            Buffer.BlockCopy(decimal.GetBits(value), 0, bytes, 0, sizeof(decimal));
+            Buffer.BlockCopy(Decimal.GetBits(value), 0, bytes, 0, sizeof(decimal));
             return bytes;
         }
     }

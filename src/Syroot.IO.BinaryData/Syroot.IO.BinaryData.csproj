@@ -5,11 +5,11 @@
     <AssemblyName>Syroot.IO.BinaryData</AssemblyName>
     <AssemblyTitle>BinaryData</AssemblyTitle>
     <Authors>Syroot</Authors>
-    <VersionPrefix>1.2.2</VersionPrefix>
+    <VersionPrefix>1.3.0</VersionPrefix>
     
     <PackageId>Syroot.IO.BinaryData</PackageId>
     <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>New methods to handle booleans and enum values aswell as multiple Strings and DateTime values at once.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for writing multiple values from IEnumerable instances rather than just arrays.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
