@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using Syroot.BinaryData.Core;
 
-namespace Syroot.IO
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents an extended <see cref="BinaryReader"/> supporting special file format data types.
@@ -13,7 +15,7 @@ namespace Syroot.IO
     [DebuggerDisplay("BinaryDataReader, Position={Position}")]
     public class BinaryDataReader : BinaryReader
     {
-        // ---- MEMBERS ------------------------------------------------------------------------------------------------
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private ByteOrder _byteOrder;
         private bool _needsReversion;
@@ -143,7 +145,7 @@ namespace Syroot.IO
         {
             Seek((-Position % alignment + alignment) % alignment);
         }
-        
+
         /// <summary>
         /// Reads a <see cref="Boolean"/> value from the current stream. The <see cref="Boolean"/> is available in the
         /// specified binary format.
@@ -195,6 +197,15 @@ namespace Syroot.IO
         }
 
         /// <summary>
+        /// Reads a <see cref="DateTime"/> from the current stream.
+        /// </summary>
+        /// <returns>The <see cref="DateTime"/> read from the current stream.</returns>
+        public DateTime ReadDateTime()
+        {
+            return ReadDateTime(BinaryDateTimeFormat.NetTicks);
+        }
+
+        /// <summary>
         /// Reads a <see cref="DateTime"/> from the current stream. The <see cref="DateTime"/> is available in the
         /// specified binary format.
         /// </summary>
@@ -212,6 +223,22 @@ namespace Syroot.IO
                     throw new ArgumentOutOfRangeException(nameof(format),
                         "The specified binary date time format is invalid.");
             }
+        }
+
+        /// <summary>
+        /// Reads the specified number of <see cref="DateTime"/> values from the current stream into a
+        /// <see cref="DateTime"/> array.
+        /// </summary>
+        /// <param name="count">The number of <see cref="DateTime"/> values to read.</param>
+        /// <returns>The <see cref="DateTime"/> array read from the current stream.</returns>
+        public DateTime[] ReadDateTimes(int count)
+        {
+            DateTime[] values = new DateTime[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = ReadDateTime();
+            }
+            return values;
         }
 
         /// <summary>
@@ -293,7 +320,7 @@ namespace Syroot.IO
         {
             return ReadMultiple(count, ReadDouble);
         }
-        
+
         /// <summary>
         /// Reads the specified enum value from the current stream and advances the current position by the size of the
         /// underlying enum type. Optionally validates the value to be defined in the enum type.
@@ -304,35 +331,9 @@ namespace Syroot.IO
         /// <returns>The enum value read from the current stream.</returns>
         public T ReadEnum<T>(bool strict) where T : struct, IComparable, IFormattable
         {
-            Type enumType = typeof(T);
-            object value;
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
-            {
-                case sizeof(Byte):
-                    value = ReadByte();
-                    break;
-                case sizeof(Int16):
-                    value = ReadInt16();
-                    break;
-                case sizeof(Int32):
-                    value = ReadInt32();
-                    break;
-                case sizeof(Int64):
-                    value = ReadInt64();
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
-            }
-
-            // Validate the value to be defined in the enum.
-            if (strict && !EnumExtensions.IsValid<T>(value))
-            {
-                throw new InvalidDataException($"Read value {value} is not defined in the given enum type.");
-            }
-
-            return (T)value;
+            return (T)ReadEnum(typeof(T), strict);
         }
-        
+
         /// <summary>
         /// Reads the specified number of enum values from the current stream into an array of the enum type. Optionally
         /// validates values to be defined in the enum type.
@@ -351,7 +352,7 @@ namespace Syroot.IO
             }
             return values;
         }
-        
+
         /// <summary>
         /// Reads a 2-byte signed integer from the current stream and advances the current position of the stream by two
         /// bytes.
@@ -443,6 +444,28 @@ namespace Syroot.IO
         public Int64[] ReadInt64s(int count)
         {
             return ReadMultiple(count, ReadInt64);
+        }
+        
+        /// <returns>The 8-byte signed integer read from the current stream.</returns>
+        /// <summary>
+        /// Reads an object of type <typeparamref name="T"/> from the current stream.
+        /// </summary>
+        /// <typeparam name="T">The type of the object to load.</typeparam>
+        /// <returns>The object read from the current stream.</returns>
+        public T ReadObject<T>()
+        {
+            return (T)ReadObject(null, BinaryMemberAttribute.Default, typeof(T));
+        }
+
+        /// <summary>
+        /// Reads the specified number of objects of type <typeparamref name="T"/> from the current stream.
+        /// </summary>
+        /// <typeparam name="T">The type of the objects to load.</typeparam>
+        /// <param name="count">The number of objects to read.</param>
+        /// <returns>The objects array read from the current stream.</returns>
+        public T[] ReadObjects<T>(int count)
+        {
+            return ReadMultiple(count, ReadObject<T>);
         }
 
         /// <summary>
@@ -636,7 +659,7 @@ namespace Syroot.IO
             }
             return values;
         }
-        
+
         /// <summary>
         /// Reads a 2-byte unsigned integer from the current stream using little-endian encoding and advances the
         /// position of the stream by two bytes.
@@ -790,12 +813,206 @@ namespace Syroot.IO
         private T[] ReadMultiple<T>(int count, Func<T> readFunc)
         {
             T[] values = new T[count];
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < count; i++)
             {
                 values[i] = readFunc.Invoke();
             }
             return values;
         }
+
+        // ---- Decimal methods ----
+
+        private decimal DecimalFromBytes(byte[] bytes)
+        {
+            if (bytes.Length < sizeof(decimal))
+            {
+                throw new ArgumentException("Not enough bytes to convert decimal from.", nameof(bytes));
+            }
+
+            // Create 4 integers from the given bytes.
+            int[] intValues = new int[sizeof(decimal) / sizeof(int)];
+            for (int i = 0; i < sizeof(decimal); i += sizeof(int))
+            {
+                intValues[i / sizeof(int)] = BitConverter.ToInt32(bytes, i);
+            }
+            return new decimal(intValues);
+        }
+
+        // ---- Enum methods ----
+
+        private object ReadEnum(Type type, bool strict)
+        {
+            object value;
+            switch (Marshal.SizeOf(Enum.GetUnderlyingType(type)))
+            {
+                case sizeof(Byte):
+                    value = ReadByte();
+                    break;
+                case sizeof(UInt16):
+                    value = ReadUInt16();
+                    break;
+                case sizeof(UInt32):
+                    value = ReadUInt32();
+                    break;
+                case sizeof(UInt64):
+                    value = ReadUInt64();
+                    break;
+                default:
+                    throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
+            }
+
+            // Validate the value to be defined in the enum.
+            if (strict && !EnumExtensions.IsValid(type, value))
+            {
+                throw new InvalidDataException($"Read value {value} is not defined in the given enum type {type}.");
+            }
+
+            return value;
+        }
+
+        // ---- Object methods ----
+
+        private object ReadObject(object instance, BinaryMemberAttribute attribute, Type type)
+        {
+            if (attribute.Converter == null)
+            {
+                if (type == typeof(String))
+                {
+                    if (attribute.StringFormat == BinaryStringFormat.NoPrefixOrTermination)
+                    {
+                        return ReadString(attribute.Length);
+                    }
+                    else
+                    {
+                        return ReadString(attribute.StringFormat);
+                    }
+                }
+                else if (type.IsEnumerable())
+                {
+                    throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
+                }
+                else if (type == typeof(Boolean))
+                {
+                    return ReadBoolean(attribute.BooleanFormat);
+                }
+                else if (type == typeof(DateTime))
+                {
+                    return ReadDateTime(attribute.DateTimeFormat);
+                }
+                else if (type == typeof(Decimal))
+                {
+                    return ReadDecimal();
+                }
+                else if (type == typeof(Double))
+                {
+                    return ReadDouble();
+                }
+                else if (type == typeof(Int16))
+                {
+                    return ReadInt16();
+                }
+                else if (type == typeof(Int32))
+                {
+                    return ReadInt32();
+                }
+                else if (type == typeof(Int64))
+                {
+                    return ReadInt64();
+                }
+                else if (type == typeof(SByte))
+                {
+                    return ReadSByte();
+                }
+                else if (type == typeof(Single))
+                {
+                    return ReadSingle();
+                }
+                else if (type == typeof(UInt16))
+                {
+                    return ReadUInt16();
+                }
+                else if (type == typeof(UInt32))
+                {
+                    return ReadUInt32();
+                }
+                else if (type == typeof(UInt64))
+                {
+                    return ReadUInt64();
+                }
+                else if (type.GetTypeInfo().IsEnum)
+                {
+                    return ReadEnum(type, attribute.Strict);
+                }
+                else
+                {
+                    return ReadCustomObject(type, null, Position);
+                }
+            }
+            else
+            {
+                // Let a converter do all the work.
+                BinaryConverter converter = BinaryConverter.GetConverter(attribute.Converter);
+                return converter.Read(this, instance, attribute);
+            }
+        }
+
+        private object ReadCustomObject(Type type, object instance, long startOffset)
+        {
+            TypeData typeData = TypeData.GetTypeData(type);
+            instance = instance ?? typeData.GetInstance();
+
+            // Read inherited members first if required.
+            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
+            {
+                ReadCustomObject(typeData.TypeInfo.BaseType, instance, startOffset);
+            }
+
+            // Read members.
+            foreach (MemberData member in typeData.Members)
+            {
+                // Reposition if required.
+                if (member.Attribute.Origin == OffsetOrigin.Begin)
+                {
+                    Position = startOffset + member.Attribute.Offset;
+                }
+                else if (member.Attribute.Offset != 0)
+                {
+                    Position += member.Attribute.Offset;
+                }
+
+                // Read the value and respect settings stored in the member attribute.
+                object value;
+                Type elementType = member.Type.GetEnumerableElementType();
+                if (elementType == null)
+                {
+                    value = ReadObject(instance, member.Attribute, member.Type);
+                }
+                else
+                {
+                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        values.SetValue(ReadObject(instance, member.Attribute, elementType), i);
+                    }
+                    value = values;
+                }
+
+                // Set the read value.
+                switch (member.MemberInfo)
+                {
+                    case FieldInfo field:
+                        field.SetValue(instance, value);
+                        break;
+                    case PropertyInfo property:
+                        property.SetValue(instance, value);
+                        break;
+                }
+            }
+
+            return instance;
+        }
+
+        // ---- String methods ----
 
         private string ReadStringInternal(int length, Encoding encoding)
         {
@@ -834,22 +1051,6 @@ namespace Syroot.IO
 
             // Convert to string.
             return encoding.GetString(bytes.ToArray());
-        }
-        
-        private decimal DecimalFromBytes(byte[] bytes)
-        {
-            if (bytes.Length < sizeof(decimal))
-            {
-                throw new ArgumentException("Not enough bytes to convert decimal from.", nameof(bytes));
-            }
-
-            // Create 4 integers from the given bytes.
-            int[] intValues = new int[sizeof(decimal) / sizeof(int)];
-            for (int i = 0; i < sizeof(decimal); i += sizeof(int))
-            {
-                intValues[i / sizeof(int)] = BitConverter.ToInt32(bytes, i);
-            }
-            return new decimal(intValues);
         }
     }
 }

@@ -1,11 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using Syroot.BinaryData.Core;
 
-namespace Syroot.IO
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents an extended <see cref="BinaryWriter"/> supporting special file format data types.
@@ -13,7 +16,7 @@ namespace Syroot.IO
     [DebuggerDisplay("BinaryDataWriter, Position={Position}")]
     public class BinaryDataWriter : BinaryWriter
     {
-        // ---- MEMBERS ------------------------------------------------------------------------------------------------
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private ByteOrder _byteOrder;
         private bool _needsReversion;
@@ -117,6 +120,15 @@ namespace Syroot.IO
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
+        /// Aligns the reader to the next given byte multiple.
+        /// </summary>
+        /// <param name="alignment">The byte multiple.</param>
+        public void Align(int alignment)
+        {
+            Seek((-Position % alignment + alignment) % alignment);
+        }
+
+        /// <summary>
         /// Allocates space for an <see cref="Offset"/> which can be satisfied later on.
         /// </summary>
         /// <returns>An <see cref="Offset"/> to satisfy later on.</returns>
@@ -139,16 +151,7 @@ namespace Syroot.IO
             }
             return offsets;
         }
-
-        /// <summary>
-        /// Aligns the reader to the next given byte multiple.
-        /// </summary>
-        /// <param name="alignment">The byte multiple.</param>
-        public void Align(int alignment)
-        {
-            Seek((-Position % alignment + alignment) % alignment);
-        }
-
+        
         /// <summary>
         /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
         /// </summary>
@@ -201,7 +204,7 @@ namespace Syroot.IO
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
-        public void Write(bool value, BinaryBooleanFormat format)
+        public void Write(Boolean value, BinaryBooleanFormat format)
         {
             switch (format)
             {
@@ -225,9 +228,12 @@ namespace Syroot.IO
         /// <c>false</c> and 1 representing <c>true</c>.
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
-        public void Write(IEnumerable<bool> values)
+        public void Write(IEnumerable<Boolean> values)
         {
-            WriteMultiple(values, base.Write);
+            foreach (Boolean value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -236,12 +242,21 @@ namespace Syroot.IO
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> values will be written.</param>
-        public void Write(IEnumerable<bool> values, BinaryBooleanFormat format)
+        public void Write(IEnumerable<Boolean> values, BinaryBooleanFormat format)
         {
             foreach (bool value in values)
             {
                 Write(value, format);
             }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="DateTime"/> value to this stream.
+        /// </summary>
+        /// <param name="value">The <see cref="DateTime"/> value to write.</param>
+        public void Write(DateTime value)
+        {
+            Write(value, BinaryDateTimeFormat.NetTicks);
         }
 
         /// <summary>
@@ -263,6 +278,18 @@ namespace Syroot.IO
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format),
                         "The specified binary date time format is invalid.");
+            }
+        }
+
+        /// <summary>
+        /// Writes an enumeration of <see cref="DateTime"/> values to this stream.
+        /// </summary>
+        /// <param name="values">The <see cref="DateTime"/> values to write.</param>
+        public void Write(IEnumerable<DateTime> values)
+        {
+            foreach (DateTime value in values)
+            {
+                Write(value, BinaryDateTimeFormat.NetTicks);
             }
         }
 
@@ -305,7 +332,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Decimal"/> values to write.</param>
         public void Write(IEnumerable<Decimal> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Decimal value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -333,9 +363,21 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Double"/> values to write.</param>
         public void Write(IEnumerable<Double> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Double value in values)
+            {
+                Write(value);
+            }
         }
-        
+
+        /// <summary>
+        /// Writes an object or enumerable of objects to this stream.
+        /// </summary>
+        /// <param name="value">The object or enumerable of objects to write.</param>
+        public void WriteObject<T>(T value)
+        {
+            WriteObject(null, BinaryMemberAttribute.Default, typeof(T), value);
+        }
+
         /// <summary>
         /// Writes an enum value to this stream and advances the current position of the stream by the size of the
         /// underlying enum type size. Optionally validates the value to be defined in the enum type.
@@ -343,32 +385,9 @@ namespace Syroot.IO
         /// <param name="value">The enum value to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
-        public void Write<T>(T value, bool strict) where T : struct, IComparable, IFormattable
+        public void Write<T>(T value, bool strict) where T : struct, IComparable, IFormattable // enum
         {
-            // Validate the value to be defined in the enum.
-            if (strict && !EnumExtensions.IsValid<T>(value))
-            {
-                throw new InvalidDataException($"Value {value} to write is not defined in the given enum type.");
-            }
-
-            Type enumType = typeof(T);
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
-            {
-                case sizeof(Byte):
-                    Write((Byte)(object)value);
-                    break;
-                case sizeof(Int16):
-                    Write((Int16)(object)value);
-                    break;
-                case sizeof(Int32):
-                    Write((Int32)(object)value);
-                    break;
-                case sizeof(Int64):
-                    Write((Int64)(object)value);
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
-            }
+            WriteEnum(typeof(T), value, strict);
         }
         
         /// <summary>
@@ -379,7 +398,7 @@ namespace Syroot.IO
         /// <param name="values">The enum values to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
-        public void Write<T>(IEnumerable<T> values, bool strict) where T : struct, IComparable, IFormattable
+        public void Write<T>(IEnumerable<T> values, bool strict) where T : struct, IComparable, IFormattable // enum
         {
             foreach (T value in values)
             {
@@ -411,7 +430,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Int16"/> values to write.</param>
         public void Write(IEnumerable<Int16> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Int16 value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -439,7 +461,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Int32"/> values to write.</param>
         public void Write(IEnumerable<Int32> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Int32 value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -467,7 +492,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
         public void Write(IEnumerable<Int64> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Int64 value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -495,7 +523,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="Single"/> values to write.</param>
         public void Write(IEnumerable<Single> values)
         {
-            WriteMultiple(values, Write);
+            foreach (Single value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -553,7 +584,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="String"/> value to write.</param>
         public void Write(IEnumerable<String> values)
         {
-            WriteMultiple(values, base.Write);
+            foreach (String value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -610,7 +644,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="UInt16"/> values to write.</param>
         public void Write(IEnumerable<UInt16> values)
         {
-            WriteMultiple(values, Write);
+            foreach (UInt16 value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -638,7 +675,10 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="UInt32"/> values to write.</param>
         public void Write(IEnumerable<UInt32> values)
         {
-            WriteMultiple(values, Write);
+            foreach (UInt32 value in values)
+            {
+                Write(value);
+            }
         }
 
         /// <summary>
@@ -666,24 +706,199 @@ namespace Syroot.IO
         /// <param name="values">The <see cref="UInt64"/> values to write.</param>
         public void Write(IEnumerable<UInt64> values)
         {
-            WriteMultiple(values, Write);
+            foreach (UInt64 value in values)
+            {
+                Write(value);
+            }
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private void WriteMultiple<T>(IEnumerable<T> values, Action<T> writeFunc)
-        {
-            foreach (T value in values)
-            {
-                writeFunc.Invoke(value);
-            }
-        }
 
         private void WriteReversed(byte[] bytes)
         {
             Array.Reverse(bytes);
             base.Write(bytes);
         }
+        
+        // ---- Decimal methods ----
+
+        private byte[] DecimalToBytes(decimal value)
+        {
+            // Get the bytes of the decimal.
+            byte[] bytes = new byte[sizeof(decimal)];
+            Buffer.BlockCopy(Decimal.GetBits(value), 0, bytes, 0, sizeof(decimal));
+            return bytes;
+        }
+
+        // ---- Enum methods ----
+
+        private void WriteEnum(Type type, object value, bool strict)
+        {
+            // Validate the value to be defined in the enum.
+            if (strict && !EnumExtensions.IsValid(type, value))
+            {
+                throw new InvalidDataException($"Value {value} to write is not defined in the given enum type {type}.");
+            }
+
+            switch (Marshal.SizeOf(Enum.GetUnderlyingType(type)))
+            {
+                case sizeof(Byte):
+                    Write((Byte)value);
+                    break;
+                case sizeof(UInt16):
+                    Write((UInt16)value);
+                    break;
+                case sizeof(UInt32):
+                    Write((UInt32)value);
+                    break;
+                case sizeof(UInt64):
+                    Write((UInt64)value);
+                    break;
+                default:
+                    throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
+            }
+        }
+
+        // ---- Object methods ----
+
+        private void WriteObject(object instance, BinaryMemberAttribute attribute, Type type, object value)
+        {
+            if (attribute.Converter == null)
+            {
+                if (value == null)
+                {
+                    return;
+                }
+                if (type == typeof(String))
+                {
+                    Write((String)value, attribute.StringFormat);
+                }
+                else if (type.TryGetEnumerableElementType(out Type elementType))
+                {
+                    foreach (object element in (IEnumerable)value)
+                    {
+                        WriteObject(null, BinaryMemberAttribute.Default, elementType, element);
+                    }
+                }
+                else if (type == typeof(Boolean))
+                {
+                    Write((Boolean)value, attribute.BooleanFormat);
+                }
+                else if (type == typeof(DateTime))
+                {
+                    Write((DateTime)value, attribute.DateTimeFormat);
+                }
+                else if (type == typeof(Decimal))
+                {
+                    Write((Decimal)value);
+                }
+                else if (type == typeof(Double))
+                {
+                    Write((Double)value);
+                }
+                else if (type == typeof(Int16))
+                {
+                    Write((Int16)value);
+                }
+                else if (type == typeof(Int32))
+                {
+                    Write((Int32)value);
+                }
+                else if (type == typeof(Int64))
+                {
+                    Write((Int64)value);
+                }
+                else if (type == typeof(SByte))
+                {
+                    Write((SByte)value);
+                }
+                else if (type == typeof(Single))
+                {
+                    Write((Single)value);
+                }
+                else if (type == typeof(UInt16))
+                {
+                    Write((UInt16)value);
+                }
+                else if (type == typeof(UInt32))
+                {
+                    Write((UInt32)value);
+                }
+                else if (type == typeof(UInt64))
+                {
+                    Write((UInt32)value);
+                }
+                else if (type.GetTypeInfo().IsEnum)
+                {
+                    WriteEnum(type, value, attribute.Strict);
+                }
+                else
+                {
+                    WriteCustomObject(type, value, Position);
+                }
+            }
+            else
+            {
+                // Let a converter do all the work.
+                BinaryConverter converter = BinaryConverter.GetConverter(attribute.Converter);
+                converter.Write(this, instance, attribute, value);
+            }
+        }
+
+        private void WriteCustomObject(Type type, object instance, long startOffset)
+        {
+            TypeData typeData = TypeData.GetTypeData(type);
+
+            // Write inherited members first if required.
+            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
+            {
+                WriteCustomObject(typeData.TypeInfo.BaseType, instance, startOffset);
+            }
+
+            // Write members.
+            foreach (MemberData member in typeData.Members)
+            {
+                // Reposition if required.
+                if (member.Attribute.Origin == OffsetOrigin.Begin)
+                {
+                    Position = startOffset + member.Attribute.Offset;
+                }
+                else if (member.Attribute.Offset != 0)
+                {
+                    Position += member.Attribute.Offset;
+                }
+                
+                // Get the value to write.
+                object value;
+                switch (member.MemberInfo)
+                {
+                    case FieldInfo field:
+                        value = field.GetValue(instance);
+                        break;
+                    case PropertyInfo property:
+                        value = property.GetValue(instance);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Tried to write an invalid member {member.MemberInfo}.");
+                }
+
+                // Write the value and respect settings stored in the member attribute.
+                Type elementType = member.Type.GetEnumerableElementType();
+                if (elementType == null)
+                {
+                    WriteObject(instance, member.Attribute, member.Type, value);
+                }
+                else
+                {
+                    foreach (object element in (IEnumerable)value)
+                    {
+                        WriteObject(instance, member.Attribute, member.Type, element);
+                    }
+                }
+            }
+        }
+
+        // ---- String methods ----
 
         private void WriteByteLengthPrefixString(string value, Encoding encoding)
         {
@@ -718,14 +933,6 @@ namespace Syroot.IO
         private void WriteNoPrefixOrTerminationString(string value, Encoding encoding)
         {
             Write(encoding.GetBytes(value));
-        }
-
-        private byte[] DecimalToBytes(decimal value)
-        {
-            // Get the bytes of the decimal.
-            byte[] bytes = new byte[sizeof(decimal)];
-            Buffer.BlockCopy(Decimal.GetBits(value), 0, bytes, 0, sizeof(decimal));
-            return bytes;
         }
     }
 }

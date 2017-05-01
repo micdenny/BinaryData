@@ -1,4 +1,4 @@
-namespace Syroot.IO
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents the set of formats of binary boolean encodings.
@@ -27,14 +27,14 @@ namespace Syroot.IO
     public enum BinaryDateTimeFormat
     {
         /// <summary>
-        /// The <see cref="System.DateTime"/> has the time_t format of the C library.
-        /// </summary>
-        CTime,
-
-        /// <summary>
         /// The <see cref="System.DateTime"/> is stored as the ticks of a .NET <see cref="System.DateTime"/> instance.
         /// </summary>
-        NetTicks
+        NetTicks,
+
+        /// <summary>
+        /// The <see cref="System.DateTime"/> has the time_t format of the C library.
+        /// </summary>
+        CTime
     }
 
     /// <summary>
@@ -42,6 +42,12 @@ namespace Syroot.IO
     /// </summary>
     public enum BinaryStringFormat
     {
+        /// <summary>
+        /// The string has a prefix of variable size determining the length of the string and no postfix. This is the
+        /// .NET default.
+        /// </summary>
+        VariableLengthPrefix,
+
         /// <summary>
         /// The string has a prefix of 1 byte determining the length of the string and no postfix.
         /// </summary>
@@ -66,12 +72,6 @@ namespace Syroot.IO
         /// The string has neither prefix nor postfix. This format is only valid for writing strings. For reading
         /// strings, the length has to be specified manually.
         /// </summary>
-        NoPrefixOrTermination,
-
-        /// <summary>
-        /// The string has a prefix of variable size determining the length of the string and no postfix. This is the
-        /// .NET default.
-        /// </summary>
-        VariableLengthPrefix
+        NoPrefixOrTermination
     }
 }
