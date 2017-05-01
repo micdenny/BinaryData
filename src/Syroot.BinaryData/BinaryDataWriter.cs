@@ -745,14 +745,14 @@ namespace Syroot.BinaryData
                 case sizeof(Byte):
                     Write((Byte)value);
                     break;
-                case sizeof(UInt16):
-                    Write((UInt16)value);
+                case sizeof(Int16):
+                    Write((Int16)value);
                     break;
-                case sizeof(UInt32):
-                    Write((UInt32)value);
+                case sizeof(Int32):
+                    Write((Int32)value);
                     break;
-                case sizeof(UInt64):
-                    Write((UInt64)value);
+                case sizeof(Int64):
+                    Write((Int64)value);
                     break;
                 default:
                     throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
@@ -840,7 +840,7 @@ namespace Syroot.BinaryData
             else
             {
                 // Let a converter do all the work.
-                BinaryConverter converter = BinaryConverter.GetConverter(attribute.Converter);
+                IBinaryConverter converter = BinaryConverterCache.GetConverter(attribute.Converter);
                 converter.Write(this, instance, attribute, value);
             }
         }
@@ -858,16 +858,16 @@ namespace Syroot.BinaryData
             // Write members.
             foreach (MemberData member in typeData.Members)
             {
-                // Reposition if required.
-                if (member.Attribute.Origin == OffsetOrigin.Begin)
+                // Reposition the stream according to offset.
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
                 {
                     Position = startOffset + member.Attribute.Offset;
                 }
-                else if (member.Attribute.Offset != 0)
+                else
                 {
                     Position += member.Attribute.Offset;
                 }
-                
+
                 // Get the value to write.
                 object value;
                 switch (member.MemberInfo)
@@ -897,7 +897,7 @@ namespace Syroot.BinaryData
                 }
             }
         }
-
+        
         // ---- String methods ----
 
         private void WriteByteLengthPrefixString(string value, Encoding encoding)

@@ -848,14 +848,14 @@ namespace Syroot.BinaryData
                 case sizeof(Byte):
                     value = ReadByte();
                     break;
-                case sizeof(UInt16):
-                    value = ReadUInt16();
+                case sizeof(Int16):
+                    value = ReadInt16();
                     break;
-                case sizeof(UInt32):
-                    value = ReadUInt32();
+                case sizeof(Int32):
+                    value = ReadInt32();
                     break;
-                case sizeof(UInt64):
-                    value = ReadUInt64();
+                case sizeof(Int64):
+                    value = ReadInt64();
                     break;
                 default:
                     throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
@@ -951,7 +951,7 @@ namespace Syroot.BinaryData
             else
             {
                 // Let a converter do all the work.
-                BinaryConverter converter = BinaryConverter.GetConverter(attribute.Converter);
+                IBinaryConverter converter = BinaryConverterCache.GetConverter(attribute.Converter);
                 return converter.Read(this, instance, attribute);
             }
         }
@@ -970,12 +970,12 @@ namespace Syroot.BinaryData
             // Read members.
             foreach (MemberData member in typeData.Members)
             {
-                // Reposition if required.
-                if (member.Attribute.Origin == OffsetOrigin.Begin)
+                // Reposition the stream according to offset.
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
                 {
                     Position = startOffset + member.Attribute.Offset;
                 }
-                else if (member.Attribute.Offset != 0)
+                else
                 {
                     Position += member.Attribute.Offset;
                 }

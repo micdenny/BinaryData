@@ -21,9 +21,9 @@ namespace Syroot.BinaryData
         public int Offset { get; set; }
 
         /// <summary>
-        /// Gets or sets the origin of the offset of this field. Defaults to <see cref="OffsetOrigin.Current"/>
+        /// Gets or sets the origin of the offset of this field. Defaults to <see cref="OffsetOrigin.Current"/>.
         /// </summary>
-        public OffsetOrigin Origin { get; set; }
+        public OffsetOrigin OffsetOrigin { get; set; }
 
         /// <summary>
         /// Gets or sets the format for <see cref="Boolean"/> members. Defaults to
@@ -57,7 +57,7 @@ namespace Syroot.BinaryData
         public bool Strict { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="BinaryConverter"/> type to read and write the value with.
+        /// Gets or sets the <see cref="IBinaryConverter"/> type to read and write the value with.
         /// </summary>
         public Type Converter { get; set; }
     }
