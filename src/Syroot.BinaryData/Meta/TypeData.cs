@@ -123,7 +123,7 @@ namespace Syroot.BinaryData
             attrib = attrib ?? new BinaryMemberAttribute();
 
             // Field must be decorated or public.
-            if (hasAttrib || (!Attribute.Manual && field.IsPublic))
+            if (hasAttrib || (!Attribute.Explicit && field.IsPublic))
             {
                 // For fields of enumerable type ElementCount must be specified.
                 if (field.FieldType.IsEnumerable() && attrib.Length <= 0)
@@ -150,7 +150,7 @@ namespace Syroot.BinaryData
             }
             // Property must be decorated or getter and setter public.
             if (hasAttrib
-                || (!Attribute.Manual && prop.GetMethod?.IsPublic == true && prop.SetMethod?.IsPublic == true))
+                || (!Attribute.Explicit && prop.GetMethod?.IsPublic == true && prop.SetMethod?.IsPublic == true))
             {
                 // For properties of enumerable type ElementCount must be specified.
                 if (prop.PropertyType.IsEnumerable() && attrib.Length <= 0)

@@ -20,6 +20,6 @@ namespace Syroot.BinaryData
         /// Gets or sets a value indicating whether public members are not automatically read and written. Defaults to
         /// <c>false</c>.
         /// </summary>
-        public bool Manual { get; set; }
+        public bool Explicit { get; set; }
     }
 }

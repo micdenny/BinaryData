@@ -373,9 +373,13 @@ namespace Syroot.BinaryData
         /// Writes an object or enumerable of objects to this stream.
         /// </summary>
         /// <param name="value">The object or enumerable of objects to write.</param>
-        public void WriteObject<T>(T value)
+        public void WriteObject(object value)
         {
-            WriteObject(null, BinaryMemberAttribute.Default, typeof(T), value);
+            if (value == null)
+            {
+                return;
+            }
+            WriteObject(null, BinaryMemberAttribute.Default, value.GetType(), value);
         }
 
         /// <summary>
