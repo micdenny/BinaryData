@@ -752,24 +752,7 @@ namespace Syroot.BinaryData
             {
                 throw new InvalidDataException($"Value {value} to write is not defined in the given enum type {type}.");
             }
-
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(type)))
-            {
-                case sizeof(Byte):
-                    Write((Byte)value);
-                    break;
-                case sizeof(Int16):
-                    Write((Int16)value);
-                    break;
-                case sizeof(Int32):
-                    Write((Int32)value);
-                    break;
-                case sizeof(Int64):
-                    Write((Int64)value);
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
-            }
+            WriteObject(null, BinaryMemberAttribute.Default, Enum.GetUnderlyingType(type), value);
         }
 
         // ---- Object methods ----
