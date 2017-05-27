@@ -5,11 +5,11 @@
     <AssemblyName>Syroot.IO.BinaryData</AssemblyName>
     <AssemblyTitle>BinaryData</AssemblyTitle>
     <Authors>Syroot</Authors>
-    <VersionPrefix>1.3.0</VersionPrefix>
+    <VersionPrefix>1.3.1</VersionPrefix>
     
     <PackageId>Syroot.IO.BinaryData</PackageId>
     <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>Add support for writing multiple values from IEnumerable instances rather than just arrays.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix reading and writing of unsigned enum values.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>

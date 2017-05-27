@@ -306,23 +306,16 @@ namespace Syroot.IO
         {
             Type enumType = typeof(T);
             object value;
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
-            {
-                case sizeof(Byte):
-                    value = ReadByte();
-                    break;
-                case sizeof(Int16):
-                    value = ReadInt16();
-                    break;
-                case sizeof(Int32):
-                    value = ReadInt32();
-                    break;
-                case sizeof(Int64):
-                    value = ReadInt64();
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
-            }
+            Type enumValueType = Enum.GetUnderlyingType(enumType);
+            if (enumValueType == typeof(Byte)) value = ReadByte();
+            else if (enumValueType == typeof(SByte)) value = ReadSByte();
+            else if (enumValueType == typeof(Int16)) value = ReadInt16();
+            else if (enumValueType == typeof(Int32)) value = ReadInt32();
+            else if (enumValueType == typeof(Int64)) value = ReadInt64();
+            else if (enumValueType == typeof(UInt16)) value = ReadUInt16();
+            else if (enumValueType == typeof(UInt32)) value = ReadUInt32();
+            else if (enumValueType == typeof(UInt64)) value = ReadUInt64();
+            else throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
 
             // Validate the value to be defined in the enum.
             if (strict && !EnumExtensions.IsValid<T>(value))

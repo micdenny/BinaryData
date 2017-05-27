@@ -352,23 +352,16 @@ namespace Syroot.IO
             }
 
             Type enumType = typeof(T);
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(enumType)))
-            {
-                case sizeof(Byte):
-                    Write((Byte)(object)value);
-                    break;
-                case sizeof(Int16):
-                    Write((Int16)(object)value);
-                    break;
-                case sizeof(Int32):
-                    Write((Int32)(object)value);
-                    break;
-                case sizeof(Int64):
-                    Write((Int64)(object)value);
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
-            }
+            Type enumValueType = Enum.GetUnderlyingType(enumType);
+            if (enumValueType == typeof(Byte)) Write((Byte)(object)value);
+            else if (enumValueType == typeof(SByte)) Write((SByte)(object)value);
+            else if (enumValueType == typeof(Int16)) Write((Int16)(object)value);
+            else if (enumValueType == typeof(Int32)) Write((Int32)(object)value);
+            else if (enumValueType == typeof(Int64)) Write((Int64)(object)value);
+            else if (enumValueType == typeof(UInt16)) Write((UInt16)(object)value);
+            else if (enumValueType == typeof(UInt32)) Write((UInt32)(object)value);
+            else if (enumValueType == typeof(UInt64)) Write((UInt64)(object)value);
+            else throw new InvalidOperationException("Cannot write enum value due to unknown enum value size.");
         }
         
         /// <summary>
