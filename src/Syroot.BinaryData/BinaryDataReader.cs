@@ -18,8 +18,7 @@ namespace Syroot.BinaryData
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private ByteOrder _byteOrder;
-        private bool _needsReversion;
-
+        
         // ---- CONSTRUCTORS -------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -95,7 +94,7 @@ namespace Syroot.BinaryData
             set
             {
                 _byteOrder = value;
-                _needsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
+                NeedsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
             }
         }
 
@@ -110,11 +109,29 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
+        /// Gets a value indicating whether the end of the stream has been reached and no more data can be read.
+        /// </summary>
+        public bool EndOfStream
+        {
+            get { return BaseStream.Position >= BaseStream.Length; }
+        }
+
+        /// <summary>
         /// Gets the length in bytes of the stream in bytes. This is a shortcut to the base stream Length property.
         /// </summary>
         public long Length
         {
             get { return BaseStream.Length; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether multibyte data requires to be reversed before being parsed, according to the
+        /// set <see cref="ByteOrder"/>.
+        /// </summary>
+        public bool NeedsReversion
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -125,14 +142,6 @@ namespace Syroot.BinaryData
         {
             get { return BaseStream.Position; }
             set { BaseStream.Position = value; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the end of the stream has been reached and no more data can be read.
-        /// </summary>
-        public bool EndOfStream
-        {
-            get { return BaseStream.Position >= BaseStream.Length; }
         }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
@@ -266,7 +275,7 @@ namespace Syroot.BinaryData
         /// <returns>The 16-byte floating point value read from the current stream.</returns>
         public override Decimal ReadDecimal()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(decimal));
                 Array.Reverse(bytes);
@@ -297,7 +306,7 @@ namespace Syroot.BinaryData
         /// <returns>The 8-byte floating point value read from the current stream.</returns>
         public override Double ReadDouble()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(double));
                 Array.Reverse(bytes);
@@ -360,7 +369,7 @@ namespace Syroot.BinaryData
         /// <returns>The 2-byte signed integer read from the current stream.</returns>
         public override Int16 ReadInt16()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(short));
                 Array.Reverse(bytes);
@@ -391,7 +400,7 @@ namespace Syroot.BinaryData
         /// <returns>The 4-byte signed integer read from the current stream.</returns>
         public override Int32 ReadInt32()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(int));
                 Array.Reverse(bytes);
@@ -422,7 +431,7 @@ namespace Syroot.BinaryData
         /// <returns>The 8-byte signed integer read from the current stream.</returns>
         public override Int64 ReadInt64()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(long));
                 Array.Reverse(bytes);
@@ -487,7 +496,7 @@ namespace Syroot.BinaryData
         /// <returns>The 4-byte floating point value read from the current stream.</returns>
         public override Single ReadSingle()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(float));
                 Array.Reverse(bytes);
@@ -667,7 +676,7 @@ namespace Syroot.BinaryData
         /// <returns>The 2-byte unsigned integer read from the current stream.</returns>
         public override UInt16 ReadUInt16()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(ushort));
                 Array.Reverse(bytes);
@@ -698,7 +707,7 @@ namespace Syroot.BinaryData
         /// <returns>The 8-byte unsigned integer read from the current stream.</returns>
         public override UInt32 ReadUInt32()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(uint));
                 Array.Reverse(bytes);
@@ -729,7 +738,7 @@ namespace Syroot.BinaryData
         /// <returns>The 8-byte unsigned integer read from the current stream.</returns>
         public override UInt64 ReadUInt64()
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = base.ReadBytes(sizeof(ulong));
                 Array.Reverse(bytes);
@@ -842,31 +851,12 @@ namespace Syroot.BinaryData
 
         private object ReadEnum(Type type, bool strict)
         {
-            object value;
-            switch (Marshal.SizeOf(Enum.GetUnderlyingType(type)))
-            {
-                case sizeof(Byte):
-                    value = ReadByte();
-                    break;
-                case sizeof(Int16):
-                    value = ReadInt16();
-                    break;
-                case sizeof(Int32):
-                    value = ReadInt32();
-                    break;
-                case sizeof(Int64):
-                    value = ReadInt64();
-                    break;
-                default:
-                    throw new InvalidOperationException("Cannot read enum value due to unknown enum value size.");
-            }
-
             // Validate the value to be defined in the enum.
+            object value = ReadObject(null, BinaryMemberAttribute.Default, Enum.GetUnderlyingType(type));
             if (strict && !EnumExtensions.IsValid(type, value))
             {
                 throw new InvalidDataException($"Read value {value} is not defined in the given enum type {type}.");
             }
-
             return value;
         }
 
@@ -975,7 +965,7 @@ namespace Syroot.BinaryData
                 {
                     Position = startOffset + member.Attribute.Offset;
                 }
-                else
+                else if (member.Attribute.Offset != 0)
                 {
                     Position += member.Attribute.Offset;
                 }

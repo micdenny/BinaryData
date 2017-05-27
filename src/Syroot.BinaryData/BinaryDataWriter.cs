@@ -19,7 +19,6 @@ namespace Syroot.BinaryData
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private ByteOrder _byteOrder;
-        private bool _needsReversion;
 
         // ---- CONSTRUCTORS -------------------------------------------------------------------------------------------
 
@@ -93,7 +92,7 @@ namespace Syroot.BinaryData
             set
             {
                 _byteOrder = value;
-                _needsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
+                NeedsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
             }
         }
 
@@ -102,6 +101,16 @@ namespace Syroot.BinaryData
         /// way the underlying <see cref="BinaryWriter"/> is instantiated, it can only be specified at creation time.
         /// </summary>
         public Encoding Encoding
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether multibyte data requires to be reversed before being written, according to
+        /// the set <see cref="ByteOrder"/>.
+        /// </summary>
+        public bool NeedsReversion
         {
             get;
             private set;
@@ -314,7 +323,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
         public override void Write(Decimal value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = DecimalToBytes(value);
                 WriteReversed(bytes);
@@ -345,7 +354,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Double"/> value to write.</param>
         public override void Write(Double value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -367,19 +376,6 @@ namespace Syroot.BinaryData
             {
                 Write(value);
             }
-        }
-
-        /// <summary>
-        /// Writes an object or enumerable of objects to this stream.
-        /// </summary>
-        /// <param name="value">The object or enumerable of objects to write.</param>
-        public void WriteObject(object value)
-        {
-            if (value == null)
-            {
-                return;
-            }
-            WriteObject(null, BinaryMemberAttribute.Default, value.GetType(), value);
         }
 
         /// <summary>
@@ -416,7 +412,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
         public override void Write(Int16 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -447,7 +443,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
         public override void Write(Int32 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -478,7 +474,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
         public override void Write(Int64 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -503,13 +499,26 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
+        /// Writes an object or enumerable of objects to this stream.
+        /// </summary>
+        /// <param name="value">The object or enumerable of objects to write.</param>
+        public void WriteObject(object value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+            WriteObject(null, BinaryMemberAttribute.Default, value.GetType(), value);
+        }
+
+        /// <summary>
         /// Writes an 4-byte floating point value to this stream and advances the current position of the stream by four
         /// bytes.
         /// </summary>
         /// <param name="value">The <see cref="Single"/> value to write.</param>
         public override void Write(Single value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -630,7 +639,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
         public override void Write(UInt16 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -661,7 +670,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
         public override void Write(UInt32 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
@@ -692,7 +701,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
         public override void Write(UInt64 value)
         {
-            if (_needsReversion)
+            if (NeedsReversion)
             {
                 byte[] bytes = BitConverter.GetBytes(value);
                 WriteReversed(bytes);
