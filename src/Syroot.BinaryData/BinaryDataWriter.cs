@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using Syroot.BinaryData.Core;
 
@@ -779,6 +778,10 @@ namespace Syroot.BinaryData
                 else if (type == typeof(Boolean))
                 {
                     Write((Boolean)value, attribute.BooleanFormat);
+                }
+                else if (type == typeof(Byte))
+                {
+                    Write((Byte)value);
                 }
                 else if (type == typeof(DateTime))
                 {

@@ -885,6 +885,10 @@ namespace Syroot.BinaryData
                 {
                     return ReadBoolean(attribute.BooleanFormat);
                 }
+                else if (type == typeof(Byte))
+                {
+                    return ReadByte();
+                }
                 else if (type == typeof(DateTime))
                 {
                     return ReadDateTime(attribute.DateTimeFormat);
