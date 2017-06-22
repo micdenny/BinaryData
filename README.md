@@ -1,6 +1,10 @@
 # BinaryData
 .NET library extending binary reading and writing functionality.
 
+## Updated from 1.x.x to 2.0.0?
+- Please read the [release notes](https://github.com/Syroot/BinaryData/releases/tag/2.0.0) for breaking changes.
+- More information on the newest feature [on the wiki](https://github.com/Syroot/BinaryData/wiki/Object-Values).
+
 ## Introduction
 
 When parsing or storing data in binary file formats, the functionality offered by the default .NET `BinaryReader` and `BinaryWriter` classes is often not sufficient. It lacks support for a different byte order than the one of the system and specific string or date formats (most prominently, 0-terminated strings instead of the default variable-length prefixed .NET strings).
