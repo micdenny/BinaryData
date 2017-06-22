@@ -6,19 +6,19 @@ namespace Syroot.BinaryData.Test
     {
         static void Main(string[] args)
         {
-            TestObject bla = new TestObject() { X = Shit.sdkjasld };
+            TestObject obj = new TestObject() { X = TestStruct.Field2 };
 
             using (MemoryStream stream = new MemoryStream())
             {
                 using (BinaryDataWriter writer = new BinaryDataWriter(stream, true))
                 {
-                    writer.WriteObject(bla);
+                    writer.WriteObject(obj);
                 }
                 
                 stream.Position = 0;
                 using (BinaryDataReader reader = new BinaryDataReader(stream, true))
                 {
-                    bla = reader.ReadObject<TestObject>();
+                    obj = reader.ReadObject<TestObject>();
                 }
             }
         }
@@ -31,12 +31,12 @@ namespace Syroot.BinaryData.Test
     
     class TestObject
     {
-        public Shit X { get; set; }
+        public TestStruct X { get; set; }
     }
 
-    enum Shit
+    enum TestStruct
     {
-        Bla = 0,
-        sdkjasld = 1
+        Field1 = 0,
+        Field2 = 1
     }
 }

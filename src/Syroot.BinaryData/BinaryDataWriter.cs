@@ -183,6 +183,15 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
+        /// Creates a <see cref="SeekTask"/> to restore the current position after it has been disposed.
+        /// </summary>
+        /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
+        public SeekTask TemporarySeek()
+        {
+            return TemporarySeek(0, SeekOrigin.Current);
+        }
+
+        /// <summary>
         /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
         /// is disposed, the previous stream position will be restored.
         /// </summary>
