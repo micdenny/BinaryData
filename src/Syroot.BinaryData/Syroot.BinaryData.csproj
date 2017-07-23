@@ -5,11 +5,11 @@
     <AssemblyName>Syroot.BinaryData</AssemblyName>
     <AssemblyTitle>BinaryData</AssemblyTitle>
     <Authors>Syroot</Authors>
-    <VersionPrefix>2.0.1</VersionPrefix>
+    <VersionPrefix>2.0.2</VersionPrefix>
     
     <PackageId>Syroot.IO.BinaryData</PackageId>
     <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>Add parameterless TemporarySeek for BinaryDataWriter.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for 64-bit CTime (time_t) format.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>

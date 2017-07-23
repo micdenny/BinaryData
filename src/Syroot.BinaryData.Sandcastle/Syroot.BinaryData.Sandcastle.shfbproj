@@ -18,9 +18,17 @@
     <HtmlHelpName>BinaryData</HtmlHelpName>
     <Language>en-US</Language>
     <TransformComponentArguments>
+      <Argument Key="logoFile" Value="" />
+      <Argument Key="logoHeight" Value="" />
+      <Argument Key="logoWidth" Value="" />
+      <Argument Key="logoAltText" Value="" />
+      <Argument Key="logoPlacement" Value="left" />
+      <Argument Key="logoAlignment" Value="left" />
       <Argument Key="maxVersionParts" Value="3" />
+      <Argument Key="defaultLanguage" Value="cs" />
       <Argument Key="includeEnumValues" Value="false" />
-      <Argument Key="baseSourceCodeUrl" Value="https://github.com/Syroot/NintenTools.Bfres/blob/master/src/" />
+      <Argument Key="baseSourceCodeUrl" Value="https://github.com/Syroot/BinaryData/blob/master/src/" />
+      <Argument Key="requestExampleUrl" Value="" />
     </TransformComponentArguments>
     <DocumentationSources>
       <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net45\Syroot.BinaryData.dll" />

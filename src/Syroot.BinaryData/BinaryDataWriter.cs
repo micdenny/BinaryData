@@ -286,11 +286,14 @@ namespace Syroot.BinaryData
         {
             switch (format)
             {
+                case BinaryDateTimeFormat.NetTicks:
+                    Write(value.Ticks);
+                    break;
                 case BinaryDateTimeFormat.CTime:
                     Write((uint)(new DateTime(1970, 1, 1) - value.ToLocalTime()).TotalSeconds);
                     break;
-                case BinaryDateTimeFormat.NetTicks:
-                    Write(value.Ticks);
+                case BinaryDateTimeFormat.CTime64:
+                    Write((ulong)(new DateTime(1970, 1, 1) - value.ToLocalTime()).TotalSeconds);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format),
@@ -574,6 +577,9 @@ namespace Syroot.BinaryData
         {
             switch (format)
             {
+                case BinaryStringFormat.VariableLengthPrefix:
+                    WriteVariableLengthPrefixString(value, encoding);
+                    break;
                 case BinaryStringFormat.ByteLengthPrefix:
                     WriteByteLengthPrefixString(value, encoding);
                     break;
@@ -582,9 +588,6 @@ namespace Syroot.BinaryData
                     break;
                 case BinaryStringFormat.DwordLengthPrefix:
                     WriteDwordLengthPrefixString(value, encoding);
-                    break;
-                case BinaryStringFormat.VariableLengthPrefix:
-                    WriteVariableLengthPrefixString(value, encoding);
                     break;
                 case BinaryStringFormat.ZeroTerminated:
                     WriteZeroTerminatedString(value, encoding);

@@ -224,10 +224,12 @@ namespace Syroot.BinaryData
         {
             switch (format)
             {
-                case BinaryDateTimeFormat.CTime:
-                    return new DateTime(1970, 1, 1).ToLocalTime().AddSeconds(ReadUInt32());
                 case BinaryDateTimeFormat.NetTicks:
                     return new DateTime(ReadInt64());
+                case BinaryDateTimeFormat.CTime:
+                    return new DateTime(1970, 1, 1).ToLocalTime().AddSeconds(ReadUInt32());
+                case BinaryDateTimeFormat.CTime64:
+                    return new DateTime(1970, 1, 1).ToLocalTime().AddSeconds(ReadUInt64());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format),
                         "The specified binary date time format is invalid.");
@@ -540,14 +542,14 @@ namespace Syroot.BinaryData
         {
             switch (format)
             {
+                case BinaryStringFormat.VariableLengthPrefix:
+                    return ReadStringInternal(Read7BitEncodedInt(), encoding);
                 case BinaryStringFormat.ByteLengthPrefix:
                     return ReadStringInternal(ReadByte(), encoding);
                 case BinaryStringFormat.WordLengthPrefix:
                     return ReadStringInternal(ReadInt16(), encoding);
                 case BinaryStringFormat.DwordLengthPrefix:
                     return ReadStringInternal(ReadInt32(), encoding);
-                case BinaryStringFormat.VariableLengthPrefix:
-                    return ReadStringInternal(Read7BitEncodedInt(), encoding);
                 case BinaryStringFormat.ZeroTerminated:
                     return ReadZeroTerminatedString(encoding);
                 case BinaryStringFormat.NoPrefixOrTermination:
@@ -583,8 +585,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
-        /// array.
+        /// Reads the specified number of <see cref="String"/> values from the current stream into a
+        /// <see cref="String"/> array.
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <returns>The <see cref="String"/> array read from the current stream.</returns>
@@ -599,8 +601,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
-        /// array. The strings are available in the specified binary format.
+        /// Reads the specified number of <see cref="String"/> values from the current stream into a
+        /// <see cref="String"/> array. The strings are available in the specified binary format.
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <param name="format">The binary format, in which the string will be read.</param>
@@ -616,8 +618,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
-        /// array. The strings are available in the specified binary format and encoding.
+        /// Reads the specified number of <see cref="String"/> values from the current stream into a
+        /// <see cref="String"/> array. The strings are available in the specified binary format and encoding.
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <param name="format">The binary format, in which the string will be read.</param>
@@ -634,8 +636,9 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
-        /// array. The strings have neither a prefix or postfix, the length has to be specified manually.
+        /// Reads the specified number of <see cref="String"/> values from the current stream into a
+        /// <see cref="String"/> array. The strings have neither a prefix or postfix, the length has to be specified
+        /// manually.
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <param name="length">The length of the string.</param>
@@ -651,9 +654,9 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Reads the specified number of <see cref="String"/> from the current stream into a <see cref="String"/>
-        /// array. The strings have neither a prefix or postfix, the length has to be specified manually. The strings
-        /// are available in the specified encoding.
+        /// Reads the specified number of <see cref="String"/> values from the current stream into a
+        /// <see cref="String"/> array. The strings have neither a prefix or postfix, the length has to be specified
+        /// manually. The strings are available in the specified encoding.
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <param name="length">The length of the string.</param>

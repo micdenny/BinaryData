@@ -32,9 +32,14 @@ namespace Syroot.BinaryData
         NetTicks,
 
         /// <summary>
-        /// The <see cref="System.DateTime"/> has the time_t format of the C library.
+        /// The <see cref="System.DateTime"/> has the 32-bit time_t format of the C library.
         /// </summary>
-        CTime
+        CTime,
+
+        /// <summary>
+        /// The <see cref="System.DateTime"/> has the 64-bit time_t format of the C library.
+        /// </summary>
+        CTime64
     }
 
     /// <summary>
