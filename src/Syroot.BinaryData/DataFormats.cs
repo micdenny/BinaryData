@@ -3,28 +3,28 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents the set of formats of binary boolean encodings.
     /// </summary>
-    public enum BinaryBooleanFormat
+    public enum BooleanDataFormat
     {
         /// <summary>
         /// The boolean is stored in 1 byte and is <c>true</c> when the value is not 0. This is the .NET default.
         /// </summary>
-        NonZeroByte,
+        Byte,
 
         /// <summary>
         /// The boolean is stored in 2 bytes and is <c>true</c> when the value is not 0.
         /// </summary>
-        NonZeroWord,
+        Word,
 
         /// <summary>
         /// The boolean is stored in 4 bytes and is <c>true</c> when the value is not 0.
         /// </summary>
-        NonZeroDword
+        Dword
     }
 
     /// <summary>
     /// Represents the set of formats of binary date and time encodings.
     /// </summary>
-    public enum BinaryDateTimeFormat
+    public enum DateTimeDataFormat
     {
         /// <summary>
         /// The <see cref="System.DateTime"/> is stored as the ticks of a .NET <see cref="System.DateTime"/> instance.
@@ -43,33 +43,37 @@ namespace Syroot.BinaryData
     }
 
     /// <summary>
-    /// Represents the set of formats of binary string encodings.
+    /// Represents formats of binary string encodings.
     /// </summary>
-    public enum BinaryStringFormat
+    public enum StringDataFormat
     {
         /// <summary>
-        /// The string has a prefix of variable size determining the length of the string and no postfix. This is the
-        /// .NET default.
+        /// The string has a prefix of a 7-bit encoded integer of variable size determining the number of bytes out of
+        /// which the string consists and no postfix. This is the .NET <see cref="System.IO.BinaryReader"/> and
+        /// <see cref="System.IO.BinaryWriter"/> default.
         /// </summary>
-        VariableLengthPrefix,
+        DynamicByteCount,
 
         /// <summary>
-        /// The string has a prefix of 1 byte determining the length of the string and no postfix.
+        /// The string has a prefix of 1 byte determining the number of chars out of which the string consists and no
+        /// postfix.
         /// </summary>
-        ByteLengthPrefix,
+        ByteCharCount,
 
         /// <summary>
-        /// The string has a prefix of 2 bytes determining the length of the string and no postfix.
+        /// The string has a prefix of 2 bytes determining the number of chars out of which the string consists and no
+        /// postfix.
         /// </summary>
-        WordLengthPrefix,
+        Int16CharCount,
 
         /// <summary>
-        /// The string has a prefix of 4 bytes determining the length of the string and no postfix.
+        /// The string has a prefix of 4 bytes determining number of chars out of which the string consists and no
+        /// postfix.
         /// </summary>
-        DwordLengthPrefix,
+        Int32CharCount,
 
         /// <summary>
-        /// The string has no prefix and is terminated with a byte of the value 0.
+        /// The string has no prefix and is terminated with a 0 value. The size of this value depends on the encoding.
         /// </summary>
         ZeroTerminated,
 
@@ -77,6 +81,6 @@ namespace Syroot.BinaryData
         /// The string has neither prefix nor postfix. This format is only valid for writing strings. For reading
         /// strings, the length has to be specified manually.
         /// </summary>
-        NoPrefixOrTermination
+        Raw
     }
 }

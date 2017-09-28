@@ -5,11 +5,11 @@
     <AssemblyName>Syroot.BinaryData</AssemblyName>
     <AssemblyTitle>BinaryData</AssemblyTitle>
     <Authors>Syroot</Authors>
-    <VersionPrefix>2.0.2</VersionPrefix>
+    <VersionPrefix>3.0.0-alpha1</VersionPrefix>
     
     <PackageId>Syroot.IO.BinaryData</PackageId>
     <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>Add support for 64-bit CTime (time_t) format.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added extension methods and several other new features.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
@@ -27,5 +27,13 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>none</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -9,8 +10,12 @@ namespace Syroot.BinaryData.Core
     /// </summary>
     internal static class EnumExtensions
     {
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
+        private static Dictionary<Type, bool> _flagEnums = new Dictionary<Type, bool>();
+
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
-        
+
         /// <summary>
         /// Returns whether <paramref name="value"/> is a defined value in the enum of the given <paramref name="type"/>
         /// or a valid set of flags for enums decorated with the <see cref="FlagsAttribute"/>.
@@ -22,7 +27,7 @@ namespace Syroot.BinaryData.Core
         {
             // For enumerations decorated with the FlagsAttribute, allow sets of flags.
             bool valid = Enum.IsDefined(type, value);
-            if (!valid && type.GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true)?.Any() == true)
+            if (!valid && IsFlagsEnum(type))
             {
                 long mask = 0;
                 foreach (object definedValue in Enum.GetValues(type))
@@ -33,6 +38,18 @@ namespace Syroot.BinaryData.Core
                 valid = (mask & longValue) == longValue;
             }
             return valid;
+        }
+
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private static bool IsFlagsEnum(Type type)
+        {
+            if (!_flagEnums.TryGetValue(type, out bool value))
+            {
+                value = type.GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true)?.Any() == true;
+                _flagEnums.Add(type, value);
+            }
+            return value;
         }
     }
 }

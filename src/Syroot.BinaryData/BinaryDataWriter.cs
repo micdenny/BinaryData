@@ -6,19 +6,16 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Syroot.BinaryData.Core;
+using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents an extended <see cref="BinaryWriter"/> supporting special file format data types.
     /// </summary>
-    [DebuggerDisplay("BinaryDataWriter, Position={Position}")]
+    [DebuggerDisplay(nameof(BinaryDataWriter) + ", " + nameof(Position) + "={" + nameof(Position) + "}")]
     public class BinaryDataWriter : BinaryWriter
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private ByteOrder _byteOrder;
-
         // ---- CONSTRUCTORS -------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -74,47 +71,48 @@ namespace Syroot.BinaryData
             : base(output, encoding, leaveOpen)
         {
             Encoding = encoding;
-            ByteOrder = ByteOrderHelper.SystemByteOrder;
+            ByteOrder = ByteConverter.System.ByteOrder;
         }
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Gets or sets the byte order used to parse binary data with.
+        /// Gets or sets the <see cref="ByteConverter"/> instance used to parse multibyte binary data with.
+        /// </summary>
+        public ByteConverter ByteConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the byte order used to parse multibyte binary data with.
         /// </summary>
         public ByteOrder ByteOrder
         {
-            get
-            {
-                return _byteOrder;
-            }
-            set
-            {
-                _byteOrder = value;
-                NeedsReversion = _byteOrder != ByteOrderHelper.SystemByteOrder;
-            }
+            get { return ByteConverter.ByteOrder; }
+            set { ByteConverter = ByteConverter.GetConverter(value); }
         }
 
         /// <summary>
         /// Gets the encoding used for string related operations where no other encoding has been provided. Due to the
         /// way the underlying <see cref="BinaryWriter"/> is instantiated, it can only be specified at creation time.
         /// </summary>
-        public Encoding Encoding
+        public Encoding Encoding { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the end of the stream has been reached.
+        /// </summary>
+        public bool EndOfStream
         {
-            get;
-            private set;
+            get { return BaseStream.IsEndOfStream(); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether multibyte data requires to be reversed before being written, according to
-        /// the set <see cref="ByteOrder"/>.
+        /// Gets or sets the length in bytes of the stream in bytes.
         /// </summary>
-        public bool NeedsReversion
+        public long Length
         {
-            get;
-            private set;
+            get { return BaseStream.Length; }
+            set { BaseStream.SetLength(value); }
         }
-
+        
         /// <summary>
         /// Gets or sets the position within the current stream. This is a shortcut to the base stream Position
         /// property.
@@ -124,16 +122,19 @@ namespace Syroot.BinaryData
             get { return BaseStream.Position; }
             set { BaseStream.Position = value; }
         }
-
+        
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Aligns the reader to the next given byte multiple.
+        /// Aligns the writer to the next given byte multiple.
         /// </summary>
         /// <param name="alignment">The byte multiple.</param>
-        public void Align(int alignment)
+        /// <param name="grow"><c>true</c> to enlarge the stream size to include the final position in case it is larger
+        /// than the current stream length.</param>
+        /// <returns>The new position within the current stream.</returns>
+        public long Align(int alignment, bool grow = false)
         {
-            Seek((-Position % alignment + alignment) % alignment);
+            return BaseStream.Align(alignment, grow);
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace Syroot.BinaryData
         /// <returns>The new position within the current stream.</returns>
         public long Seek(long offset)
         {
-            return Seek(offset, SeekOrigin.Current);
+            return BaseStream.Seek(offset);
         }
 
         /// <summary>
@@ -188,7 +189,7 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
         public SeekTask TemporarySeek()
         {
-            return TemporarySeek(0, SeekOrigin.Current);
+            return BaseStream.TemporarySeek();
         }
 
         /// <summary>
@@ -199,7 +200,7 @@ namespace Syroot.BinaryData
         /// <returns>A <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
         public SeekTask TemporarySeek(long offset)
         {
-            return TemporarySeek(offset, SeekOrigin.Current);
+            return BaseStream.TemporarySeek(offset);
         }
 
         /// <summary>
@@ -212,7 +213,7 @@ namespace Syroot.BinaryData
         /// <returns>A <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
         public SeekTask TemporarySeek(long offset, SeekOrigin origin)
         {
-            return new SeekTask(BaseStream, offset, origin);
+            return BaseStream.TemporarySeek(offset, origin);
         }
         
         /// <summary>
@@ -221,23 +222,9 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
-        public void Write(Boolean value, BinaryBooleanFormat format)
+        public void Write(Boolean value, BooleanDataFormat format)
         {
-            switch (format)
-            {
-                case BinaryBooleanFormat.NonZeroByte:
-                    base.Write(value);
-                    break;
-                case BinaryBooleanFormat.NonZeroWord:
-                    Write(value ? (Int16)1 : (Int16)0);
-                    break;
-                case BinaryBooleanFormat.NonZeroDword:
-                    Write(value ? 1 : 0);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(format),
-                        "The specified binary boolean format is invalid.");
-            }
+            BaseStream.Write(value, format, ByteConverter);
         }
 
         /// <summary>
@@ -245,73 +232,23 @@ namespace Syroot.BinaryData
         /// <c>false</c> and 1 representing <c>true</c>.
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
-        public void Write(IEnumerable<Boolean> values)
+        /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
+        public void Write(IEnumerable<Boolean> values, BooleanDataFormat format = BooleanDataFormat.Byte)
         {
-            foreach (Boolean value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, format, ByteConverter);
         }
-
-        /// <summary>
-        /// Writes an enumeration of <see cref="Boolean"/> values in the given format to the current stream, with 0
-        /// representing <c>false</c> and 1 representing <c>true</c>.
-        /// </summary>
-        /// <param name="values">The <see cref="Boolean"/> values to write.</param>
-        /// <param name="format">The binary format in which the <see cref="Boolean"/> values will be written.</param>
-        public void Write(IEnumerable<Boolean> values, BinaryBooleanFormat format)
-        {
-            foreach (bool value in values)
-            {
-                Write(value, format);
-            }
-        }
-
-        /// <summary>
-        /// Writes a <see cref="DateTime"/> value to this stream.
-        /// </summary>
-        /// <param name="value">The <see cref="DateTime"/> value to write.</param>
-        public void Write(DateTime value)
-        {
-            Write(value, BinaryDateTimeFormat.NetTicks);
-        }
-
+        
         /// <summary>
         /// Writes a <see cref="DateTime"/> value to this stream. The <see cref="DateTime"/> will be available in the
         /// specified binary format.
         /// </summary>
         /// <param name="value">The <see cref="DateTime"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> will be written.</param>
-        public void Write(DateTime value, BinaryDateTimeFormat format)
+        public void Write(DateTime value, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
         {
-            switch (format)
-            {
-                case BinaryDateTimeFormat.NetTicks:
-                    Write(value.Ticks);
-                    break;
-                case BinaryDateTimeFormat.CTime:
-                    Write((uint)(new DateTime(1970, 1, 1) - value.ToLocalTime()).TotalSeconds);
-                    break;
-                case BinaryDateTimeFormat.CTime64:
-                    Write((ulong)(new DateTime(1970, 1, 1) - value.ToLocalTime()).TotalSeconds);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(format),
-                        "The specified binary date time format is invalid.");
-            }
+            BaseStream.Write(value, format, ByteConverter);
         }
 
-        /// <summary>
-        /// Writes an enumeration of <see cref="DateTime"/> values to this stream.
-        /// </summary>
-        /// <param name="values">The <see cref="DateTime"/> values to write.</param>
-        public void Write(IEnumerable<DateTime> values)
-        {
-            foreach (DateTime value in values)
-            {
-                Write(value, BinaryDateTimeFormat.NetTicks);
-            }
-        }
 
         /// <summary>
         /// Writes an enumeration of <see cref="DateTime"/> values to this stream. The <see cref="DateTime"/> values
@@ -319,12 +256,9 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="DateTime"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> values will be written.</param>
-        public void Write(IEnumerable<DateTime> values, BinaryDateTimeFormat format)
+        public void Write(IEnumerable<DateTime> values, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
         {
-            foreach (DateTime value in values)
-            {
-                Write(value, format);
-            }
+            BaseStream.Write(values, format, ByteConverter);
         }
 
         /// <summary>
@@ -334,15 +268,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Decimal"/> value to write.</param>
         public override void Write(Decimal value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = DecimalToBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -352,10 +278,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Decimal"/> values to write.</param>
         public void Write(IEnumerable<Decimal> values)
         {
-            foreach (Decimal value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -365,15 +288,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Double"/> value to write.</param>
         public override void Write(Double value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -383,10 +298,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Double"/> values to write.</param>
         public void Write(IEnumerable<Double> values)
         {
-            foreach (Double value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -423,15 +335,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int16"/> value to write.</param>
         public override void Write(Int16 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -441,10 +345,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Int16"/> values to write.</param>
         public void Write(IEnumerable<Int16> values)
         {
-            foreach (Int16 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -454,15 +355,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int32"/> value to write.</param>
         public override void Write(Int32 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -472,10 +365,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Int32"/> values to write.</param>
         public void Write(IEnumerable<Int32> values)
         {
-            foreach (Int32 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -485,15 +375,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Int64"/> value to write.</param>
         public override void Write(Int64 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -503,10 +385,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
         public void Write(IEnumerable<Int64> values)
         {
-            foreach (Int64 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -516,9 +395,7 @@ namespace Syroot.BinaryData
         public void WriteObject(object value)
         {
             if (value == null)
-            {
                 return;
-            }
             WriteObject(null, BinaryMemberAttribute.Default, value.GetType(), value);
         }
 
@@ -529,15 +406,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="Single"/> value to write.</param>
         public override void Write(Single value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -547,24 +416,9 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Single"/> values to write.</param>
         public void Write(IEnumerable<Single> values)
         {
-            foreach (Single value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
-
-        /// <summary>
-        /// Writes a string to this stream in the current encoding of the <see cref="BinaryDataWriter"/> and advances
-        /// the current position of the stream in accordance with the encoding used and the specific characters being
-        /// written to the stream. The string will be available in the specified binary format.
-        /// </summary>
-        /// <param name="value">The <see cref="String"/> value to write.</param>
-        /// <param name="format">The binary format in which the string will be written.</param>
-        public void Write(String value, BinaryStringFormat format)
-        {
-            Write(value, format, Encoding);
-        }
-
+        
         /// <summary>
         /// Writes a string to this stream with the given encoding and advances the current position of the stream in
         /// accordance with the encoding used and the specific characters being written to the stream. The string will
@@ -573,59 +427,9 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="String"/> value to write.</param>
         /// <param name="format">The binary format in which the string will be written.</param>
         /// <param name="encoding">The encoding used for converting the string.</param>
-        public void Write(String value, BinaryStringFormat format, Encoding encoding)
+        public void Write(String value, StringDataFormat format, Encoding encoding = null)
         {
-            switch (format)
-            {
-                case BinaryStringFormat.VariableLengthPrefix:
-                    WriteVariableLengthPrefixString(value, encoding);
-                    break;
-                case BinaryStringFormat.ByteLengthPrefix:
-                    WriteByteLengthPrefixString(value, encoding);
-                    break;
-                case BinaryStringFormat.WordLengthPrefix:
-                    WriteWordLengthPrefixString(value, encoding);
-                    break;
-                case BinaryStringFormat.DwordLengthPrefix:
-                    WriteDwordLengthPrefixString(value, encoding);
-                    break;
-                case BinaryStringFormat.ZeroTerminated:
-                    WriteZeroTerminatedString(value, encoding);
-                    break;
-                case BinaryStringFormat.NoPrefixOrTermination:
-                    WriteNoPrefixOrTerminationString(value, encoding);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(format),
-                        "The specified binary string format is invalid.");
-            }
-        }
-
-        /// <summary>
-        /// Writes an enumeration of <see cref="String"/> values to this in the current encoding of the
-        /// <see cref="BinaryDataWriter"/>.
-        /// </summary>
-        /// <param name="values">The <see cref="String"/> value to write.</param>
-        public void Write(IEnumerable<String> values)
-        {
-            foreach (String value in values)
-            {
-                Write(value);
-            }
-        }
-
-        /// <summary>
-        /// Writes an enumeration of <see cref="String"/> values to this stream in the current encoding of the
-        /// <see cref="BinaryDataWriter"/>. The strings will be available in the specified binary format.
-        /// </summary>
-        /// <param name="values">The <see cref="String"/> values to write.</param>
-        /// <param name="format">The binary format in which the strings will be written.</param>
-        public void Write(IEnumerable<String> values, BinaryStringFormat format)
-        {
-            foreach (String value in values)
-            {
-                Write(value, format);
-            }
+            BaseStream.Write(value, format, encoding, ByteConverter);
         }
 
         /// <summary>
@@ -635,14 +439,12 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="String"/> values to write.</param>
         /// <param name="format">The binary format in which the strings will be written.</param>
         /// <param name="encoding">The encoding used for converting the strings.</param>
-        public void Write(IEnumerable<String> values, BinaryStringFormat format, Encoding encoding)
+        public void Write(IEnumerable<String> values, StringDataFormat format = StringDataFormat.DynamicByteCount,
+            Encoding encoding = null)
         {
-            foreach (String value in values)
-            {
-                Write(value, format, encoding);
-            }
+            BaseStream.Write(values, format, encoding);
         }
-
+        
         /// <summary>
         /// Writes an 2-byte unsigned integer value to this stream and advances the current position of the stream by
         /// two bytes.
@@ -650,15 +452,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt16"/> value to write.</param>
         public override void Write(UInt16 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -668,10 +462,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="UInt16"/> values to write.</param>
         public void Write(IEnumerable<UInt16> values)
         {
-            foreach (UInt16 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -681,15 +472,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt32"/> value to write.</param>
         public override void Write(UInt32 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -699,10 +482,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="UInt32"/> values to write.</param>
         public void Write(IEnumerable<UInt32> values)
         {
-            foreach (UInt32 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         /// <summary>
@@ -712,15 +492,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="UInt64"/> value to write.</param>
         public override void Write(UInt64 value)
         {
-            if (NeedsReversion)
-            {
-                byte[] bytes = BitConverter.GetBytes(value);
-                WriteReversed(bytes);
-            }
-            else
-            {
-                base.Write(value);
-            }
+            BaseStream.Write(value, ByteConverter);
         }
 
         /// <summary>
@@ -730,32 +502,11 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="UInt64"/> values to write.</param>
         public void Write(IEnumerable<UInt64> values)
         {
-            foreach (UInt64 value in values)
-            {
-                Write(value);
-            }
+            BaseStream.Write(values, ByteConverter);
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private void WriteReversed(byte[] bytes)
-        {
-            Array.Reverse(bytes);
-            base.Write(bytes);
-        }
         
-        // ---- Decimal methods ----
-
-        private byte[] DecimalToBytes(decimal value)
-        {
-            // Get the bytes of the decimal.
-            byte[] bytes = new byte[sizeof(decimal)];
-            Buffer.BlockCopy(Decimal.GetBits(value), 0, bytes, 0, sizeof(decimal));
-            return bytes;
-        }
-
-        // ---- Enum methods ----
-
         private void WriteEnum(Type type, object value, bool strict)
         {
             // Validate the value to be defined in the enum.
@@ -765,9 +516,7 @@ namespace Syroot.BinaryData
             }
             WriteObject(null, BinaryMemberAttribute.Default, Enum.GetUnderlyingType(type), value);
         }
-
-        // ---- Object methods ----
-
+        
         private void WriteObject(object instance, BinaryMemberAttribute attribute, Type type, object value)
         {
             if (attribute.Converter == null)
@@ -910,40 +659,11 @@ namespace Syroot.BinaryData
         }
         
         // ---- String methods ----
-
-        private void WriteByteLengthPrefixString(string value, Encoding encoding)
-        {
-            Write((byte)value.Length);
-            Write(encoding.GetBytes(value));
-        }
-
-        private void WriteWordLengthPrefixString(string value, Encoding encoding)
-        {
-            Write((short)value.Length);
-            Write(encoding.GetBytes(value));
-        }
-
-        private void WriteDwordLengthPrefixString(string value, Encoding encoding)
-        {
-            Write(value.Length);
-            Write(encoding.GetBytes(value));
-        }
-
-        private void WriteVariableLengthPrefixString(string value, Encoding encoding)
-        {
-            Write7BitEncodedInt(value.Length);
-            Write(encoding.GetBytes(value));
-        }
-
+        
         private void WriteZeroTerminatedString(string value, Encoding encoding)
         {
             Write(encoding.GetBytes(value));
             Write((byte)0);
-        }
-
-        private void WriteNoPrefixOrTerminationString(string value, Encoding encoding)
-        {
-            Write(encoding.GetBytes(value));
         }
     }
 }

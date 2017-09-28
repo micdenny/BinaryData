@@ -27,25 +27,25 @@ namespace Syroot.BinaryData
 
         /// <summary>
         /// Gets or sets the format for <see cref="Boolean"/> members. Defaults to
-        /// <see cref="BinaryBooleanFormat.NonZeroByte"/>.
+        /// <see cref="BooleanDataFormat.Byte"/>.
         /// </summary>
-        public BinaryBooleanFormat BooleanFormat { get; set; }
+        public BooleanDataFormat BooleanFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the format for <see cref="DateTime"/> members. Defaults to
-        /// <see cref="BinaryDateTimeFormat.NetTicks"/>.
+        /// <see cref="DateTimeDataFormat.NetTicks"/>.
         /// </summary>
-        public BinaryDateTimeFormat DateTimeFormat { get; set; }
+        public DateTimeDataFormat DateTimeFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the format for <see cref="String"/> members. Defaults to
-        /// <see cref="BinaryStringFormat.VariableLengthPrefix"/>.
+        /// <see cref="StringDataFormat.DynamicByteCount"/>.
         /// </summary>
-        public BinaryStringFormat StringFormat { get; set; }
+        public StringDataFormat StringFormat { get; set; }
         
         /// <summary>
         /// Gets or sets the number of elements to read or write. Required for <see cref="IEnumerable"/> members or
-        /// strings when <see cref="StringFormat"/> is <see cref="BinaryStringFormat.NoPrefixOrTermination"/>.
+        /// strings when <see cref="StringFormat"/> is <see cref="StringDataFormat.Raw"/>.
         /// Multidimensional arrays are not supported.
         /// </summary>
         public int Length { get; set; }

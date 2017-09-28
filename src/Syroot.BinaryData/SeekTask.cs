@@ -22,7 +22,7 @@ namespace Syroot.BinaryData
         public SeekTask(Stream stream, long offset, SeekOrigin origin)
         {
             Stream = stream;
-            PreviousPosition = stream.Position;
+            PreviousPosition = Stream.Position;
             Stream.Seek(offset, origin);
         }
 
@@ -31,20 +31,12 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets the <see cref="Stream"/> which is temporarily sought to another position.
         /// </summary>
-        public Stream Stream
-        {
-            get;
-            private set;
-        }
+        public Stream Stream { get; private set; }
 
         /// <summary>
-        /// Gets the absolute position to which the <see cref="Stream"/> will be rewound after this task is disposed.
+        /// Gets the absolute position to which the <see cref="Stream"/> will be rewound when this task is disposed.
         /// </summary>
-        public long PreviousPosition
-        {
-            get;
-            private set;
-        }
+        public long PreviousPosition { get; private set; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
