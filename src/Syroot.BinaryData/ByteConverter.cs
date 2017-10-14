@@ -7,6 +7,13 @@ namespace Syroot.BinaryData
     /// </summary>
     public abstract class ByteConverter
     {
+        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// The exception thrown if a conversion buffer is too small or <c>null</c>.
+        /// </summary>
+        protected static readonly Exception BufferException = new Exception("Buffer null or too small.");
+        
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
@@ -22,10 +29,7 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteConverter"/> class.
         /// </summary>
-        internal ByteConverter(ByteOrder byteOrder)
-        {
-            ByteOrder = byteOrder;
-        }
+        protected ByteConverter() { }
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -46,9 +50,9 @@ namespace Syroot.BinaryData
         public static ByteConverter System { get; }
 
         /// <summary>
-        /// Gets the <see cref="ByteOrder"/> in which data is stored as converted by this instance.
+        /// Gets the <see cref="BinaryData.ByteOrder"/> in which data is stored as converted by this instance.
         /// </summary>
-        public ByteOrder ByteOrder { get; }
+        public abstract ByteOrder ByteOrder { get; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -73,424 +77,179 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Returns the specified <see cref="Decimal"/> value as an array of bytes.
+        /// Stores the specified <see cref="Decimal"/> value as bytes in the given <paramref name="buffer"/>.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Decimal value)
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public void GetBytes(Decimal value, byte[] buffer, int startIndex = 0)
         {
-            byte[] array = new byte[sizeof(Decimal)];
-            GetBytes(value, array, 0);
-            return array;
+            if (buffer?.Length - startIndex < sizeof(Decimal))
+                throw BufferException;
+
+            // Decimal is composed of low, middle, high and flags Int32 instances which are not affected by endianness.
+            int[] parts = Decimal.GetBits(value);
+            for (int i = 0; i < 4; i++)
+            {
+                int offset = startIndex + i * sizeof(int);
+                int part = parts[i];
+                buffer[offset] = (byte)part;
+                buffer[offset + 1] = (byte)(part >> 8);
+                buffer[offset + 2] = (byte)(part >> 16);
+                buffer[offset + 3] = (byte)(part >> 24);
+            }
         }
 
         /// <summary>
-        /// Returns the specified <see cref="Double"/> value as an array of bytes.
+        /// Stores the specified <see cref="Double"/> value as bytes in the given <paramref name="buffer"/>.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Double value)
-        {
-            byte[] array = new byte[sizeof(Double)];
-            GetBytes(value, array, 0);
-            return array;
-        }
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(Double value, byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns the specified <see cref="Int16"/> value as an array of bytes.
+        /// Stores the specified <see cref="Int16"/> value as bytes in the given <paramref name="buffer"/>.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Int16 value)
-        {
-            byte[] array = new byte[sizeof(Int16)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="Int32"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Int32 value)
-        {
-            byte[] array = new byte[sizeof(Int32)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="Int64"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Int64 value)
-        {
-            byte[] array = new byte[sizeof(Int64)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="Single"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(Single value)
-        {
-            byte[] array = new byte[sizeof(Single)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="UInt16"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(UInt16 value)
-        {
-            byte[] array = new byte[sizeof(UInt16)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="UInt32"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(UInt32 value)
-        {
-            byte[] array = new byte[sizeof(UInt32)];
-            GetBytes(value, array, 0);
-            return array;
-        }
-
-        /// <summary>
-        /// Returns the specified <see cref="UInt64"/> value as an array of bytes.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>An array of bytes representing the value.</returns>
-        public byte[] GetBytes(UInt64 value)
-        {
-            byte[] array = new byte[sizeof(UInt64)];
-            GetBytes(value, array, 0);
-            return array;
-        }
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(Int16 value, byte[] buffer, int startIndex = 0);
         
         /// <summary>
-        /// Stores the specified <see cref="Decimal"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
+        /// Stores the specified <see cref="Int32"/> value as bytes in the given <paramref name="buffer"/>.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public void GetBytes(Decimal value, byte[] array, int startIndex)
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(Int32 value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Stores the specified <see cref="Int64"/> value as bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(Int64 value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Stores the specified <see cref="Single"/> value as bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(Single value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Stores the specified <see cref="UInt16"/> value as bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(UInt16 value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Stores the specified <see cref="UInt32"/> value as bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(UInt32 value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Stores the specified <see cref="UInt64"/> value as bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="buffer">The byte array to store the value in.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        public abstract void GetBytes(UInt64 value, byte[] buffer, int startIndex = 0);
+
+        /// <summary>
+        /// Returns an <see cref="Decimal"/> instance converted from the bytes in the given <paramref name="buffer"/>.
+        /// </summary>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
+        /// <returns>The converted value.</returns>
+        public Decimal ToDecimal(byte[] buffer, int startIndex = 0)
         {
-            int[] values = Decimal.GetBits(value);
-            for (int i = 0; i < values.Length; i++)
+            if (buffer?.Length - startIndex < sizeof(Decimal))
+                throw BufferException;
+
+            // Decimal is composed of low, middle, high and flags Int32 instances which are not affected by endianness.
+            int[] parts = new int[4];
+            for (int i = 0; i < 4; i++)
             {
-                GetBytes(values[i], array, startIndex + i * sizeof(int));
+                int offset = startIndex + i * sizeof(int);
+                parts[i] = buffer[offset]
+                    | buffer[offset + 1] << 8
+                    | buffer[offset + 2] << 16
+                    | buffer[offset + 3] << 24;
             }
+            return new Decimal(parts);
         }
 
         /// <summary>
-        /// Stores the specified <see cref="Double"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
+        /// Returns an <see cref="Double"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public void GetBytes(Double value, byte[] array, int startIndex)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            if (ByteOrder != System.ByteOrder)
-            {
-                Array.Reverse(buffer);
-            }
-            Buffer.BlockCopy(buffer, 0, array, startIndex, sizeof(Double));
-        }
-
-        /// <summary>
-        /// Stores the specified <see cref="Int16"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(Int16 value, byte[] array, int startIndex);
-
-        /// <summary>
-        /// Stores the specified <see cref="Int32"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(Int32 value, byte[] array, int startIndex);
-
-        /// <summary>
-        /// Stores the specified <see cref="Int64"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(Int64 value, byte[] array, int startIndex);
-
-        /// <summary>
-        /// Stores the specified <see cref="Single"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public void GetBytes(Single value, byte[] array, int startIndex)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            if (ByteOrder != System.ByteOrder)
-            {
-                Array.Reverse(buffer);
-            }
-            Buffer.BlockCopy(buffer, 0, array, startIndex, sizeof(Single));
-        }
-
-        /// <summary>
-        /// Stores the specified <see cref="UInt16"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(UInt16 value, byte[] array, int startIndex);
-
-        /// <summary>
-        /// Stores the specified <see cref="UInt32"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(UInt32 value, byte[] array, int startIndex);
-
-        /// <summary>
-        /// Stores the specified <see cref="UInt64"/> value as bytes in the given <paramref name="array"/>, starting at
-        /// the provided <paramref name="startIndex"/>.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="array">The byte array to store the value in.</param>
-        /// <param name="startIndex">The index at which to start storing the value.</param>
-        public abstract void GetBytes(UInt64 value, byte[] array, int startIndex);
-        
-        /// <summary>
-        /// Returns an <see cref="Decimal"/> instance converted from the bytes in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Decimal ToDecimal(byte[] array)
-        {
-            return ToDecimal(array, 0);
-        }
+        public abstract Double ToDouble(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="Double"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="Int16"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Double ToDouble(byte[] array)
-        {
-            return ToDouble(array, 0);
-        }
+        public abstract Int16 ToInt16(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="Int16"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="Int32"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Int16 ToInt16(byte[] array)
-        {
-            return ToInt16(array, 0);
-        }
+        public abstract Int32 ToInt32(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="Int32"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="Int64"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Int32 ToInt32(byte[] array)
-        {
-            return ToInt32(array, 0);
-        }
+        public abstract Int64 ToInt64(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="Int64"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="Single"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Int64 ToInt64(byte[] array)
-        {
-            return ToInt64(array, 0);
-        }
+        public abstract Single ToSingle(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="Single"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="UInt16"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Single ToSingle(byte[] array)
-        {
-            return ToSingle(array, 0);
-        }
+        public abstract UInt16 ToUInt16(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="UInt16"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="UInt32"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public UInt16 ToUInt16(byte[] array)
-        {
-            return ToUInt16(array, 0);
-        }
+        public abstract UInt32 ToUInt32(byte[] buffer, int startIndex = 0);
 
         /// <summary>
-        /// Returns an <see cref="UInt32"/> instance converted from the bytes in the given <paramref name="array"/>.
+        /// Returns an <see cref="UInt64"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
+        /// <param name="buffer">The byte array storing the raw data.</param>
+        /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public UInt32 ToUInt32(byte[] array)
-        {
-            return ToUInt32(array, 0);
-        }
-
-        /// <summary>
-        /// Returns an <see cref="UInt64"/> instance converted from the bytes in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <returns>The converted value.</returns>
-        public UInt64 ToUInt64(byte[] array)
-        {
-            return ToUInt64(array, 0);
-        }
-        
-        /// <summary>
-        /// Returns an <see cref="Decimal"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public Decimal ToDecimal(byte[] array, int startIndex)
-        {
-            int[] values = new int[4];
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i] = ToInt32(array, startIndex + i * sizeof(int));
-            }
-            return new Decimal(values);
-        }
-
-        /// <summary>
-        /// Returns an <see cref="Double"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public Double ToDouble(byte[] array, int startIndex)
-        {
-            if (ByteOrder == System.ByteOrder)
-            {
-                return BitConverter.ToDouble(array, 0);
-            }
-            else
-            {
-                byte[] reversed = new byte[array.Length];
-                for (int i = 0; i < array.Length; i++)
-                {
-                    reversed[reversed.Length - i - 1] = array[i];
-                }
-                return BitConverter.ToDouble(array, 0);
-            }
-        }
-
-        /// <summary>
-        /// Returns an <see cref="Int16"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract Int16 ToInt16(byte[] array, int startIndex);
-
-        /// <summary>
-        /// Returns an <see cref="Int32"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract Int32 ToInt32(byte[] array, int startIndex);
-
-        /// <summary>
-        /// Returns an <see cref="Int64"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract Int64 ToInt64(byte[] array, int startIndex);
-
-        /// <summary>
-        /// Returns an <see cref="Single"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public Single ToSingle(byte[] array, int startIndex)
-        {
-            if (ByteOrder == System.ByteOrder)
-            {
-                return BitConverter.ToSingle(array, 0);
-            }
-            else
-            {
-                byte[] reversed = new byte[array.Length];
-                for (int i = 0; i < array.Length; i++)
-                {
-                    reversed[reversed.Length - i - 1] = array[i];
-                }
-                return BitConverter.ToSingle(array, 0);
-            }
-        }
-
-        /// <summary>
-        /// Returns an <see cref="UInt16"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract UInt16 ToUInt16(byte[] array, int startIndex);
-
-        /// <summary>
-        /// Returns an <see cref="UInt32"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract UInt32 ToUInt32(byte[] array, int startIndex);
-
-        /// <summary>
-        /// Returns an <see cref="UInt64"/> instance converted from the bytes at the specific
-        /// <paramref name="startIndex"/> in the given <paramref name="array"/>.
-        /// </summary>
-        /// <param name="array">The byte array storing the raw data.</param>
-        /// <param name="startIndex">The index of the first byte to convert from.</param>
-        /// <returns>The converted value.</returns>
-        public abstract UInt64 ToUInt64(byte[] array, int startIndex);
+        public abstract UInt64 ToUInt64(byte[] buffer, int startIndex = 0);
     }
 }

@@ -248,8 +248,7 @@ namespace Syroot.BinaryData
         {
             BaseStream.Write(value, format, ByteConverter);
         }
-
-
+        
         /// <summary>
         /// Writes an enumeration of <see cref="DateTime"/> values to this stream. The <see cref="DateTime"/> values
         /// will be available in the specified binary format.

@@ -104,7 +104,7 @@ namespace Syroot.BinaryData.Extensions
                 case DateTimeDataFormat.CTime:
                     return _cTimeBase.AddSeconds(ReadUInt32(stream, converter));
                 case DateTimeDataFormat.CTime64:
-                    return _cTimeBase.AddSeconds(ReadUInt64(stream, converter));
+                    return _cTimeBase.AddSeconds(ReadInt64(stream, converter));
                 default:
                     throw new ArgumentException($"Invalid {nameof(DateTimeDataFormat)}.", nameof(format));
             }
@@ -135,15 +135,13 @@ namespace Syroot.BinaryData.Extensions
                     case DateTimeDataFormat.CTime:
                         for (int i = 0; i < count; i++)
                         {
-                            values[i] = new DateTime(1970, 1, 1).ToUniversalTime().AddSeconds(
-                                ReadUInt32(stream, converter));
+                            values[i] = _cTimeBase.AddSeconds(ReadUInt32(stream, converter));
                         }
                         break;
                     case DateTimeDataFormat.CTime64:
                         for (int i = 0; i < count; i++)
                         {
-                            values[i] = new DateTime(1970, 1, 1).ToUniversalTime().AddSeconds(
-                                ReadUInt64(stream, converter));
+                            values[i] = _cTimeBase.AddSeconds(ReadInt64(stream, converter));
                         }
                         break;
                     default:
@@ -161,7 +159,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Decimal ReadDecimal(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Decimal));
+            FillBuffer(stream, sizeof(Decimal));
             return (converter ?? ByteConverter.System).ToDecimal(_buffer);
         }
 
@@ -180,7 +178,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Decimal));
+                    FillBuffer(stream, sizeof(Decimal));
                     values[i] = converter.ToDecimal(_buffer);
                 }
             }
@@ -195,7 +193,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Double ReadDouble(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Double));
+            FillBuffer(stream, sizeof(Double));
             return (converter ?? ByteConverter.System).ToDouble(_buffer);
         }
 
@@ -214,7 +212,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Double));
+                    FillBuffer(stream, sizeof(Double));
                     values[i] = converter.ToDouble(_buffer);
                 }
             }
@@ -229,7 +227,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Int16 ReadInt16(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Int16));
+            FillBuffer(stream, sizeof(Int16));
             return (converter ?? ByteConverter.System).ToInt16(_buffer);
         }
 
@@ -248,7 +246,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Int16));
+                    FillBuffer(stream, sizeof(Int16));
                     values[i] = converter.ToInt16(_buffer);
                 }
             }
@@ -263,7 +261,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Int32 ReadInt32(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Int32));
+            FillBuffer(stream, sizeof(Int32));
             return (converter ?? ByteConverter.System).ToInt32(_buffer);
         }
 
@@ -282,7 +280,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Int32));
+                    FillBuffer(stream, sizeof(Int32));
                     values[i] = converter.ToInt32(_buffer);
                 }
             }
@@ -297,7 +295,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Int64 ReadInt64(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Int64));
+            FillBuffer(stream, sizeof(Int64));
             return (converter ?? ByteConverter.System).ToInt64(_buffer);
         }
 
@@ -316,7 +314,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Int64));
+                    FillBuffer(stream, sizeof(Int64));
                     values[i] = converter.ToInt64(_buffer);
                 }
             }
@@ -346,7 +344,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(SByte));
+                    FillBuffer(stream, sizeof(SByte));
                     values[i] = (SByte)_buffer[0];
                 }
             }
@@ -361,7 +359,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static Single ReadSingle(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(Single));
+            FillBuffer(stream, sizeof(Single));
             return (converter ?? ByteConverter.System).ToSingle(_buffer);
         }
 
@@ -380,7 +378,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(Single));
+                    FillBuffer(stream, sizeof(Single));
                     values[i] = converter.ToSingle(_buffer);
                 }
             }
@@ -523,7 +521,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static UInt16 ReadUInt16(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(UInt16));
+            FillBuffer(stream, sizeof(UInt16));
             return (converter ?? ByteConverter.System).ToUInt16(_buffer);
         }
 
@@ -542,7 +540,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(UInt16));
+                    FillBuffer(stream, sizeof(UInt16));
                     values[i] = converter.ToUInt16(_buffer);
                 }
             }
@@ -557,7 +555,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static UInt32 ReadUInt32(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(UInt32));
+            FillBuffer(stream, sizeof(UInt32));
             return (converter ?? ByteConverter.System).ToUInt32(_buffer);
         }
 
@@ -576,7 +574,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(UInt32));
+                    FillBuffer(stream, sizeof(UInt32));
                     values[i] = converter.ToUInt32(_buffer);
                 }
             }
@@ -591,7 +589,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static UInt64 ReadUInt64(this Stream stream, ByteConverter converter = null)
         {
-            stream.Read(_buffer, 0, sizeof(UInt64));
+            FillBuffer(stream, sizeof(UInt64));
             return (converter ?? ByteConverter.System).ToUInt64(_buffer);
         }
 
@@ -610,7 +608,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    stream.Read(_buffer, 0, sizeof(UInt64));
+                    FillBuffer(stream, sizeof(UInt64));
                     values[i] = converter.ToUInt64(_buffer);
                 }
             }
@@ -618,6 +616,12 @@ namespace Syroot.BinaryData.Extensions
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private static void FillBuffer(Stream stream, int length)
+        {
+            if (stream.Read(_buffer, 0, length) < length)
+                throw new EndOfStreamException($"Could not read {length} bytes.");
+        }
 
         private static Int32 Read7BitEncodedInt32(Stream stream)
         {
@@ -680,24 +684,22 @@ namespace Syroot.BinaryData.Extensions
             bool isChar = true;
             switch (encoding.GetByteCount("A"))
             {
-                case sizeof(byte):
+                case sizeof(Byte):
                     // Read single bytes.
                     while (isChar)
                     {
-                        if (stream.Read(_buffer, 0, sizeof(byte)) == 0)
-                            throw new EndOfStreamException("Incomplete string data, missing 0 termination.");
+                        FillBuffer(stream, sizeof(Byte));
                         if (isChar = _buffer[0] != 0)
                         {
                             bytes.Add(_buffer[0]);
                         }
                     }
                     break;
-                case sizeof(ushort):
+                case sizeof(Int16):
                     // Read word values of 2 bytes width.
                     while (isChar)
                     {
-                        if (stream.Read(_buffer, 0, sizeof(ushort)) == 0)
-                            throw new EndOfStreamException("Incomplete string data, missing 0 termination.");
+                        FillBuffer(stream, sizeof(Int16));
                         if (isChar = _buffer[0] != 0 || _buffer[1] != 0)
                         {
                             bytes.Add(_buffer[0]);

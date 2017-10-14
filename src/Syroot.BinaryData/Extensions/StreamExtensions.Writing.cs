@@ -251,6 +251,7 @@ namespace Syroot.BinaryData.Extensions
         {
             (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
             stream.Write(_buffer, 0, sizeof(Int32));
+            
         }
 
         /// <summary>

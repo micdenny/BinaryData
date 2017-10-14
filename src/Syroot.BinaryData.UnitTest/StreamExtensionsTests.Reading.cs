@@ -11,23 +11,12 @@ namespace Syroot.BinaryData.UnitTest
     {
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
+        private static readonly ByteConverter _reversedConverter
+            = BitConverter.IsLittleEndian ? ByteConverter.BigEndian : ByteConverter.LittleEndian;
+
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
         private static MemoryStream _stream = new MemoryStream();
-        
-        private static readonly MemoryStream _data = new MemoryStream(new byte[]
-        {
-            /*          |50594819 Int32 LE===|  |-1146486526 Int32 LE|  |-285221428 Int32 LE=|
-            |67305985 Int32 LE===|  |16909060 Int32 LE===|  |-573785174 Int32 LE=|  |-857870593 Int32 LE=|
-            |16909060 Int32 BE===|  |67305985 Int32 BE===|  |-1430532899 Int32 BE|  |-1122868 Int32 BE===|
-            |72623859773407745 Int64 LE==================|  |-3684526137413944406 Int64 LE===============|
-            |72623859773407745 Int64 BE==================|  |-6144092012763226676 Int64 BE===============|
-            |72623859773407745 UInt64 LE=================|  |14762217936295607210 UInt64 LE==============|
-            |72623859773407745 UInt64 BE=================|  |12302652060946324940 UInt64 BE==============|*/
-            0x01, 0x02, 0x03, 0x04, 0x04, 0x03, 0x02, 0x01, 0xAA, 0xBB, 0xCC, 0xDD, 0xFF, 0xEE, 0xDD, 0xCC
-        });
-        private const string _unicodeTestString1 = "크레이지레이싱 카트라이더"; // "Crazyracing KartRider"
-        private const string _unicodeTestString2 = "äöüßÄÖÜ"; // German characters
-        private const string _asciiTestString1 = "Hello World"; // Dennis Ritchie
-        private const string _asciiTestString2 = "Trump sucks"; // Truth
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -69,255 +58,414 @@ namespace Syroot.BinaryData.UnitTest
         }
 
         [TestMethod]
-        public void ReadBoolean() { }
-
-        [TestMethod]
-        public void ReadBooleans() { }
-
-        [TestMethod]
-        public void ReadDateTime() { }
-
-        [TestMethod]
-        public void ReadDateTimes() { }
-
-        [TestMethod]
-        public void ReadDecimal() { }
-
-        [TestMethod]
-        public void ReadDecimals() { }
-
-        [TestMethod]
-        public void ReadDouble() { }
-
-        [TestMethod]
-        public void ReadDoubles() { }
-        
-        [TestMethod]
-        public void ReadInt16() { }
-
-        [TestMethod]
-        public void ReadInt16s() { }
-        
-        [TestMethod]
-        public void ReadInt32()
+        public void ReadBoolean()
         {
-            Int32 value;
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(true);
+                writer.Write(false);
+                writer.Write((byte)255);
+                writer.Write((byte)0);
 
-            // Read as little endian.
-            _data.Position = 0;
-            value = _data.ReadInt32(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(67305985, value);
-            value = _data.ReadInt32(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(16909060, value);
-            value = _data.ReadInt32(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(-573785174, value);
-            value = _data.ReadInt32(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(-857870593, value);
+                writer.Write((short)0);
+                writer.Write((short)1);
+                writer.Write((short)256);
+                writer.Write((short)-5);
 
-            // Read as big endian.
-            _data.Position = 0;
-            value = _data.ReadInt32(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(16909060, value);
-            value = _data.ReadInt32(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(67305985, value);
-            value = _data.ReadInt32(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(-1430532899, value);
-            value = _data.ReadInt32(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(-1122868, value);
+                writer.Write(0);
+                writer.Write(1);
+                writer.Write(3);
+                writer.Write(-1);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+
+            Assert.AreEqual(true, _stream.ReadBoolean());
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Byte));
+            Assert.AreEqual(true, _stream.ReadBoolean());
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Byte));
+
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
+
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
         }
 
         [TestMethod]
-        public void ReadInt32s()
+        public void ReadDateTime()
         {
-            Int32[] values;
+            DateTime value1 = new DateTime(2000, 12, 24);
+            DateTime value2 = DateTime.Now;
+            DateTime value3 = new DateTime(1970, 1, 1);
+            DateTime value4 = new DateTime(2001, 09, 09, 01, 46, 40);
 
-            // Read as little endian.
-            _data.Position = 0;
-            values = _data.ReadInt32s(4, converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(67305985, values[0]);
-            Assert.AreEqual(16909060, values[1]);
-            Assert.AreEqual(-573785174, values[2]);
-            Assert.AreEqual(-857870593, values[3]);
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1.Ticks);
+                writer.Write(value2.Ticks);
+                writer.Write(0); // value3
+                writer.Write((long)0); // value3
+                writer.Write(1_000_000_000); // value4
+            }
 
-            // Read as big endian.
-            _data.Position = 0;
-            values = _data.ReadInt32s(4, converter: ByteConverter.BigEndian);
-            Assert.AreEqual(16909060, values[0]);
-            Assert.AreEqual(67305985, values[1]);
-            Assert.AreEqual(-1430532899, values[2]);
-            Assert.AreEqual(-1122868, values[3]);
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadDateTime());
+            Assert.AreEqual(value2, _stream.ReadDateTime());
+            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeDataFormat.CTime));
+            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeDataFormat.CTime64));
+            Assert.AreEqual(value4, _stream.ReadDateTime(DateTimeDataFormat.CTime));
+        }
+
+        [TestMethod]
+        public void ReadDecimal()
+        {
+            Decimal value1 = new Decimal(1111, 2222, 3333, false, 4);
+            Decimal value2 = new Decimal(100.123);
+            Decimal value3 = new Decimal(-567.890);
+            Decimal value4 = Decimal.MaxValue;
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadDecimal());
+            Assert.AreEqual(value2, _stream.ReadDecimal());
+            Assert.AreEqual(value3, _stream.ReadDecimal());
+            Assert.AreEqual(value4, _stream.ReadDecimal());
+        }
+
+        [TestMethod]
+        public void ReadDouble()
+        {
+            const Double value1 = 49210421.2421;
+            const Double value2 = Double.NegativeInfinity;
+            const Double value3 = -567.890;
+            const Double value4 = Double.NaN;
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadDouble());
+            Assert.AreEqual(value2, _stream.ReadDouble());
+            Assert.AreEqual(value3, _stream.ReadDouble());
+            Assert.AreEqual(value4, _stream.ReadDouble());
+        }
+
+        [TestMethod]
+        public void ReadInt16()
+        {
+            const Int16 value1 = 0x0403;
+            const Int16 value2 = 0x0102;
+            const Int16 value3 = unchecked((Int16)0xDDCC);
+            const Int16 value4 = unchecked((Int16)0xCCDD);
+            const Int16 value1r = 0x0304;
+            const Int16 value2r = 0x0201;
+            const Int16 value3r = unchecked((Int16)0xCCDD);
+            const Int16 value4r = unchecked((Int16)0xDDCC);
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadInt16());
+            Assert.AreEqual(value2, _stream.ReadInt16());
+            Assert.AreEqual(value3, _stream.ReadInt16());
+            Assert.AreEqual(value4, _stream.ReadInt16());
+
+            // Read in reversed endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadInt16(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadInt16(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadInt16(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadInt16(converter: _reversedConverter));
+        }
+
+        [TestMethod]
+        public void ReadInt32()
+        {
+            const Int32 value1 = 0x04030201;
+            const Int32 value2 = 0x01020304;
+            const Int32 value3 = unchecked((Int32)0xDDCCBBAA);
+            const Int32 value4 = unchecked((Int32)0xCCDDEEFF);
+            const Int32 value1r = 0x01020304;
+            const Int32 value2r = 0x04030201;
+            const Int32 value3r = unchecked((Int32)0xAABBCCDD);
+            const Int32 value4r = unchecked((Int32)0xFFEEDDCC);
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadInt32());
+            Assert.AreEqual(value2, _stream.ReadInt32());
+            Assert.AreEqual(value3, _stream.ReadInt32());
+            Assert.AreEqual(value4, _stream.ReadInt32());
+
+            // Read in other endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadInt32(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadInt32(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadInt32(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadInt32(converter: _reversedConverter));
         }
 
         [TestMethod]
         public void ReadInt64()
         {
-            Int64 value;
+            const Int64 value1 = 0x0807060504030201;
+            const Int64 value2 = 0x0102030405060708;
+            const Int64 value3 = unchecked((Int64)0xFFEEDDCCBBAA9988);
+            const Int64 value4 = unchecked((Int64)0x8899AABBCCDDEEFF);
+            const Int64 value1r = 0x0102030405060708;
+            const Int64 value2r = 0x0807060504030201;
+            const Int64 value3r = unchecked((Int64)0x8899AABBCCDDEEFF);
+            const Int64 value4r = unchecked((Int64)0xFFEEDDCCBBAA9988);
 
-            // Read as little endian.
-            _data.Position = 0;
-            value = _data.ReadInt64(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(72623859773407745, value);
-            value = _data.ReadInt64(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(-3684526137413944406, value);
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
 
-            // Read as big endian.
-            _data.Position = 0;
-            value = _data.ReadInt64(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(72623859773407745, value);
-            value = _data.ReadInt64(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(-6144092012763226676, value);
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadInt64());
+            Assert.AreEqual(value2, _stream.ReadInt64());
+            Assert.AreEqual(value3, _stream.ReadInt64());
+            Assert.AreEqual(value4, _stream.ReadInt64());
+
+            // Read in other endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadInt64(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadInt64(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadInt64(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadInt64(converter: _reversedConverter));
         }
 
         [TestMethod]
-        public void ReadInt64s()
+        public void ReadSingle()
         {
-            Int64[] values;
+            const Single value1 = 49210421.2421f;
+            const Single value2 = Single.NegativeInfinity;
+            const Single value3 = -567.890f;
+            const Single value4 = Single.NaN;
 
-            // Read as little endian.
-            _data.Position = 0;
-            values = _data.ReadInt64s(2, converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(72623859773407745, values[0]);
-            Assert.AreEqual(-3684526137413944406, values[1]);
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
 
-            // Read as big endian.
-            _data.Position = 0;
-            values = _data.ReadInt64s(2, converter: ByteConverter.BigEndian);
-            Assert.AreEqual(72623859773407745, values[0]);
-            Assert.AreEqual(-6144092012763226676, values[1]);
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadSingle());
+            Assert.AreEqual(value2, _stream.ReadSingle());
+            Assert.AreEqual(value3, _stream.ReadSingle());
+            Assert.AreEqual(value4, _stream.ReadSingle());
         }
-        
-        [TestMethod]
-        public void ReadSBytes() { }
 
-        [TestMethod]
-        public void ReadSingle() { }
-
-        [TestMethod]
-        public void ReadSingles() { }
-        
         [TestMethod]
         public void ReadString()
         {
-            using (MemoryStream stream = new MemoryStream())
+            const string value1 = "크레이지레이싱 카트라이더";
+            const string value2 = "äöüßÄÖÜ";
+            const string value3 = "Hello World";
+            const string value4 = "Trump sucks";
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
             {
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, true))
-                {
-                    // .NET variable-length prefix
-                    writer.Write(_unicodeTestString1);
-                    writer.Write(_unicodeTestString2);
-                    // Custom length prefix
-                    writer.Write(_unicodeTestString1.Length);
-                    writer.Write(Encoding.UTF8.GetBytes(_unicodeTestString1));
-                    writer.Write((Int16)_unicodeTestString2.Length);
-                    writer.Write(Encoding.UTF8.GetBytes(_unicodeTestString2));
-                    // Zero termination
-                    writer.Write(Encoding.Unicode.GetBytes(_unicodeTestString1));
-                    writer.Write((Int16)0);
-                }
-                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.ASCII, true))
-                {
-                    // .NET variable-length prefix
-                    writer.Write(_asciiTestString1);
-                    writer.Write(_asciiTestString2);
-                    // Custom length prefix
-                    writer.Write(_asciiTestString1.Length);
-                    writer.Write(Encoding.ASCII.GetBytes(_asciiTestString1));
-                    writer.Write((Byte)_asciiTestString2.Length);
-                    writer.Write(Encoding.ASCII.GetBytes(_asciiTestString2));
-                    // Zero termination
-                    writer.Write(Encoding.ASCII.GetBytes(_asciiTestString1));
-                    writer.Write((Byte)0);
-                }
-                stream.Position = 0;
-                Assert.AreEqual(_unicodeTestString1, stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
-                Assert.AreEqual(_unicodeTestString2, stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
-                Assert.AreEqual(_unicodeTestString1, stream.ReadString(StringDataFormat.Int32CharCount, Encoding.UTF8));
-                Assert.AreEqual(_unicodeTestString2, stream.ReadString(StringDataFormat.Int16CharCount, Encoding.UTF8));
-                Assert.AreEqual(_unicodeTestString1, stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.Unicode));
-                Assert.AreEqual(_asciiTestString1, stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
-                Assert.AreEqual(_asciiTestString2, stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
-                Assert.AreEqual(_asciiTestString1, stream.ReadString(StringDataFormat.Int32CharCount, Encoding.ASCII));
-                Assert.AreEqual(_asciiTestString2, stream.ReadString(StringDataFormat.ByteCharCount, Encoding.ASCII));
-                Assert.AreEqual(_asciiTestString1, stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.ASCII));
+                // .NET variable-length prefix
+                writer.Write(value1);
+                writer.Write(value2);
+                // Custom length prefix
+                writer.Write(value1.Length);
+                writer.Write(Encoding.UTF8.GetBytes(value1));
+                writer.Write((Int16)value2.Length);
+                writer.Write(Encoding.UTF8.GetBytes(value2));
+                // Zero termination
+                writer.Write(Encoding.Unicode.GetBytes(value1));
+                writer.Write((Int16)0);
             }
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.ASCII, true))
+            {
+                // .NET variable-length prefix
+                writer.Write(value3);
+                writer.Write(value4);
+                // Custom length prefix
+                writer.Write(value3.Length);
+                writer.Write(Encoding.ASCII.GetBytes(value3));
+                writer.Write((Byte)value4.Length);
+                writer.Write(Encoding.ASCII.GetBytes(value4));
+                // Zero termination
+                writer.Write(Encoding.ASCII.GetBytes(value3));
+                writer.Write((Byte)0);
+            }
+
+            // Read test values.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
+            Assert.AreEqual(value2, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
+            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.Int32CharCount, Encoding.UTF8));
+            Assert.AreEqual(value2, _stream.ReadString(StringDataFormat.Int16CharCount, Encoding.UTF8));
+            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.Unicode));
+            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
+            Assert.AreEqual(value4, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
+            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.Int32CharCount, Encoding.ASCII));
+            Assert.AreEqual(value4, _stream.ReadString(StringDataFormat.ByteCharCount, Encoding.ASCII));
+            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.ASCII));
         }
 
         [TestMethod]
-        public void ReadUInt16() { }
+        public void ReadUInt16()
+        {
+            const UInt16 value1 = 0x0403;
+            const UInt16 value2 = 0x0102;
+            const UInt16 value3 = 0xDDCC;
+            const UInt16 value4 = 0xCCDD;
+            const UInt16 value1r = 0x0304;
+            const UInt16 value2r = 0x0201;
+            const UInt16 value3r = 0xCCDD;
+            const UInt16 value4r = 0xDDCC;
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
+
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadUInt16());
+            Assert.AreEqual(value2, _stream.ReadUInt16());
+            Assert.AreEqual(value3, _stream.ReadUInt16());
+            Assert.AreEqual(value4, _stream.ReadUInt16());
+
+            // Read in reversed endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadUInt16(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadUInt16(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadUInt16(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadUInt16(converter: _reversedConverter));
+        }
 
         [TestMethod]
-        public void ReadUInt16s() { }
+        public void ReadUInt32()
+        {
+            const UInt32 value1 = 0x04030201;
+            const UInt32 value2 = 0x01020304;
+            const UInt32 value3 = 0xDDCCBBAA;
+            const UInt32 value4 = 0xCCDDEEFF;
+            const UInt32 value1r = 0x01020304;
+            const UInt32 value2r = 0x04030201;
+            const UInt32 value3r = 0xAABBCCDD;
+            const UInt32 value4r = 0xFFEEDDCC;
 
-        [TestMethod]
-        public void ReadUInt32() { }
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
+            }
 
-        [TestMethod]
-        public void ReadUInt32s() { }
-        
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadUInt32());
+            Assert.AreEqual(value2, _stream.ReadUInt32());
+            Assert.AreEqual(value3, _stream.ReadUInt32());
+            Assert.AreEqual(value4, _stream.ReadUInt32());
+
+            // Read in other endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadUInt32(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadUInt32(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadUInt32(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadUInt32(converter: _reversedConverter));
+        }
+
         [TestMethod]
         public void ReadUInt64()
         {
-            UInt64 value;
+            const UInt64 value1 = 0x0807060504030201;
+            const UInt64 value2 = 0x0102030405060708;
+            const UInt64 value3 = 0xFFEEDDCCBBAA9988;
+            const UInt64 value4 = 0x8899AABBCCDDEEFF;
+            const UInt64 value1r = 0x0102030405060708;
+            const UInt64 value2r = 0x0807060504030201;
+            const UInt64 value3r = 0x8899AABBCCDDEEFF;
+            const UInt64 value4r = 0xFFEEDDCCBBAA9988;
 
-            // Read as little endian.
-            _data.Position = 0;
-            value = _data.ReadUInt64(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(72623859773407745u, value);
-            value = _data.ReadUInt64(converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(14762217936295607210u, value);
-
-            // Read as big endian.
-            _data.Position = 0;
-            value = _data.ReadUInt64(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(72623859773407745u, value);
-            value = _data.ReadUInt64(converter: ByteConverter.BigEndian);
-            Assert.AreEqual(12302652060946324940u, value);
-        }
-
-        [TestMethod]
-        public void ReadUInt64s()
-        {
-            UInt64[] values;
-
-            // Read as little endian.
-            _data.Position = 0;
-            values = _data.ReadUInt64s(2, converter: ByteConverter.LittleEndian);
-            Assert.AreEqual(72623859773407745u, values[0]);
-            Assert.AreEqual(14762217936295607210u, values[1]);
-
-            // Read as big endian.
-            _data.Position = 0;
-            values = _data.ReadUInt64s(2, converter: ByteConverter.BigEndian);
-            Assert.AreEqual(72623859773407745u, values[0]);
-            Assert.AreEqual(12302652060946324940u, values[1]);
-        }
-
-        [TestMethod]
-        public void Seek() { }
-
-        [TestMethod]
-        public void TemporarySeek()
-        {
-            _data.Position = 1;
-
-            // Check read value and restoration of position.
-            Int32 value;
-            using (_data.TemporarySeek(2, SeekOrigin.Begin))
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
             {
-                value = _data.ReadInt32(ByteConverter.LittleEndian);
+                writer.Write(value1);
+                writer.Write(value2);
+                writer.Write(value3);
+                writer.Write(value4);
             }
-            Assert.AreEqual(1, _data.Position);
-            Assert.AreEqual(50594819, value);
 
-            Int32[] values;
-            using (_data.TemporarySeek(2, SeekOrigin.Begin))
-            {
-                values = _data.ReadInt32s(3, ByteConverter.LittleEndian);
-            }
-            Assert.AreEqual(1, _data.Position);
-            Assert.AreEqual(50594819, values[0]);
-            Assert.AreEqual(-1146486526, values[1]);
-            Assert.AreEqual(-285221428, values[2]);
+            // Read in system endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadUInt64());
+            Assert.AreEqual(value2, _stream.ReadUInt64());
+            Assert.AreEqual(value3, _stream.ReadUInt64());
+            Assert.AreEqual(value4, _stream.ReadUInt64());
+
+            // Read in other endianness.
+            _stream.Position = 0;
+            Assert.AreEqual(value1r, _stream.ReadUInt64(converter: _reversedConverter));
+            Assert.AreEqual(value2r, _stream.ReadUInt64(converter: _reversedConverter));
+            Assert.AreEqual(value3r, _stream.ReadUInt64(converter: _reversedConverter));
+            Assert.AreEqual(value4r, _stream.ReadUInt64(converter: _reversedConverter));
         }
     }
 }

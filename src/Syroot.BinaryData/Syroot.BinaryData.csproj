@@ -1,39 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Description>.NET library extending binary reading and writing functionality.</Description>
-    <Copyright>(c) Syroot, licensed under MIT</Copyright>
-    <AssemblyName>Syroot.BinaryData</AssemblyName>
-    <AssemblyTitle>BinaryData</AssemblyTitle>
-    <Authors>Syroot</Authors>
-    <VersionPrefix>3.0.0-alpha1</VersionPrefix>
-    
-    <PackageId>Syroot.IO.BinaryData</PackageId>
-    <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-    <PackageReleaseNotes>Added extension methods and several other new features.</PackageReleaseNotes>
-    <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
-    
-    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>.NET library extending binary reading and writing functionality.</Description>
+        <Copyright>(c) Syroot, licensed under MIT</Copyright>
+        <AssemblyName>Syroot.BinaryData</AssemblyName>
+        <AssemblyTitle>BinaryData</AssemblyTitle>
+        <Authors>Syroot</Authors>
+        <VersionPrefix>3.0.0-beta1</VersionPrefix>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
+        <PackageId>Syroot.IO.BinaryData</PackageId>
+        <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
+        <PackageReleaseNotes>Added extension methods and several other new features.</PackageReleaseNotes>
+        <PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugType>none</DebugType>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
+        <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>Syroot.BinaryData.pfx</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 </Project>
