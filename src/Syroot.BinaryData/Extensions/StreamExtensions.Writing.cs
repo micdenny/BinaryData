@@ -23,18 +23,21 @@ namespace Syroot.BinaryData.Extensions
             BooleanDataFormat format = BooleanDataFormat.Byte, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
+            byte[] buffer;
             switch (format)
             {
                 case BooleanDataFormat.Byte:
                     stream.WriteByte((Byte)(value ? 1 : 0));
                     break;
                 case BooleanDataFormat.Word:
-                    converter.GetBytes((Int16)(value ? 1 : 0), _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int16));
+                    buffer = Buffer;
+                    converter.GetBytes((Int16)(value ? 1 : 0), buffer, 0);
+                    stream.Write(Buffer, 0, sizeof(Int16));
                     break;
                 case BooleanDataFormat.Dword:
-                    converter.GetBytes(value ? 1 : 0, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int32));
+                    buffer = Buffer;
+                    converter.GetBytes(value ? 1 : 0, buffer, 0);
+                    stream.Write(Buffer, 0, sizeof(Int32));
                     break;
                 default:
                     throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
@@ -54,6 +57,7 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer;
                 switch (format)
                 {
                     case BooleanDataFormat.Byte:
@@ -63,17 +67,19 @@ namespace Syroot.BinaryData.Extensions
                         }
                         break;
                     case BooleanDataFormat.Word:
+                        buffer = Buffer;
                         foreach (var value in values)
                         {
-                            converter.GetBytes((Int16)(value ? 1 : 0), _buffer, 0);
-                            stream.Write(_buffer, 0, sizeof(Int16));
+                            converter.GetBytes((Int16)(value ? 1 : 0), buffer, 0);
+                            stream.Write(Buffer, 0, sizeof(Int16));
                         }
                         break;
                     case BooleanDataFormat.Dword:
+                        buffer = Buffer;
                         foreach (var value in values)
                         {
-                            converter.GetBytes(value ? 1 : 0, _buffer, 0);
-                            stream.Write(_buffer, 0, sizeof(Int32));
+                            converter.GetBytes(value ? 1 : 0, buffer, 0);
+                            stream.Write(Buffer, 0, sizeof(Int32));
                         }
                         break;
                     default:
@@ -156,8 +162,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Decimal value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Decimal));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Decimal));
         }
 
         /// <summary>
@@ -171,10 +178,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Decimal));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Decimal));
                 }
             }
         }
@@ -187,8 +195,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Double value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Double));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Double));
         }
 
         /// <summary>
@@ -202,10 +211,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Double));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Double));
                 }
             }
         }
@@ -218,8 +228,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Int16 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Int16));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Int16));
         }
 
         /// <summary>
@@ -233,10 +244,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int16));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Int16));
                 }
             }
         }
@@ -249,9 +261,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Int32 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Int32));
-            
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Int32));
         }
 
         /// <summary>
@@ -265,10 +277,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int32));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Int32));
                 }
             }
         }
@@ -281,8 +294,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Int64 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Int64));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Int64));
         }
 
         /// <summary>
@@ -296,10 +310,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int64));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Int64));
                 }
             }
         }
@@ -311,8 +326,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="value">The value to write.</param>
         public static void Write(this Stream stream, SByte value)
         {
-            _buffer[0] = (byte)value;
-            stream.Write(_buffer, 0, sizeof(SByte));
+            byte[] buffer = Buffer;
+            buffer[0] = (byte)value;
+            stream.Write(buffer, 0, sizeof(SByte));
         }
 
         /// <summary>
@@ -324,10 +340,11 @@ namespace Syroot.BinaryData.Extensions
         {
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    _buffer[0] = (byte)value;
-                    stream.Write(_buffer, 0, sizeof(SByte));
+                    buffer[0] = (byte)value;
+                    stream.Write(buffer, 0, sizeof(SByte));
                 }
             }
         }
@@ -340,8 +357,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Single value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(Single));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(Single));
         }
 
         /// <summary>
@@ -355,10 +373,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Single));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Single));
                 }
             }
         }
@@ -391,13 +410,13 @@ namespace Syroot.BinaryData.Extensions
                     stream.Write(buffer, 0, buffer.Length);
                     break;
                 case StringDataFormat.Int16CharCount:
-                    converter.GetBytes((Int16)value.Length, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int16));
+                    converter.GetBytes((Int16)value.Length, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Int16));
                     stream.Write(buffer, 0, buffer.Length);
                     break;
                 case StringDataFormat.Int32CharCount:
-                    converter.GetBytes(value.Length, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(Int32));
+                    converter.GetBytes(value.Length, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(Int32));
                     stream.Write(buffer, 0, buffer.Length);
                     break;
                 case StringDataFormat.ZeroTerminated:
@@ -442,8 +461,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, UInt16 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(UInt16));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(UInt16));
         }
 
         /// <summary>
@@ -457,10 +477,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(UInt16));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(UInt16));
                 }
             }
         }
@@ -473,8 +494,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, UInt32 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(UInt32));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(UInt32));
         }
 
         /// <summary>
@@ -488,10 +510,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(UInt32));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(UInt32));
                 }
             }
         }
@@ -504,8 +527,9 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, UInt64 value, ByteConverter converter = null)
         {
-            (converter ?? ByteConverter.System).GetBytes(value, _buffer, 0);
-            stream.Write(_buffer, 0, sizeof(UInt64));
+            byte[] buffer = Buffer;
+            (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
+            stream.Write(buffer, 0, sizeof(UInt64));
         }
 
         /// <summary>
@@ -519,10 +543,11 @@ namespace Syroot.BinaryData.Extensions
             converter = converter ?? ByteConverter.System;
             lock (stream)
             {
+                byte[] buffer = Buffer;
                 foreach (var value in values)
                 {
-                    converter.GetBytes(value, _buffer, 0);
-                    stream.Write(_buffer, 0, sizeof(UInt64));
+                    converter.GetBytes(value, buffer, 0);
+                    stream.Write(buffer, 0, sizeof(UInt64));
                 }
             }
         }

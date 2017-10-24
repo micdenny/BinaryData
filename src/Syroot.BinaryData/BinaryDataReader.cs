@@ -23,10 +23,7 @@ namespace Syroot.BinaryData
         /// <param name="input">The input stream.</param>
         /// <exception cref="ArgumentException">The stream does not support reading, is null, or is already closed.
         /// </exception>
-        public BinaryDataReader(Stream input)
-            : this(input, new UTF8Encoding(), false)
-        {
-        }
+        public BinaryDataReader(Stream input) : this(input, new UTF8Encoding(), false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader"/> class based on the specified stream, UTF-8
@@ -38,10 +35,7 @@ namespace Syroot.BinaryData
         /// <exception cref="ArgumentException">The stream does not support reading, is null, or is already closed.
         /// </exception>
         /// <exception cref="ArgumentNullException">encoding is null.</exception>
-        public BinaryDataReader(Stream input, bool leaveOpen)
-            : this(input, new UTF8Encoding(), leaveOpen)
-        {
-        }
+        public BinaryDataReader(Stream input, bool leaveOpen) : this(input, new UTF8Encoding(), leaveOpen) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader"/> class based on the specified stream and
@@ -52,10 +46,7 @@ namespace Syroot.BinaryData
         /// <exception cref="ArgumentException">The stream does not support reading, is null, or is already closed.
         /// </exception>
         /// <exception cref="ArgumentNullException">encoding is null.</exception>
-        public BinaryDataReader(Stream input, Encoding encoding)
-            : this(input, encoding, false)
-        {
-        }
+        public BinaryDataReader(Stream input, Encoding encoding) : this(input, encoding, false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryDataReader"/> class based on the specified stream and
@@ -68,8 +59,7 @@ namespace Syroot.BinaryData
         /// <exception cref="ArgumentException">The stream does not support reading, is null, or is already closed.
         /// </exception>
         /// <exception cref="ArgumentNullException">encoding is null.</exception>
-        public BinaryDataReader(Stream input, Encoding encoding, bool leaveOpen)
-            : base(input, encoding, leaveOpen)
+        public BinaryDataReader(Stream input, Encoding encoding, bool leaveOpen) : base(input, encoding, leaveOpen)
         {
             Encoding = encoding;
             ByteOrder = ByteConverter.System.ByteOrder;
@@ -87,31 +77,25 @@ namespace Syroot.BinaryData
         /// </summary>
         public ByteOrder ByteOrder
         {
-            get { return ByteConverter.ByteOrder; }
-            set { ByteConverter = ByteConverter.GetConverter(value); }
+            get => ByteConverter.ByteOrder;
+            set => ByteConverter = ByteConverter.GetConverter(value);
         }
 
         /// <summary>
         /// Gets the encoding used for string related operations where no other encoding has been provided. Due to the
         /// way the underlying <see cref="BinaryReader"/> is instantiated, it can only be specified at creation time.
         /// </summary>
-        public Encoding Encoding { get; private set; }
+        public Encoding Encoding { get; }
 
         /// <summary>
         /// Gets a value indicating whether the end of the stream has been reached and no more data can be read.
         /// </summary>
-        public bool EndOfStream
-        {
-            get { return BaseStream.IsEndOfStream(); }
-        }
+        public bool EndOfStream => BaseStream.IsEndOfStream();
 
         /// <summary>
         /// Gets the length in bytes of the stream in bytes.
         /// </summary>
-        public long Length
-        {
-            get { return BaseStream.Length; }
-        }
+        public long Length => BaseStream.Length;
         
         /// <summary>
         /// Gets or sets the position within the current stream. This is a shortcut to the base stream Position
@@ -119,8 +103,8 @@ namespace Syroot.BinaryData
         /// </summary>
         public long Position
         {
-            get { return BaseStream.Position; }
-            set { BaseStream.Position = value; }
+            get => BaseStream.Position;
+            set => BaseStream.Position = value;
         }
         
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
@@ -130,10 +114,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="alignment">The byte multiple.</param>
         /// <returns>The new position within the current stream.</returns>
-        public long Align(int alignment)
-        {
-            return BaseStream.Align(alignment);
-        }
+        public long Align(int alignment) => BaseStream.Align(alignment);
 
         /// <summary>
         /// Reads a <see cref="Boolean"/> value from the current stream. The <see cref="Boolean"/> is available in the
@@ -141,10 +122,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="format">The binary format, in which the <see cref="Boolean"/> will be read.</param>
         /// <returns>The <see cref="Boolean"/> read from the current stream.</returns>
-        public Boolean ReadBoolean(BooleanDataFormat format)
-        {
-            return BaseStream.ReadBoolean(format);
-        }
+        public Boolean ReadBoolean(BooleanDataFormat format) => BaseStream.ReadBoolean(format);
 
         /// <summary>
         /// Reads the specified number of <see cref="Boolean"/> values from the current stream into a
@@ -154,10 +132,8 @@ namespace Syroot.BinaryData
         /// <param name="format">The binary format, in which the <see cref="Boolean"/> values will be read.</param>
         /// <returns>The <see cref="Boolean"/> array read from the current stream.</returns>
         public Boolean[] ReadBooleans(int count, BooleanDataFormat format = BooleanDataFormat.Byte)
-        {
-            return BaseStream.ReadBooleans(count, format);
-        }
-        
+            => BaseStream.ReadBooleans(count, format);
+
         /// <summary>
         /// Reads a <see cref="DateTime"/> from the current stream. The <see cref="DateTime"/> is available in the
         /// specified binary format.
@@ -165,10 +141,8 @@ namespace Syroot.BinaryData
         /// <param name="format">The binary format, in which the <see cref="DateTime"/> will be read.</param>
         /// <returns>The <see cref="DateTime"/> read from the current stream.</returns>
         public DateTime ReadDateTime(DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
-        {
-            return BaseStream.ReadDateTime(format, ByteConverter);
-        }
-        
+            => BaseStream.ReadDateTime(format, ByteConverter);
+
         /// <summary>
         /// Reads the specified number of <see cref="DateTime"/> values from the current stream into a
         /// <see cref="DateTime"/> array. The <see cref="DateTime"/> values are available in the specified binary
@@ -178,19 +152,14 @@ namespace Syroot.BinaryData
         /// <param name="format">The binary format, in which the <see cref="DateTime"/> values will be read.</param>
         /// <returns>The <see cref="DateTime"/> array read from the current stream.</returns>
         public DateTime[] ReadDateTimes(int count, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
-        {
-            return BaseStream.ReadDateTimes(count, format, ByteConverter);
-        }
+            => BaseStream.ReadDateTimes(count, format, ByteConverter);
 
         /// <summary>
         /// Reads an 16-byte floating point value from the current stream and advances the current position of the
         /// stream by sixteen bytes.
         /// </summary>
         /// <returns>The 16-byte floating point value read from the current stream.</returns>
-        public override Decimal ReadDecimal()
-        {
-            return BaseStream.ReadDecimal(ByteConverter);
-        }
+        public override Decimal ReadDecimal() => BaseStream.ReadDecimal(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Decimal"/> values from the current stream into a
@@ -199,20 +168,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Decimal"/> values to read.</param>
         /// <returns>The <see cref="Decimal"/> array read from the current stream.</returns>
-        public Decimal[] ReadDecimals(int count)
-        {
-            return BaseStream.ReadDecimals(count, ByteConverter);
-        }
+        public Decimal[] ReadDecimals(int count) => BaseStream.ReadDecimals(count, ByteConverter);
 
         /// <summary>
         /// Reads an 8-byte floating point value from the current stream and advances the current position of the stream
         /// by eight bytes.
         /// </summary>
         /// <returns>The 8-byte floating point value read from the current stream.</returns>
-        public override Double ReadDouble()
-        {
-            return BaseStream.ReadDouble(ByteConverter);
-        }
+        public override Double ReadDouble() => BaseStream.ReadDouble(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Double"/> values from the current stream into a
@@ -221,10 +184,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Double"/> values to read.</param>
         /// <returns>The <see cref="Double"/> array read from the current stream.</returns>
-        public Double[] ReadDoubles(int count)
-        {
-            return BaseStream.ReadDoubles(count, ByteConverter);
-        }
+        public Double[] ReadDoubles(int count) => BaseStream.ReadDoubles(count, ByteConverter);
 
         /// <summary>
         /// Reads the specified enum value from the current stream and advances the current position by the size of the
@@ -234,8 +194,7 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <returns>The enum value read from the current stream.</returns>
-        public T ReadEnum<T>(bool strict)
-            where T : struct, IComparable, IFormattable // enum
+        public T ReadEnum<T>(bool strict) where T : struct, IComparable, IFormattable // enum
         {
             return (T)ReadEnum(typeof(T), strict);
         }
@@ -249,8 +208,7 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
         /// <returns>The enum values array read from the current stream.</returns>
-        public T[] ReadEnums<T>(int count, bool strict)
-            where T : struct, IComparable, IFormattable // enum
+        public T[] ReadEnums<T>(int count, bool strict) where T : struct, IComparable, IFormattable // enum
         {
             T[] values = new T[count];
             for (int i = 0; i < values.Length; i++)
@@ -265,10 +223,7 @@ namespace Syroot.BinaryData
         /// bytes.
         /// </summary>
         /// <returns>The 2-byte signed integer read from the current stream.</returns>
-        public override Int16 ReadInt16()
-        {
-            return BaseStream.ReadInt16(ByteConverter);
-        }
+        public override Int16 ReadInt16() => BaseStream.ReadInt16(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Int16"/> values from the current stream into a <see cref="Int16"/>
@@ -277,20 +232,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Int16"/> values to read.</param>
         /// <returns>The <see cref="Int16"/> array read from the current stream.</returns>
-        public Int16[] ReadInt16s(int count)
-        {
-            return BaseStream.ReadInt16s(count, ByteConverter);
-        }
+        public Int16[] ReadInt16s(int count) => BaseStream.ReadInt16s(count, ByteConverter);
 
         /// <summary>
         /// Reads a 4-byte signed integer from the current stream and advances the current position of the stream by
         /// four bytes.
         /// </summary>
         /// <returns>The 4-byte signed integer read from the current stream.</returns>
-        public override Int32 ReadInt32()
-        {
-            return BaseStream.ReadInt32(ByteConverter);
-        }
+        public override Int32 ReadInt32() => BaseStream.ReadInt32(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Int32"/> values from the current stream into a <see cref="Int32"/>
@@ -299,20 +248,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Int32"/> values to read.</param>
         /// <returns>The <see cref="Int32"/> array read from the current stream.</returns>
-        public Int32[] ReadInt32s(int count)
-        {
-            return BaseStream.ReadInt32s(count, ByteConverter);
-        }
+        public Int32[] ReadInt32s(int count) => BaseStream.ReadInt32s(count, ByteConverter);
 
         /// <summary>
         /// Reads an 8-byte signed integer from the current stream and advances the current position of the stream by
         /// eight bytes.
         /// </summary>
         /// <returns>The 8-byte signed integer read from the current stream.</returns>
-        public override Int64 ReadInt64()
-        {
-            return BaseStream.ReadInt64(ByteConverter);
-        }
+        public override Int64 ReadInt64() => BaseStream.ReadInt64(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Int64"/> values from the current stream into a <see cref="Int64"/>
@@ -321,10 +264,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Int64"/> values to read.</param>
         /// <returns>The <see cref="Int64"/> array read from the current stream.</returns>
-        public Int64[] ReadInt64s(int count)
-        {
-            return BaseStream.ReadInt64s(count, ByteConverter);
-        }
+        public Int64[] ReadInt64s(int count) => BaseStream.ReadInt64s(count, ByteConverter);
 
         /// <returns>The 8-byte signed integer read from the current stream.</returns>
         /// <summary>
@@ -352,7 +292,7 @@ namespace Syroot.BinaryData
             }
             return values;
         }
-        
+
         /// <summary>
         /// Reads the specified number of <see cref="SByte"/> values from the current stream into a <see cref="SByte"/>
         /// array and advances the current position by that number of <see cref="SByte"/> values multiplied with the
@@ -360,20 +300,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="SByte"/> values to read.</param>
         /// <returns>The <see cref="SByte"/> array read from the current stream.</returns>
-        public SByte[] ReadSBytes(int count)
-        {
-            return BaseStream.ReadSBytes(count);
-        }
+        public SByte[] ReadSBytes(int count) => BaseStream.ReadSBytes(count);
 
         /// <summary>
         /// Reads a 4-byte floating point value from the current stream and advances the current position of the stream
         /// by four bytes.
         /// </summary>
         /// <returns>The 4-byte floating point value read from the current stream.</returns>
-        public override Single ReadSingle()
-        {
-            return BaseStream.ReadSingle(ByteConverter);
-        }
+        public override Single ReadSingle() => BaseStream.ReadSingle(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="Single"/> values from the current stream into a
@@ -382,10 +316,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="Single"/> values to read.</param>
         /// <returns>The <see cref="Single"/> array read from the current stream.</returns>
-        public Single[] ReadSingles(int count)
-        {
-            return BaseStream.ReadSingles(count, ByteConverter);
-        }
+        public Single[] ReadSingles(int count) => BaseStream.ReadSingles(count, ByteConverter);
 
         /// <summary>
         /// Reads a string from the current stream. The string is available in the specified binary format and encoding.
@@ -395,9 +326,7 @@ namespace Syroot.BinaryData
         /// configured for this instance.</param>
         /// <returns>The string read from the current stream.</returns>
         public String ReadString(StringDataFormat format, Encoding encoding = null)
-        {
-            return BaseStream.ReadString(format, encoding ?? Encoding, ByteConverter);
-        }
+            => BaseStream.ReadString(format, encoding ?? Encoding, ByteConverter);
 
         /// <summary>
         /// Reads a string from the current stream. The string has neither a prefix or postfix, the length has to be
@@ -408,9 +337,7 @@ namespace Syroot.BinaryData
         /// configured for this instance.</param>
         /// <returns>The <see cref="String"/> read from the current stream.</returns>
         public String ReadString(int length, Encoding encoding = null)
-        {
-            return BaseStream.ReadString(length, encoding ?? Encoding);
-        }
+            => BaseStream.ReadString(length, encoding ?? Encoding);
 
         /// <summary>
         /// Reads the specified number of <see cref="String"/> values from the current stream into a
@@ -418,10 +345,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="String"/> values to read.</param>
         /// <returns>The <see cref="String"/> array read from the current stream.</returns>
-        public String[] ReadStrings(int count)
-        {
-            return BaseStream.ReadStrings(count);
-        }
+        public String[] ReadStrings(int count) => BaseStream.ReadStrings(count);
 
         /// <summary>
         /// Reads the specified number of <see cref="String"/> values from the current stream into a
@@ -433,9 +357,7 @@ namespace Syroot.BinaryData
         /// configured for this instance.</param>
         /// <returns>The <see cref="String"/> array read from the current stream.</returns>
         public String[] ReadStrings(int count, StringDataFormat format, Encoding encoding = null)
-        {
-            return BaseStream.ReadStrings(count, format, encoding ?? Encoding, ByteConverter);
-        }
+            => BaseStream.ReadStrings(count, format, encoding ?? Encoding, ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="String"/> values from the current stream into a
@@ -448,19 +370,14 @@ namespace Syroot.BinaryData
         /// configured for this instance.</param>
         /// <returns>The <see cref="String"/> array read from the current stream.</returns>
         public String[] ReadStrings(int count, int length, Encoding encoding = null)
-        {
-            return BaseStream.ReadStrings(count, length, encoding ?? Encoding);
-        }
+            => BaseStream.ReadStrings(count, length, encoding ?? Encoding);
 
         /// <summary>
         /// Reads a 2-byte unsigned integer from the current stream using little-endian encoding and advances the
         /// position of the stream by two bytes.
         /// </summary>
         /// <returns>The 2-byte unsigned integer read from the current stream.</returns>
-        public override UInt16 ReadUInt16()
-        {
-            return BaseStream.ReadUInt16(ByteConverter);
-        }
+        public override UInt16 ReadUInt16() => BaseStream.ReadUInt16(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="UInt16"/> values from the current stream into a
@@ -469,20 +386,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="UInt16"/> values to read.</param>
         /// <returns>The <see cref="UInt16"/> array read from the current stream.</returns>
-        public UInt16[] ReadUInt16s(int count)
-        {
-            return BaseStream.ReadUInt16s(count, ByteConverter);
-        }
+        public UInt16[] ReadUInt16s(int count) => BaseStream.ReadUInt16s(count, ByteConverter);
 
         /// <summary>
         /// Reads an 8-byte unsigned integer from the current stream and advances the position of the stream by eight
         /// bytes.
         /// </summary>
         /// <returns>The 8-byte unsigned integer read from the current stream.</returns>
-        public override UInt32 ReadUInt32()
-        {
-            return BaseStream.ReadUInt32(ByteConverter);
-        }
+        public override UInt32 ReadUInt32() => BaseStream.ReadUInt32(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="UInt32"/> values from the current stream into a
@@ -491,20 +402,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="UInt32"/> values to read.</param>
         /// <returns>The <see cref="UInt32"/> array read from the current stream.</returns>
-        public UInt32[] ReadUInt32s(int count)
-        {
-            return BaseStream.ReadUInt32s(count, ByteConverter);
-        }
+        public UInt32[] ReadUInt32s(int count) => BaseStream.ReadUInt32s(count, ByteConverter);
 
         /// <summary>
         /// Reads an 8-byte unsigned integer from the current stream and advances the position of the stream by eight
         /// bytes.
         /// </summary>
         /// <returns>The 8-byte unsigned integer read from the current stream.</returns>
-        public override UInt64 ReadUInt64()
-        {
-            return BaseStream.ReadUInt64(ByteConverter);
-        }
+        public override UInt64 ReadUInt64() => BaseStream.ReadUInt64(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of <see cref="UInt64"/> values from the current stream into a
@@ -513,20 +418,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="count">The number of <see cref="UInt64"/> values to read.</param>
         /// <returns>The <see cref="UInt64"/> array read from the current stream.</returns>
-        public UInt64[] ReadUInt64s(int count)
-        {
-            return BaseStream.ReadUInt64s(count, ByteConverter);
-        }
+        public UInt64[] ReadUInt64s(int count) => BaseStream.ReadUInt64s(count, ByteConverter);
 
         /// <summary>
         /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
         /// </summary>
         /// <param name="offset">A byte offset relative to the current position in the stream.</param>
         /// <returns>The new position within the current stream.</returns>
-        public long Seek(long offset)
-        {
-            return BaseStream.Seek(offset, SeekOrigin.Current);
-        }
+        public long Seek(long offset) => BaseStream.Seek(offset, SeekOrigin.Current);
 
         /// <summary>
         /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
@@ -535,19 +434,13 @@ namespace Syroot.BinaryData
         /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
         /// the new position.</param>
         /// <returns>The new position within the current stream.</returns>
-        public long Seek(long offset, SeekOrigin origin)
-        {
-            return BaseStream.Seek(offset, origin);
-        }
+        public long Seek(long offset, SeekOrigin origin) => BaseStream.Seek(offset, origin);
 
         /// <summary>
         /// Creates a <see cref="SeekTask"/> to restore the current position after it has been disposed.
         /// </summary>
         /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
-        public SeekTask TemporarySeek()
-        {
-            return BaseStream.TemporarySeek(0, SeekOrigin.Current);
-        }
+        public SeekTask TemporarySeek() => BaseStream.TemporarySeek(0, SeekOrigin.Current);
 
         /// <summary>
         /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
@@ -555,10 +448,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="offset">A byte offset relative to the current position in the stream.</param>
         /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public SeekTask TemporarySeek(long offset)
-        {
-            return BaseStream.TemporarySeek(offset, SeekOrigin.Current);
-        }
+        public SeekTask TemporarySeek(long offset) => BaseStream.TemporarySeek(offset, SeekOrigin.Current);
 
         /// <summary>
         /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
@@ -568,13 +458,10 @@ namespace Syroot.BinaryData
         /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
         /// the new position.</param>
         /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public SeekTask TemporarySeek(long offset, SeekOrigin origin)
-        {
-            return BaseStream.TemporarySeek(offset, origin);
-        }
+        public SeekTask TemporarySeek(long offset, SeekOrigin origin) => BaseStream.TemporarySeek(offset, origin);
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-        
+
         private object ReadEnum(Type type, bool strict)
         {
             // Validate the value to be defined in the enum.

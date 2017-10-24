@@ -8,13 +8,36 @@ namespace Syroot.BinaryData.Extensions
     /// </summary>
     public static partial class StreamExtensions
     {
-        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
-        
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
         [ThreadStatic]
-        private static readonly byte[] _buffer = new byte[16];
+        private static byte[] _buffer;
         [ThreadStatic]
-        private static readonly char[] _charBuffer = new char[16];
+        private static char[] _charBuffer;
+
         private static readonly DateTime _cTimeBase = new DateTime(1970, 1, 1);
+
+        // ---- PROPERTIES ---------------------------------------------------------------------------------------------
+
+        private static byte[] Buffer
+        {
+            get
+            {
+                if (_buffer == null)
+                    _buffer = new byte[16];
+                return _buffer;
+            }
+        }
+
+        private static char[] CharBuffer
+        {
+            get
+            {
+                if (_charBuffer == null)
+                    _charBuffer = new char[16];
+                return _charBuffer;
+            }
+        }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -95,5 +118,6 @@ namespace Syroot.BinaryData.Extensions
         {
             return new SeekTask(stream, offset, origin);
         }
+
     }
 }

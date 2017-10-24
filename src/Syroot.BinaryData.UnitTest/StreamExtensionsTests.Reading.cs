@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syroot.BinaryData.Extensions;
 
@@ -466,6 +468,35 @@ namespace Syroot.BinaryData.UnitTest
             Assert.AreEqual(value2r, _stream.ReadUInt64(converter: _reversedConverter));
             Assert.AreEqual(value3r, _stream.ReadUInt64(converter: _reversedConverter));
             Assert.AreEqual(value4r, _stream.ReadUInt64(converter: _reversedConverter));
+        }
+
+        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
+
+        [TestMethod]
+        public void ThreadSafety()
+        {
+            // Create several threads. Each requires its own parsing buffer to succeed.
+            Thread[] threads = new Thread[32];
+            for (int i = 0; i < threads.Length; i++)
+            {
+                Thread thread = new Thread(BufferCreationThread);
+                thread.Start();
+                threads[i] = thread;
+            }
+            foreach (Thread thread in threads)
+            {
+                thread.Join();
+            }
+        }
+
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private void BufferCreationThread(object obj)
+        {
+            using (Stream stream = new MemoryStream(BitConverter.GetBytes(0x12345678)))
+            {
+                Assert.AreEqual(0x12345678, stream.ReadInt32());
+            }
         }
     }
 }
