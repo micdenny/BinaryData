@@ -398,29 +398,29 @@ namespace Syroot.BinaryData.Extensions
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
-            byte[] buffer = encoding.GetBytes(value);
+            byte[] textBuffer = encoding.GetBytes(value);
             switch (format)
             {
                 case StringDataFormat.DynamicByteCount:
-                    Write7BitEncodedInt(stream, buffer.Length);
-                    stream.Write(buffer, 0, buffer.Length);
+                    Write7BitEncodedInt(stream, textBuffer.Length);
+                    stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
                 case StringDataFormat.ByteCharCount:
                     stream.WriteByte((byte)value.Length);
-                    stream.Write(buffer, 0, buffer.Length);
+                    stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
                 case StringDataFormat.Int16CharCount:
-                    converter.GetBytes((Int16)value.Length, buffer, 0);
-                    stream.Write(buffer, 0, sizeof(Int16));
-                    stream.Write(buffer, 0, buffer.Length);
+                    converter.GetBytes((Int16)value.Length, Buffer, 0);
+                    stream.Write(Buffer, 0, sizeof(Int16));
+                    stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
                 case StringDataFormat.Int32CharCount:
-                    converter.GetBytes(value.Length, buffer, 0);
-                    stream.Write(buffer, 0, sizeof(Int32));
-                    stream.Write(buffer, 0, buffer.Length);
+                    converter.GetBytes(value.Length, Buffer, 0);
+                    stream.Write(Buffer, 0, sizeof(Int32));
+                    stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
                 case StringDataFormat.ZeroTerminated:
-                    stream.Write(buffer, 0, buffer.Length);
+                    stream.Write(textBuffer, 0, textBuffer.Length);
                     switch (encoding.GetByteCount("A"))
                     {
                         case sizeof(Byte):
@@ -451,6 +451,7 @@ namespace Syroot.BinaryData.Extensions
             StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null, 
             ByteConverter converter = null)
         {
+            // TODO: Add this!
         }
 
         /// <summary>

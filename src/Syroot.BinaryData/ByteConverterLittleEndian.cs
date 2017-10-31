@@ -14,10 +14,7 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets the <see cref="BinaryData.ByteOrder"/> in which data is stored as converted by this instance.
         /// </summary>
-        public override ByteOrder ByteOrder
-        {
-            get { return ByteOrder.LittleEndian; }
-        }
+        public override ByteOrder ByteOrder => ByteOrder.LittleEndian;
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
