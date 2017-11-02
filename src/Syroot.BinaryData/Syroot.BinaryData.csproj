@@ -5,7 +5,7 @@
         <AssemblyName>Syroot.BinaryData</AssemblyName>
         <AssemblyTitle>BinaryData</AssemblyTitle>
         <Authors>Syroot</Authors>
-        <VersionPrefix>3.0.0-beta4</VersionPrefix>
+        <VersionPrefix>3.0.0-beta3</VersionPrefix>
 
         <PackageId>Syroot.IO.BinaryData</PackageId>
         <PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
@@ -16,7 +16,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
 
-        <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
+        <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <SignAssembly>true</SignAssembly>
