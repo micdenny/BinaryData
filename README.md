@@ -2,7 +2,8 @@
 .NET library extending binary reading and writing functionality.
 
 ## Updated from 2.x.x to 3.x.x?
-- Please read the [release notes](https://github.com/Syroot/BinaryData/releases/tag/3.0.0) for breaking changes.
+- Please read the [release notes](https://github.com/Syroot/BinaryData/releases/tag/3.0.0) for the many new features and
+  breaking changes.
 
 ## Introduction
 
