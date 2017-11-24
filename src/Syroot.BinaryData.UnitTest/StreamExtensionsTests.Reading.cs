@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,28 +7,8 @@ using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData.UnitTest
 {
-    [TestClass]
-    public class StreamExtensionsTests
+    public partial class StreamExtensionsTests
     {
-        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
-
-        private static readonly ByteConverter _reversedConverter
-            = BitConverter.IsLittleEndian ? ByteConverter.BigEndian : ByteConverter.LittleEndian;
-
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private static MemoryStream _stream = new MemoryStream();
-
-        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            // Create a new stream to write test data into with the .NET default writer.
-            _stream?.Dispose();
-            _stream = new MemoryStream();
-        }
-
         [TestMethod]
         public void Align()
         {
@@ -175,6 +154,37 @@ namespace Syroot.BinaryData.UnitTest
             Assert.AreEqual(value2, _stream.ReadDouble());
             Assert.AreEqual(value3, _stream.ReadDouble());
             Assert.AreEqual(value4, _stream.ReadDouble());
+        }
+
+        [TestMethod]
+        public void ReadEnum()
+        {
+            const TestEnum value1 = TestEnum.Zero;
+            const TestEnum value2 = TestEnum.TwoHundred;
+            const TestEnum value3 = (TestEnum)666;
+            const TestFlags value4 = TestFlags.Apple;
+            const TestFlags value5 = TestFlags.Apple | TestFlags.Banana;
+            const TestFlags value6 = (TestFlags)666;
+
+            // Write test values.
+            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            {
+                writer.Write((int)value1);
+                writer.Write((int)value2);
+                writer.Write((int)value3);
+                writer.Write((ushort)value4);
+                writer.Write((ushort)value5);
+                writer.Write((ushort)value6);
+            }
+
+            // Read test values.
+            _stream.Position = 0;
+            Assert.AreEqual(value1, _stream.ReadEnum<TestEnum>());
+            Assert.AreEqual(value2, _stream.ReadEnum<TestEnum>(true));
+            Assert.ThrowsException<InvalidDataException>(() => _stream.ReadEnum<TestEnum>(true));
+            Assert.AreEqual(value4, _stream.ReadEnum<TestFlags>(true));
+            Assert.AreEqual(value5, _stream.ReadEnum<TestFlags>(true));
+            Assert.ThrowsException<InvalidDataException>(() => _stream.ReadEnum<TestFlags>(true));
         }
 
         [TestMethod]

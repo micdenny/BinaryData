@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text;
-using Syroot.BinaryData.Core;
 using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData
@@ -117,6 +115,48 @@ namespace Syroot.BinaryData
         public long Align(int alignment) => BaseStream.Align(alignment);
 
         /// <summary>
+        /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the current position in the stream.</param>
+        /// <returns>The new position within the current stream.</returns>
+        public long Seek(long offset) => BaseStream.Seek(offset, SeekOrigin.Current);
+
+        /// <summary>
+        /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the origin parameter.</param>
+        /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
+        /// the new position.</param>
+        /// <returns>The new position within the current stream.</returns>
+        public long Seek(long offset, SeekOrigin origin) => BaseStream.Seek(offset, origin);
+
+        /// <summary>
+        /// Creates a <see cref="SeekTask"/> to restore the current position after it has been disposed.
+        /// </summary>
+        /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
+        public SeekTask TemporarySeek() => BaseStream.TemporarySeek(0, SeekOrigin.Current);
+
+        /// <summary>
+        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
+        /// is disposed, the previous stream position will be restored.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the current position in the stream.</param>
+        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
+        public SeekTask TemporarySeek(long offset) => BaseStream.TemporarySeek(offset, SeekOrigin.Current);
+
+        /// <summary>
+        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
+        /// is disposed, the previous stream position will be restored.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the origin parameter.</param>
+        /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
+        /// the new position.</param>
+        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
+        public SeekTask TemporarySeek(long offset, SeekOrigin origin) => BaseStream.TemporarySeek(offset, origin);
+
+        // ---- Boolean ----
+
+        /// <summary>
         /// Reads a <see cref="Boolean"/> value from the current stream. The <see cref="Boolean"/> is available in the
         /// specified binary format.
         /// </summary>
@@ -133,6 +173,8 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="Boolean"/> array read from the current stream.</returns>
         public Boolean[] ReadBooleans(int count, BooleanDataFormat format = BooleanDataFormat.Byte)
             => BaseStream.ReadBooleans(count, format);
+
+        // ---- DateTime ----
 
         /// <summary>
         /// Reads a <see cref="DateTime"/> from the current stream. The <see cref="DateTime"/> is available in the
@@ -154,6 +196,8 @@ namespace Syroot.BinaryData
         public DateTime[] ReadDateTimes(int count, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
             => BaseStream.ReadDateTimes(count, format, ByteConverter);
 
+        // ---- Decimal ----
+
         /// <summary>
         /// Reads an 16-byte floating point value from the current stream and advances the current position of the
         /// stream by sixteen bytes.
@@ -169,6 +213,8 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="Decimal"/> values to read.</param>
         /// <returns>The <see cref="Decimal"/> array read from the current stream.</returns>
         public Decimal[] ReadDecimals(int count) => BaseStream.ReadDecimals(count, ByteConverter);
+
+        // ---- Double ----
 
         /// <summary>
         /// Reads an 8-byte floating point value from the current stream and advances the current position of the stream
@@ -186,6 +232,8 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="Double"/> array read from the current stream.</returns>
         public Double[] ReadDoubles(int count) => BaseStream.ReadDoubles(count, ByteConverter);
 
+        // ---- Enum ----
+
         /// <summary>
         /// Reads the specified enum value from the current stream and advances the current position by the size of the
         /// underlying enum type. Optionally validates the value to be defined in the enum type.
@@ -194,10 +242,9 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <returns>The enum value read from the current stream.</returns>
-        public T ReadEnum<T>(bool strict) where T : struct, IComparable, IFormattable // enum
-        {
-            return (T)ReadEnum(typeof(T), strict);
-        }
+        public T ReadEnum<T>(bool strict = false)
+            where T : struct, IComparable, IFormattable
+            => BaseStream.ReadEnum<T>(strict, ByteConverter);
 
         /// <summary>
         /// Reads the specified number of enum values from the current stream into an array of the enum type. Optionally
@@ -208,15 +255,11 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
         /// <returns>The enum values array read from the current stream.</returns>
-        public T[] ReadEnums<T>(int count, bool strict) where T : struct, IComparable, IFormattable // enum
-        {
-            T[] values = new T[count];
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i] = ReadEnum<T>(strict);
-            }
-            return values;
-        }
+        public T[] ReadEnums<T>(int count, bool strict = false)
+            where T : struct, IComparable, IFormattable
+            => BaseStream.ReadEnums<T>(count, strict, ByteConverter);
+
+        // ---- Int16 ----
 
         /// <summary>
         /// Reads a 2-byte signed integer from the current stream and advances the current position of the stream by two
@@ -234,6 +277,8 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="Int16"/> array read from the current stream.</returns>
         public Int16[] ReadInt16s(int count) => BaseStream.ReadInt16s(count, ByteConverter);
 
+        // ---- Int32 ----
+
         /// <summary>
         /// Reads a 4-byte signed integer from the current stream and advances the current position of the stream by
         /// four bytes.
@@ -249,6 +294,8 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="Int32"/> values to read.</param>
         /// <returns>The <see cref="Int32"/> array read from the current stream.</returns>
         public Int32[] ReadInt32s(int count) => BaseStream.ReadInt32s(count, ByteConverter);
+
+        // ---- Int64 ----
 
         /// <summary>
         /// Reads an 8-byte signed integer from the current stream and advances the current position of the stream by
@@ -266,16 +313,14 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="Int64"/> array read from the current stream.</returns>
         public Int64[] ReadInt64s(int count) => BaseStream.ReadInt64s(count, ByteConverter);
 
-        /// <returns>The 8-byte signed integer read from the current stream.</returns>
+        // ---- Object ----
+
         /// <summary>
         /// Reads an object of type <typeparamref name="T"/> from the current stream.
         /// </summary>
         /// <typeparam name="T">The type of the object to load.</typeparam>
         /// <returns>The object read from the current stream.</returns>
-        public T ReadObject<T>()
-        {
-            return (T)ReadObject(null, BinaryMemberAttribute.Default, typeof(T));
-        }
+        public T ReadObject<T>() => BaseStream.ReadObject<T>(ByteConverter);
 
         /// <summary>
         /// Reads the specified number of objects of type <typeparamref name="T"/> from the current stream.
@@ -283,15 +328,9 @@ namespace Syroot.BinaryData
         /// <typeparam name="T">The type of the objects to load.</typeparam>
         /// <param name="count">The number of objects to read.</param>
         /// <returns>The objects array read from the current stream.</returns>
-        public T[] ReadObjects<T>(int count)
-        {
-            T[] values = new T[count];
-            for (int i = 0; i < count; i++)
-            {
-                values[i] = ReadObject<T>();
-            }
-            return values;
-        }
+        public T[] ReadObjects<T>(int count) => BaseStream.ReadObjects<T>(count, ByteConverter);
+        
+        // ---- SByte ----
 
         /// <summary>
         /// Reads the specified number of <see cref="SByte"/> values from the current stream into a <see cref="SByte"/>
@@ -302,13 +341,15 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="SByte"/> array read from the current stream.</returns>
         public SByte[] ReadSBytes(int count) => BaseStream.ReadSBytes(count);
 
+        // ---- Single ----
+
         /// <summary>
         /// Reads a 4-byte floating point value from the current stream and advances the current position of the stream
         /// by four bytes.
         /// </summary>
         /// <returns>The 4-byte floating point value read from the current stream.</returns>
         public override Single ReadSingle() => BaseStream.ReadSingle(ByteConverter);
-
+        
         /// <summary>
         /// Reads the specified number of <see cref="Single"/> values from the current stream into a
         /// <see cref="Single"/> array and advances the current position by that number of <see cref="Single"/> values
@@ -317,6 +358,8 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="Single"/> values to read.</param>
         /// <returns>The <see cref="Single"/> array read from the current stream.</returns>
         public Single[] ReadSingles(int count) => BaseStream.ReadSingles(count, ByteConverter);
+
+        // ---- String ----
 
         /// <summary>
         /// Reads a string from the current stream. The string is available in the specified binary format and encoding.
@@ -372,6 +415,8 @@ namespace Syroot.BinaryData
         public String[] ReadStrings(int count, int length, Encoding encoding = null)
             => BaseStream.ReadStrings(count, length, encoding ?? Encoding);
 
+        // ---- UInt16 ----
+
         /// <summary>
         /// Reads a 2-byte unsigned integer from the current stream using little-endian encoding and advances the
         /// position of the stream by two bytes.
@@ -387,6 +432,8 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="UInt16"/> values to read.</param>
         /// <returns>The <see cref="UInt16"/> array read from the current stream.</returns>
         public UInt16[] ReadUInt16s(int count) => BaseStream.ReadUInt16s(count, ByteConverter);
+
+        // ---- UInt32 ----
 
         /// <summary>
         /// Reads an 8-byte unsigned integer from the current stream and advances the position of the stream by eight
@@ -404,6 +451,8 @@ namespace Syroot.BinaryData
         /// <returns>The <see cref="UInt32"/> array read from the current stream.</returns>
         public UInt32[] ReadUInt32s(int count) => BaseStream.ReadUInt32s(count, ByteConverter);
 
+        // ---- UInt64 ----
+
         /// <summary>
         /// Reads an 8-byte unsigned integer from the current stream and advances the position of the stream by eight
         /// bytes.
@@ -419,202 +468,5 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="UInt64"/> values to read.</param>
         /// <returns>The <see cref="UInt64"/> array read from the current stream.</returns>
         public UInt64[] ReadUInt64s(int count) => BaseStream.ReadUInt64s(count, ByteConverter);
-
-        /// <summary>
-        /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
-        /// </summary>
-        /// <param name="offset">A byte offset relative to the current position in the stream.</param>
-        /// <returns>The new position within the current stream.</returns>
-        public long Seek(long offset) => BaseStream.Seek(offset, SeekOrigin.Current);
-
-        /// <summary>
-        /// Sets the position within the current stream. This is a shortcut to the base stream Seek method.
-        /// </summary>
-        /// <param name="offset">A byte offset relative to the origin parameter.</param>
-        /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
-        /// the new position.</param>
-        /// <returns>The new position within the current stream.</returns>
-        public long Seek(long offset, SeekOrigin origin) => BaseStream.Seek(offset, origin);
-
-        /// <summary>
-        /// Creates a <see cref="SeekTask"/> to restore the current position after it has been disposed.
-        /// </summary>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
-        public SeekTask TemporarySeek() => BaseStream.TemporarySeek(0, SeekOrigin.Current);
-
-        /// <summary>
-        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
-        /// is disposed, the previous stream position will be restored.
-        /// </summary>
-        /// <param name="offset">A byte offset relative to the current position in the stream.</param>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public SeekTask TemporarySeek(long offset) => BaseStream.TemporarySeek(offset, SeekOrigin.Current);
-
-        /// <summary>
-        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
-        /// is disposed, the previous stream position will be restored.
-        /// </summary>
-        /// <param name="offset">A byte offset relative to the origin parameter.</param>
-        /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
-        /// the new position.</param>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public SeekTask TemporarySeek(long offset, SeekOrigin origin) => BaseStream.TemporarySeek(offset, origin);
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private object ReadEnum(Type type, bool strict)
-        {
-            // Validate the value to be defined in the enum.
-            object value = ReadObject(null, BinaryMemberAttribute.Default, Enum.GetUnderlyingType(type));
-            if (strict && !EnumExtensions.IsValid(type, value))
-            {
-                throw new InvalidDataException($"Read value {value} is not defined in the given enum type {type}.");
-            }
-            return value;
-        }
-        
-        private object ReadObject(object instance, BinaryMemberAttribute attribute, Type type)
-        {
-            if (attribute.Converter == null)
-            {
-                if (type == typeof(String))
-                {
-                    if (attribute.StringFormat == StringDataFormat.Raw)
-                    {
-                        return ReadString(attribute.Length);
-                    }
-                    else
-                    {
-                        return ReadString(attribute.StringFormat);
-                    }
-                }
-                else if (type.IsEnumerable())
-                {
-                    throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
-                }
-                else if (type == typeof(Boolean))
-                {
-                    return ReadBoolean(attribute.BooleanFormat);
-                }
-                else if (type == typeof(Byte))
-                {
-                    return ReadByte();
-                }
-                else if (type == typeof(DateTime))
-                {
-                    return ReadDateTime(attribute.DateTimeFormat);
-                }
-                else if (type == typeof(Decimal))
-                {
-                    return ReadDecimal();
-                }
-                else if (type == typeof(Double))
-                {
-                    return ReadDouble();
-                }
-                else if (type == typeof(Int16))
-                {
-                    return ReadInt16();
-                }
-                else if (type == typeof(Int32))
-                {
-                    return ReadInt32();
-                }
-                else if (type == typeof(Int64))
-                {
-                    return ReadInt64();
-                }
-                else if (type == typeof(SByte))
-                {
-                    return ReadSByte();
-                }
-                else if (type == typeof(Single))
-                {
-                    return ReadSingle();
-                }
-                else if (type == typeof(UInt16))
-                {
-                    return ReadUInt16();
-                }
-                else if (type == typeof(UInt32))
-                {
-                    return ReadUInt32();
-                }
-                else if (type == typeof(UInt64))
-                {
-                    return ReadUInt64();
-                }
-                else if (type.GetTypeInfo().IsEnum)
-                {
-                    return ReadEnum(type, attribute.Strict);
-                }
-                else
-                {
-                    return ReadCustomObject(type, null, Position);
-                }
-            }
-            else
-            {
-                // Let a converter do all the work.
-                IBinaryConverter converter = BinaryConverterCache.GetConverter(attribute.Converter);
-                return converter.Read(this, instance, attribute);
-            }
-        }
-
-        private object ReadCustomObject(Type type, object instance, long startOffset)
-        {
-            TypeData typeData = TypeData.GetTypeData(type);
-            instance = instance ?? typeData.GetInstance();
-
-            // Read inherited members first if required.
-            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
-            {
-                ReadCustomObject(typeData.TypeInfo.BaseType, instance, startOffset);
-            }
-
-            // Read members.
-            foreach (MemberData member in typeData.Members)
-            {
-                // Reposition the stream according to offset.
-                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
-                {
-                    Position = startOffset + member.Attribute.Offset;
-                }
-                else if (member.Attribute.Offset != 0)
-                {
-                    Position += member.Attribute.Offset;
-                }
-
-                // Read the value and respect settings stored in the member attribute.
-                object value;
-                Type elementType = member.Type.GetEnumerableElementType();
-                if (elementType == null)
-                {
-                    value = ReadObject(instance, member.Attribute, member.Type);
-                }
-                else
-                {
-                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        values.SetValue(ReadObject(instance, member.Attribute, elementType), i);
-                    }
-                    value = values;
-                }
-
-                // Set the read value.
-                switch (member.MemberInfo)
-                {
-                    case FieldInfo field:
-                        field.SetValue(instance, value);
-                        break;
-                    case PropertyInfo property:
-                        property.SetValue(instance, value);
-                        break;
-                }
-            }
-
-            return instance;
-        }
     }
 }

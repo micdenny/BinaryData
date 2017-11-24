@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using Syroot.BinaryData.Core;
 
 namespace Syroot.BinaryData.Extensions
 {
@@ -11,6 +14,8 @@ namespace Syroot.BinaryData.Extensions
     public static partial class StreamExtensions
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
+
+        // ---- Boolean ----
 
         /// <summary>
         /// Returns a <see cref="Boolean"/> instance read from the <paramref name="stream"/>.
@@ -74,6 +79,18 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- Byte ----
+
+        /// <summary>
+        /// Returns a <see cref="Byte"/> instance read from the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <returns>The value read from the current stream.</returns>
+        public static Byte Read1Byte(this Stream stream)
+        {
+            return (Byte)stream.ReadByte();
+        }
+
         /// <summary>
         /// Returns an array of <see cref="Byte"/> instances read from the <paramref name="stream"/>.
         /// </summary>
@@ -86,6 +103,8 @@ namespace Syroot.BinaryData.Extensions
             stream.Read(buffer, 0, count);
             return buffer;
         }
+
+        // ---- DateTime ----
 
         /// <summary>
         /// Returns a <see cref="DateTime"/> instance read from the <paramref name="stream"/>.
@@ -151,6 +170,8 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- Decimal ----
+
         /// <summary>
         /// Returns a <see cref="Decimal"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -185,6 +206,8 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
+
+        // ---- Double ----
 
         /// <summary>
         /// Returns a <see cref="Double"/> instance read from the <paramref name="stream"/>.
@@ -221,6 +244,51 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- Enum ----
+
+        /// <summary>
+        /// Returns an <see cref="Enum"/> instance of type <typeparamref name="T"/> from the <paramref name="stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The value read from the current stream.</returns>
+        public static T ReadEnum<T>(this Stream stream, bool strict = false, ByteConverter converter = null)
+            where T : struct, IComparable, IFormattable
+            => (T)ReadEnum(stream, typeof(T), strict, converter);
+
+        /// <summary>
+        /// Returns an array of <see cref="Enum"/> instances of type <typeparamref name="T"/> read from the
+        /// <paramref name="stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of values to read.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The array of values read from the current stream.</returns>
+        public static T[] ReadEnums<T>(this Stream stream, int count, bool strict = false,
+            ByteConverter converter = null)
+            where T : struct, IComparable, IFormattable
+        {
+            converter = converter ?? ByteConverter.System;
+            var values = new T[count];
+            Type enumType = typeof(T);
+            lock (stream)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    values[i] = (T)ReadEnum(stream, enumType, strict, converter);
+                }
+            }
+            return values;
+        }
+
+        // ---- Int16 ----
+
         /// <summary>
         /// Returns an <see cref="Int16"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -255,6 +323,8 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
+
+        // ---- Int32 ----
 
         /// <summary>
         /// Returns an <see cref="Int32"/> instance read from the <paramref name="stream"/>.
@@ -291,6 +361,8 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- Int64 ----
+
         /// <summary>
         /// Returns an <see cref="Int64"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -326,6 +398,42 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- Object ----
+
+        /// <summary>
+        /// Returns an object of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the object to read.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The value read from the current stream.</returns>
+        public static T ReadObject<T>(this Stream stream, ByteConverter converter = null)
+            => (T)ReadObject(stream, null, BinaryMemberAttribute.Default, typeof(T), converter);
+
+        /// <summary>
+        /// Returns an array of objects of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the object to load.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of values to read.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The array of values read from the current stream.</returns>
+        public static T[] ReadObjects<T>(this Stream stream, int count, ByteConverter converter = null)
+        {
+            converter = converter ?? ByteConverter.System;
+            var values = new T[count];
+            lock (stream)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    values[i] = stream.ReadObject<T>(converter);
+                }
+            }
+            return values;
+        }
+
+        // ---- SByte ----
+
         /// <summary>
         /// Returns an <see cref="SByte"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -356,6 +464,8 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
+
+        // ---- Single ----
 
         /// <summary>
         /// Returns a <see cref="Single"/> instance read from the <paramref name="stream"/>.
@@ -391,6 +501,8 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
+
+        // ---- String ----
 
         /// <summary>
         /// Returns a <see cref="String"/> instance read from the <paramref name="stream"/>.
@@ -520,6 +632,8 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- UInt16 ----
+
         /// <summary>
         /// Returns a <see cref="UInt16"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -555,6 +669,8 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- UInt32 ----
+
         /// <summary>
         /// Returns a <see cref="UInt32"/> instance read from the <paramref name="stream"/>.
         /// </summary>
@@ -589,6 +705,8 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
+
+        // ---- UInt64 ----
 
         /// <summary>
         /// Returns a <see cref="UInt64"/> instance read from the <paramref name="stream"/>.
@@ -650,6 +768,207 @@ namespace Syroot.BinaryData.Extensions
                 }
             }
             throw new InvalidDataException("Invalid 7-bit encoded integer.");
+        }
+
+        private static object ReadEnum(Stream stream, Type enumType, bool strict, ByteConverter converter)
+        {
+            converter = converter ?? ByteConverter.System;
+
+            Type valueType = Enum.GetUnderlyingType(enumType);
+            int valueSize = Marshal.SizeOf(valueType);
+            object value;
+
+            // Read enough bytes to form an enum value.
+            FillBuffer(stream, valueSize);
+            if (valueType == typeof(Byte))
+            {
+                value = Buffer[0];
+            }
+            else if (valueType == typeof(SByte))
+            {
+                value = (sbyte)Buffer[0];
+            }
+            else if (valueType == typeof(Int16))
+            {
+                value = converter.ToInt16(Buffer);
+            }
+            else if (valueType == typeof(Int32))
+            {
+                value = converter.ToInt32(Buffer);
+            }
+            else if (valueType == typeof(Int64))
+            {
+                value = converter.ToInt64(Buffer);
+            }
+            else if (valueType == typeof(UInt16))
+            {
+                value = converter.ToUInt16(Buffer);
+            }
+            else if (valueType == typeof(UInt32))
+            {
+                value = converter.ToUInt32(Buffer);
+            }
+            else if (valueType == typeof(UInt64))
+            {
+                value = converter.ToUInt64(Buffer);
+            }
+            else
+            {
+                throw new NotImplementedException($"Unsupported enum type {valueType}.");
+            }
+            
+            // Check if the value is defined in the enumeration, if requested.
+            if (strict)
+            {
+                ValidateEnumValue(enumType, value);
+            }
+            return value;
+        }
+
+        private static object ReadObject(Stream stream, object instance, BinaryMemberAttribute attribute,
+            Type type, ByteConverter converter)
+        {
+            if (attribute.Converter == null)
+            {
+                if (type == typeof(String))
+                {
+                    if (attribute.StringFormat == StringDataFormat.Raw)
+                    {
+                        return stream.ReadString(attribute.Length);
+                    }
+                    else
+                    {
+                        return stream.ReadString(attribute.StringFormat, converter: converter);
+                    }
+                }
+                else if (type.IsEnumerable())
+                {
+                    throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
+                }
+                else if (type == typeof(Boolean))
+                {
+                    return stream.ReadBoolean(attribute.BooleanFormat);
+                }
+                else if (type == typeof(Byte))
+                {
+                    return stream.Read1Byte();
+                }
+                else if (type == typeof(DateTime))
+                {
+                    return stream.ReadDateTime(attribute.DateTimeFormat, converter);
+                }
+                else if (type == typeof(Decimal))
+                {
+                    return stream.ReadDecimal(converter);
+                }
+                else if (type == typeof(Double))
+                {
+                    return stream.ReadDouble(converter);
+                }
+                else if (type == typeof(Int16))
+                {
+                    return stream.ReadInt16(converter);
+                }
+                else if (type == typeof(Int32))
+                {
+                    return stream.ReadInt32(converter);
+                }
+                else if (type == typeof(Int64))
+                {
+                    return stream.ReadInt64(converter);
+                }
+                else if (type == typeof(SByte))
+                {
+                    return stream.ReadSByte();
+                }
+                else if (type == typeof(Single))
+                {
+                    return stream.ReadSingle(converter);
+                }
+                else if (type == typeof(UInt16))
+                {
+                    return stream.ReadUInt16(converter);
+                }
+                else if (type == typeof(UInt32))
+                {
+                    return stream.ReadUInt32(converter);
+                }
+                else if (type == typeof(UInt64))
+                {
+                    return stream.ReadUInt64(converter);
+                }
+                else if (type.IsEnum)
+                {
+                    return ReadEnum(stream, type, attribute.Strict, converter);
+                }
+                else
+                {
+                    return ReadCustomObject(stream, type, null, stream.Position, converter);
+                }
+            }
+            else
+            {
+                // Let a binary converter do all the work.
+                IBinaryConverter binaryConverter = BinaryConverterCache.GetConverter(attribute.Converter);
+                return binaryConverter.Read(stream, instance, attribute, converter);
+            }
+        }
+
+        private static object ReadCustomObject(Stream stream, Type type, object instance, long startOffset,
+            ByteConverter converter)
+        {
+            TypeData typeData = TypeData.GetTypeData(type);
+            instance = instance ?? typeData.GetInstance();
+
+            // Read inherited members first if required.
+            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
+            {
+                ReadCustomObject(stream, typeData.TypeInfo.BaseType, instance, startOffset, converter);
+            }
+
+            // Read members.
+            foreach (MemberData member in typeData.Members)
+            {
+                // Reposition the stream according to offset.
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                {
+                    stream.Position = startOffset + member.Attribute.Offset;
+                }
+                else if (member.Attribute.Offset != 0)
+                {
+                    stream.Position += member.Attribute.Offset;
+                }
+
+                // Read the value and respect settings stored in the member attribute.
+                object value;
+                Type elementType = member.Type.GetEnumerableElementType();
+                if (elementType == null)
+                {
+                    value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
+                }
+                else
+                {
+                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
+                    }
+                    value = values;
+                }
+
+                // Set the read value.
+                switch (member.MemberInfo)
+                {
+                    case FieldInfo field:
+                        field.SetValue(instance, value);
+                        break;
+                    case PropertyInfo property:
+                        property.SetValue(instance, value);
+                        break;
+                }
+            }
+
+            return instance;
         }
 
         private static string ReadStringWithLength(Stream stream, int length, bool lengthInChars, Encoding encoding)

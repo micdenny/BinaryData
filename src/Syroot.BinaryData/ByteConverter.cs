@@ -75,7 +75,7 @@ namespace Syroot.BinaryData
                     throw new ArgumentException($"Invalid {nameof(ByteOrder)}.", nameof(byteOrder));
             }
         }
-
+        
         /// <summary>
         /// Stores the specified <see cref="Decimal"/> value as bytes in the given <paramref name="buffer"/>.
         /// </summary>
@@ -195,7 +195,7 @@ namespace Syroot.BinaryData
         /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
         public abstract Double ToDouble(byte[] buffer, int startIndex = 0);
-
+        
         /// <summary>
         /// Returns an <see cref="Int16"/> instance converted from the bytes in the given <paramref name="buffer"/>.
         /// </summary>

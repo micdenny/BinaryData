@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Syroot.BinaryData.Core;
 
 namespace Syroot.BinaryData.Extensions
 {
@@ -10,10 +11,8 @@ namespace Syroot.BinaryData.Extensions
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
-        [ThreadStatic]
-        private static byte[] _buffer;
-        [ThreadStatic]
-        private static char[] _charBuffer;
+        [ThreadStatic] private static byte[] _buffer;
+        [ThreadStatic] private static char[] _charBuffer;
 
         private static readonly DateTime _cTimeBase = new DateTime(1970, 1, 1);
 
@@ -119,5 +118,14 @@ namespace Syroot.BinaryData.Extensions
             return new SeekTask(stream, offset, origin);
         }
 
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private static void ValidateEnumValue(Type enumType, object value)
+        {
+            if (!EnumExtensions.IsValid(enumType, value))
+            {
+                throw new InvalidDataException($"Read value {value} is not defined in the enum type {enumType}.");
+            }
+        }
     }
 }

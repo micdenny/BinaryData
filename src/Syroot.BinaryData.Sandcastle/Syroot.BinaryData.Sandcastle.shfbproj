@@ -58,7 +58,7 @@
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Syroot.BinaryData" isDocumented="True">This namespace provides classes providing advanced binary data reading and writing functionality.</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="Syroot.BinaryData.Extensions" isDocumented="True">This namespace provides extension methods for the Stream class to add new reading and writing functionality.</NamespaceSummaryItem></NamespaceSummaries>
     <WebsiteSdkLinkType>Msdn</WebsiteSdkLinkType>
     <HtmlSdkLinkType>Msdn</HtmlSdkLinkType>
     <IncludeFavorites>False</IncludeFavorites>

@@ -182,6 +182,8 @@ namespace Syroot.BinaryData
         /// <returns>A <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
         public SeekTask TemporarySeek(long offset, SeekOrigin origin) => BaseStream.TemporarySeek(offset, origin);
         
+        // ---- Boolean ----
+
         /// <summary>
         /// Writes a <see cref="Boolean"/> value in the given format to the current stream, with 0 representing
         /// <c>false</c> and 1 representing <c>true</c>.
@@ -198,7 +200,9 @@ namespace Syroot.BinaryData
         /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
         public void Write(IEnumerable<Boolean> values, BooleanDataFormat format = BooleanDataFormat.Byte)
             => BaseStream.Write(values, format, ByteConverter);
-        
+
+        // ---- DateTime ----
+
         /// <summary>
         /// Writes a <see cref="DateTime"/> value to this stream. The <see cref="DateTime"/> will be available in the
         /// specified binary format.
@@ -217,6 +221,8 @@ namespace Syroot.BinaryData
         public void Write(IEnumerable<DateTime> values, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
             => BaseStream.Write(values, format, ByteConverter);
 
+        // ---- Decimal ----
+
         /// <summary>
         /// Writes an 16-byte floating point value to this stream and advances the current position of the stream by
         /// sixteen bytes.
@@ -230,6 +236,8 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Decimal"/> values to write.</param>
         public void Write(IEnumerable<Decimal> values) => BaseStream.Write(values, ByteConverter);
+
+        // ---- Double ----
 
         /// <summary>
         /// Writes an 8-byte floating point value to this stream and advances the current position of the stream by
@@ -245,6 +253,8 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Double"/> values to write.</param>
         public void Write(IEnumerable<Double> values) => BaseStream.Write(values, ByteConverter);
 
+        // ---- Enum ----
+
         /// <summary>
         /// Writes an enum value to this stream and advances the current position of the stream by the size of the
         /// underlying enum type size. Optionally validates the value to be defined in the enum type.
@@ -252,11 +262,10 @@ namespace Syroot.BinaryData
         /// <param name="value">The enum value to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
-        public void Write<T>(T value, bool strict) where T : struct, IComparable, IFormattable // enum
-        {
-            WriteEnum(typeof(T), value, strict);
-        }
-        
+        public void WriteEnum<T>(T value, bool strict = false)
+            where T : struct, IComparable, IFormattable
+            => BaseStream.WriteEnum(value, strict, ByteConverter);
+
         /// <summary>
         /// Writes an enumeration of enum values to this stream and advances the current position of the stream by the
         /// size of the underlying enum type size multiplied by the number of values. Optionally validates the values to
@@ -265,13 +274,11 @@ namespace Syroot.BinaryData
         /// <param name="values">The enum values to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
-        public void Write<T>(IEnumerable<T> values, bool strict) where T : struct, IComparable, IFormattable // enum
-        {
-            foreach (T value in values)
-            {
-                Write(value, strict);
-            }
-        }
+        public void WriteEnums<T>(IEnumerable<T> values, bool strict = false)
+            where T : struct, IComparable, IFormattable
+            => BaseStream.WriteEnums(values, strict, ByteConverter);
+
+        // ---- Int16 ----
 
         /// <summary>
         /// Writes an 2-byte signed integer to this stream and advances the current position of the stream by two bytes.
@@ -285,6 +292,8 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Int16"/> values to write.</param>
         public void Write(IEnumerable<Int16> values) => BaseStream.Write(values, ByteConverter);
+        
+        // ---- Int32 ----
 
         /// <summary>
         /// Writes an 4-byte signed integer to this stream and advances the current position of the stream by four
@@ -299,6 +308,8 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Int32"/> values to write.</param>
         public void Write(IEnumerable<Int32> values) => BaseStream.Write(values, ByteConverter);
+        
+        // ---- Int64 ----
 
         /// <summary>
         /// Writes an 8-byte signed integer to this stream and advances the current position of the stream by eight
@@ -314,16 +325,15 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
         public void Write(IEnumerable<Int64> values) => BaseStream.Write(values, ByteConverter);
 
+        // ---- Object ----
+
         /// <summary>
         /// Writes an object or enumerable of objects to this stream.
         /// </summary>
         /// <param name="value">The object or enumerable of objects to write.</param>
-        public void WriteObject(object value)
-        {
-            if (value == null)
-                return;
-            WriteObject(null, BinaryMemberAttribute.Default, value.GetType(), value);
-        }
+        public void WriteObject(object value) => BaseStream.WriteObject(value, ByteConverter);
+
+        // ---- Single ----
 
         /// <summary>
         /// Writes an 4-byte floating point value to this stream and advances the current position of the stream by four
@@ -338,7 +348,9 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Single"/> values to write.</param>
         public void Write(IEnumerable<Single> values) => BaseStream.Write(values, ByteConverter);
-        
+
+        // ---- String ----
+
         /// <summary>
         /// Writes a string to this stream with the given encoding and advances the current position of the stream in
         /// accordance with the encoding used and the specific characters being written to the stream. The string will
@@ -360,7 +372,9 @@ namespace Syroot.BinaryData
         public void Write(IEnumerable<String> values, StringDataFormat format = StringDataFormat.DynamicByteCount,
             Encoding encoding = null)
             => BaseStream.Write(values, format, encoding);
-        
+
+        // ---- UInt16 ----
+
         /// <summary>
         /// Writes an 2-byte unsigned integer value to this stream and advances the current position of the stream by
         /// two bytes.
@@ -374,6 +388,8 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="UInt16"/> values to write.</param>
         public void Write(IEnumerable<UInt16> values) => BaseStream.Write(values, ByteConverter);
+
+        // ---- UInt16 ----
 
         /// <summary>
         /// Writes an 4-byte unsigned integer value to this stream and advances the current position of the stream by
@@ -389,6 +405,8 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="UInt32"/> values to write.</param>
         public void Write(IEnumerable<UInt32> values) => BaseStream.Write(values, ByteConverter);
 
+        // ---- UInt64 ----
+
         /// <summary>
         /// Writes an 8-byte unsigned integer value to this stream and advances the current position of the stream by
         /// eight bytes.
@@ -402,166 +420,5 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="UInt64"/> values to write.</param>
         public void Write(IEnumerable<UInt64> values) => BaseStream.Write(values, ByteConverter);
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-        
-        private void WriteEnum(Type type, object value, bool strict)
-        {
-            // Validate the value to be defined in the enum.
-            if (strict && !EnumExtensions.IsValid(type, value))
-            {
-                throw new InvalidDataException($"Value {value} to write is not defined in the given enum type {type}.");
-            }
-            WriteObject(null, BinaryMemberAttribute.Default, Enum.GetUnderlyingType(type), value);
-        }
-        
-        private void WriteObject(object instance, BinaryMemberAttribute attribute, Type type, object value)
-        {
-            if (attribute.Converter == null)
-            {
-                if (value == null)
-                {
-                    return;
-                }
-                if (type == typeof(String))
-                {
-                    Write((String)value, attribute.StringFormat);
-                }
-                else if (type.TryGetEnumerableElementType(out Type elementType))
-                {
-                    foreach (object element in (IEnumerable)value)
-                    {
-                        WriteObject(null, BinaryMemberAttribute.Default, elementType, element);
-                    }
-                }
-                else if (type == typeof(Boolean))
-                {
-                    Write((Boolean)value, attribute.BooleanFormat);
-                }
-                else if (type == typeof(Byte))
-                {
-                    Write((Byte)value);
-                }
-                else if (type == typeof(DateTime))
-                {
-                    Write((DateTime)value, attribute.DateTimeFormat);
-                }
-                else if (type == typeof(Decimal))
-                {
-                    Write((Decimal)value);
-                }
-                else if (type == typeof(Double))
-                {
-                    Write((Double)value);
-                }
-                else if (type == typeof(Int16))
-                {
-                    Write((Int16)value);
-                }
-                else if (type == typeof(Int32))
-                {
-                    Write((Int32)value);
-                }
-                else if (type == typeof(Int64))
-                {
-                    Write((Int64)value);
-                }
-                else if (type == typeof(SByte))
-                {
-                    Write((SByte)value);
-                }
-                else if (type == typeof(Single))
-                {
-                    Write((Single)value);
-                }
-                else if (type == typeof(UInt16))
-                {
-                    Write((UInt16)value);
-                }
-                else if (type == typeof(UInt32))
-                {
-                    Write((UInt32)value);
-                }
-                else if (type == typeof(UInt64))
-                {
-                    Write((UInt32)value);
-                }
-                else if (type.GetTypeInfo().IsEnum)
-                {
-                    WriteEnum(type, value, attribute.Strict);
-                }
-                else
-                {
-                    WriteCustomObject(type, value, Position);
-                }
-            }
-            else
-            {
-                // Let a converter do all the work.
-                IBinaryConverter converter = BinaryConverterCache.GetConverter(attribute.Converter);
-                converter.Write(this, instance, attribute, value);
-            }
-        }
-
-        private void WriteCustomObject(Type type, object instance, long startOffset)
-        {
-            TypeData typeData = TypeData.GetTypeData(type);
-
-            // Write inherited members first if required.
-            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
-            {
-                WriteCustomObject(typeData.TypeInfo.BaseType, instance, startOffset);
-            }
-
-            // Write members.
-            foreach (MemberData member in typeData.Members)
-            {
-                // Reposition the stream according to offset.
-                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
-                {
-                    Position = startOffset + member.Attribute.Offset;
-                }
-                else
-                {
-                    Position += member.Attribute.Offset;
-                }
-
-                // Get the value to write.
-                object value;
-                switch (member.MemberInfo)
-                {
-                    case FieldInfo field:
-                        value = field.GetValue(instance);
-                        break;
-                    case PropertyInfo property:
-                        value = property.GetValue(instance);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Tried to write an invalid member {member.MemberInfo}.");
-                }
-
-                // Write the value and respect settings stored in the member attribute.
-                Type elementType = member.Type.GetEnumerableElementType();
-                if (elementType == null)
-                {
-                    WriteObject(instance, member.Attribute, member.Type, value);
-                }
-                else
-                {
-                    foreach (object element in (IEnumerable)value)
-                    {
-                        WriteObject(instance, member.Attribute, member.Type, element);
-                    }
-                }
-            }
-        }
-        
-        // ---- String methods ----
-        
-        private void WriteZeroTerminatedString(string value, Encoding encoding)
-        {
-            Write(encoding.GetBytes(value));
-            Write((byte)0);
-        }
     }
 }
