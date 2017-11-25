@@ -5,11 +5,11 @@
 		<AssemblyName>Syroot.BinaryData</AssemblyName>
 		<AssemblyTitle>BinaryData</AssemblyTitle>
 		<Authors>Syroot</Authors>
-		<VersionPrefix>3.0.0</VersionPrefix>
+		<VersionPrefix>3.0.1-alpha2</VersionPrefix>
 
 		<PackageId>Syroot.IO.BinaryData</PackageId>
 		<PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-		<PackageReleaseNotes>Added extension methods and several other new features.</PackageReleaseNotes>
+		<PackageReleaseNotes>Allow reading and writing most objects from non-seekable streams.</PackageReleaseNotes>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
 		<PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>

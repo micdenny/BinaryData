@@ -7,10 +7,7 @@ using System.Text;
 using Syroot.BinaryData.Core;
 
 namespace Syroot.BinaryData.Extensions
-{
-    /// <summary>
-    /// Represents static extension methods for reading data with <see cref="Stream"/> instances.
-    /// </summary>  
+{  
     public static partial class StreamExtensions
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
@@ -833,13 +830,9 @@ namespace Syroot.BinaryData.Extensions
                 if (type == typeof(String))
                 {
                     if (attribute.StringFormat == StringDataFormat.Raw)
-                    {
                         return stream.ReadString(attribute.Length);
-                    }
                     else
-                    {
                         return stream.ReadString(attribute.StringFormat, converter: converter);
-                    }
                 }
                 else if (type.IsEnumerable())
                 {
@@ -903,7 +896,10 @@ namespace Syroot.BinaryData.Extensions
                 }
                 else
                 {
-                    return ReadCustomObject(stream, type, null, stream.Position, converter);
+                    if (stream.CanSeek)
+                        return ReadCustomObject(stream, type, null, stream.Position, converter);
+                    else
+                        return ReadCustomObject(stream, type, null, -1, converter);
                 }
             }
             else
@@ -929,16 +925,22 @@ namespace Syroot.BinaryData.Extensions
             // Read members.
             foreach (MemberData member in typeData.Members)
             {
-                // Reposition the stream according to offset.
-                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                // If possible, reposition the stream according to offset.
+                if (stream.CanSeek)
                 {
-                    stream.Position = startOffset + member.Attribute.Offset;
+                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                        stream.Position = startOffset + member.Attribute.Offset;
+                    else if (member.Attribute.Offset != 0)
+                        stream.Position += member.Attribute.Offset;
                 }
-                else if (member.Attribute.Offset != 0)
+                else
                 {
-                    stream.Position += member.Attribute.Offset;
+                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
+                        throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
+                    else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
+                        stream.ReadBytes(member.Attribute.Offset);
                 }
-
+                
                 // Read the value and respect settings stored in the member attribute.
                 object value;
                 Type elementType = member.Type.GetEnumerableElementType();

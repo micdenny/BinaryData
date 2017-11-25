@@ -5,7 +5,7 @@ using Syroot.BinaryData.Core;
 namespace Syroot.BinaryData.Extensions
 {
     /// <summary>
-    /// Represents static extension methods for general operations with <see cref="Stream"/> instances.
+    /// Represents static extension methods for read and write operations on <see cref="Stream"/> instances.
     /// </summary>
     public static partial class StreamExtensions
     {
