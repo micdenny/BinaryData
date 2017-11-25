@@ -917,9 +917,9 @@ namespace Syroot.BinaryData.Extensions
             instance = instance ?? typeData.GetInstance();
 
             // Read inherited members first if required.
-            if (typeData.Attribute.Inherit && typeData.TypeInfo.BaseType != null)
+            if (typeData.Attribute.Inherit && typeData.Type.BaseType != null)
             {
-                ReadCustomObject(stream, typeData.TypeInfo.BaseType, instance, startOffset, converter);
+                ReadCustomObject(stream, typeData.Type.BaseType, instance, startOffset, converter);
             }
 
             // Read members.

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Syroot.BinaryData.Core
 {
@@ -46,7 +45,7 @@ namespace Syroot.BinaryData.Core
         {
             if (!_flagEnums.TryGetValue(type, out bool value))
             {
-                value = type.GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true)?.Any() == true;
+                value = type.GetCustomAttributes(typeof(FlagsAttribute), true)?.Any() == true;
                 _flagEnums.Add(type, value);
             }
             return value;

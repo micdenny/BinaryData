@@ -19,14 +19,13 @@ namespace Syroot.BinaryData
         private TypeData(Type type)
         {
             Type = type;
-            TypeInfo = Type.GetTypeInfo();
 
             // Get the type configuration.
-            Attribute = TypeInfo.GetCustomAttribute<BinaryObjectAttribute>() ?? new BinaryObjectAttribute();
+            Attribute = Type.GetCustomAttribute<BinaryObjectAttribute>() ?? new BinaryObjectAttribute();
             
             // Get the member configurations, and collect a parameterless constructor on the way.
             Members = new List<MemberData>();
-            foreach (MemberInfo member in TypeInfo.GetMembers(
+            foreach (MemberInfo member in Type.GetMembers(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 switch (member)
@@ -53,12 +52,7 @@ namespace Syroot.BinaryData
         /// Gets the <see cref="Type"/> to which informations are stored.
         /// </summary>
         internal Type Type { get; }
-
-        /// <summary>
-        /// Gets the <see cref="TypeInfo"/> to which informations are stored.
-        /// </summary>
-        internal TypeInfo TypeInfo { get; }
-
+        
         /// <summary>
         /// Gets the <see cref="BinaryObjectAttribute"/> configuring how the object is read and written.
         /// </summary>
@@ -99,7 +93,7 @@ namespace Syroot.BinaryData
         internal object GetInstance()
         {
             // Invoke the automatic default constructor for structs.
-            if (TypeInfo.IsValueType)
+            if (Type.IsValueType)
             {
                 return Activator.CreateInstance(Type);
             }

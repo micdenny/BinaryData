@@ -5,7 +5,7 @@ using System.Reflection;
 namespace Syroot.BinaryData
 {
     /// <summary>
-    /// Represents information on a member of a type cached as <see cref="TypeInfo"/>.
+    /// Represents information on a member of a type cached as <see cref="TypeData"/>.
     /// </summary>
     [DebuggerDisplay(nameof(MemberData) + " " + nameof(MemberInfo) + "={" + nameof(MemberInfo) + "}")]
     internal class MemberData

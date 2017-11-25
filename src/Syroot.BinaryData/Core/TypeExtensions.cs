@@ -12,7 +12,7 @@ namespace Syroot.BinaryData.Core
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
         
-        private static readonly TypeInfo _iEnumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
+        private static readonly Type _iEnumerableType = typeof(IEnumerable);
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
@@ -24,7 +24,7 @@ namespace Syroot.BinaryData.Core
         /// <returns><c>true</c> if the type is enumerable and not a string; otherwise <c>false</c>.</returns>
         internal static bool IsEnumerable(this Type type)
         {
-            return type != typeof(String) && (type.IsArray || _iEnumerableTypeInfo.IsAssignableFrom(type));
+            return type != typeof(String) && (type.IsArray || _iEnumerableType.IsAssignableFrom(type));
         }
 
         /// <summary>
@@ -54,15 +54,14 @@ namespace Syroot.BinaryData.Core
             }
 
             // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-            if (_iEnumerableTypeInfo.IsAssignableFrom(type))
+            if (_iEnumerableType.IsAssignableFrom(type))
             {
-                foreach (Type interfaceType in type.GetTypeInfo().GetInterfaces())
+                foreach (Type interfaceType in type.GetInterfaces())
                 {
-                    TypeInfo interfaceTypeInfo = interfaceType.GetTypeInfo();
-                    if (interfaceTypeInfo.IsGenericType
-                        && interfaceTypeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    if (interfaceType.IsGenericType
+                        && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        return interfaceTypeInfo.GetGenericArguments()[0];
+                        return interfaceType.GetGenericArguments()[0];
                     }
                 }
             }
@@ -89,15 +88,14 @@ namespace Syroot.BinaryData.Core
                 }
 
                 // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-                if (_iEnumerableTypeInfo.IsAssignableFrom(type))
+                if (_iEnumerableType.IsAssignableFrom(type))
                 {
-                    foreach (Type interfaceType in type.GetTypeInfo().GetInterfaces())
+                    foreach (Type interfaceType in type.GetInterfaces())
                     {
-                        TypeInfo interfaceTypeInfo = interfaceType.GetTypeInfo();
-                        if (interfaceTypeInfo.IsGenericType
-                            && interfaceTypeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                        if (interfaceType.IsGenericType
+                            && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                         {
-                            elementType = interfaceTypeInfo.GetGenericArguments()[0];
+                            elementType = interfaceType.GetGenericArguments()[0];
                             return true;
                         }
                     }
