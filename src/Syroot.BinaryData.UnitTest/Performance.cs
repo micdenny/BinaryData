@@ -15,7 +15,7 @@ namespace Syroot.BinaryData.UnitTest
 
         private static readonly Random _random = new Random();
         private static readonly ByteConverter _nonSystemConverter
-            = BitConverter.IsLittleEndian ? ByteConverter.BigEndian : ByteConverter.LittleEndian;
+            = BitConverter.IsLittleEndian ? ByteConverter.Big : ByteConverter.Little;
         private static readonly byte[] _buffer = new byte[sizeof(Int32)];
         
         // ---- FIELDS -------------------------------------------------------------------------------------------------

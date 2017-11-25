@@ -1,9 +1,9 @@
 ﻿namespace Syroot.BinaryData
 {
     /// <summary>
-    /// Represents the possible endianness of binary data.
+    /// Represents the possible byte order of binary data.
     /// </summary>
-    public enum ByteOrder : ushort
+    public enum Endian : ushort
     {
         /// <summary>
         /// Indicates the byte order of the system executing the assembly.
@@ -13,11 +13,11 @@
         /// <summary>
         /// Indicates big endian byte order.
         /// </summary>
-        BigEndian = 0xFEFF,
+        Big = 0xFEFF,
 
         /// <summary>
         /// Indicates little endian byte order.
         /// </summary>
-        LittleEndian = 0xFFFE
+        Little = 0xFFFE
     }
 }

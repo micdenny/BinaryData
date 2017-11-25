@@ -73,7 +73,7 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets or sets the byte order used to parse multibyte binary data with.
         /// </summary>
-        public ByteOrder ByteOrder
+        public Endian ByteOrder
         {
             get => ByteConverter.ByteOrder;
             set => ByteConverter = ByteConverter.GetConverter(value);
@@ -162,7 +162,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="format">The binary format, in which the <see cref="Boolean"/> will be read.</param>
         /// <returns>The <see cref="Boolean"/> read from the current stream.</returns>
-        public Boolean ReadBoolean(BooleanDataFormat format) => BaseStream.ReadBoolean(format);
+        public Boolean ReadBoolean(BooleanCoding format) => BaseStream.ReadBoolean(format);
 
         /// <summary>
         /// Reads the specified number of <see cref="Boolean"/> values from the current stream into a
@@ -171,7 +171,7 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="Boolean"/> values to read.</param>
         /// <param name="format">The binary format, in which the <see cref="Boolean"/> values will be read.</param>
         /// <returns>The <see cref="Boolean"/> array read from the current stream.</returns>
-        public Boolean[] ReadBooleans(int count, BooleanDataFormat format = BooleanDataFormat.Byte)
+        public Boolean[] ReadBooleans(int count, BooleanCoding format = BooleanCoding.Byte)
             => BaseStream.ReadBooleans(count, format);
 
         // ---- DateTime ----
@@ -182,7 +182,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="format">The binary format, in which the <see cref="DateTime"/> will be read.</param>
         /// <returns>The <see cref="DateTime"/> read from the current stream.</returns>
-        public DateTime ReadDateTime(DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
+        public DateTime ReadDateTime(DateTimeCoding format = DateTimeCoding.NetTicks)
             => BaseStream.ReadDateTime(format, ByteConverter);
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="DateTime"/> values to read.</param>
         /// <param name="format">The binary format, in which the <see cref="DateTime"/> values will be read.</param>
         /// <returns>The <see cref="DateTime"/> array read from the current stream.</returns>
-        public DateTime[] ReadDateTimes(int count, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
+        public DateTime[] ReadDateTimes(int count, DateTimeCoding format = DateTimeCoding.NetTicks)
             => BaseStream.ReadDateTimes(count, format, ByteConverter);
 
         // ---- Decimal ----
@@ -368,7 +368,7 @@ namespace Syroot.BinaryData
         /// <param name="encoding">The encoding used for converting the string or <c>null</c> to use the encoding
         /// configured for this instance.</param>
         /// <returns>The string read from the current stream.</returns>
-        public String ReadString(StringDataFormat format, Encoding encoding = null)
+        public String ReadString(StringCoding format, Encoding encoding = null)
             => BaseStream.ReadString(format, encoding ?? Encoding, ByteConverter);
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace Syroot.BinaryData
         /// <param name="encoding">The encoding used for converting the string or <c>null</c> to use the encoding
         /// configured for this instance.</param>
         /// <returns>The <see cref="String"/> array read from the current stream.</returns>
-        public String[] ReadStrings(int count, StringDataFormat format, Encoding encoding = null)
+        public String[] ReadStrings(int count, StringCoding format, Encoding encoding = null)
             => BaseStream.ReadStrings(count, format, encoding ?? Encoding, ByteConverter);
 
         /// <summary>

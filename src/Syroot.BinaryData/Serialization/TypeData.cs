@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Syroot.BinaryData.Core;
 
-namespace Syroot.BinaryData
+namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
     /// Represents reflected type configuration required for reading and writing it as binary data.
@@ -21,11 +21,10 @@ namespace Syroot.BinaryData
             Type = type;
 
             // Get the type configuration.
-            Attribute = Type.GetCustomAttribute<BinaryObjectAttribute>() ?? new BinaryObjectAttribute();
-
+            Attribute = Type.GetCustomAttribute<DataObjectAttribute>() ?? new DataObjectAttribute();
+            
             // Get the member configurations, and collect a parameterless constructor on the way.
-            OrderedMembers = new SortedDictionary<int, MemberData>();
-            UnorderedMembers = new SortedList<string, MemberData>(StringComparer.Ordinal);
+            Members = new List<MemberData>();
             foreach (MemberInfo member in Type.GetMembers(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
@@ -53,11 +52,11 @@ namespace Syroot.BinaryData
         /// Gets the <see cref="Type"/> to which informations are stored.
         /// </summary>
         internal Type Type { get; }
-        
+
         /// <summary>
-        /// Gets the <see cref="BinaryObjectAttribute"/> configuring how the object is read and written.
+        /// Gets the <see cref="DataObjectAttribute"/> configuring how the object is read and written.
         /// </summary>
-        internal BinaryObjectAttribute Attribute { get; }
+        internal DataObjectAttribute Attribute { get; }
 
         /// <summary>
         /// Gets a parameterless <see cref="ConstructorInfo"/> to instantiate the class.
@@ -65,16 +64,9 @@ namespace Syroot.BinaryData
         internal ConstructorInfo Constructor { get; }
 
         /// <summary>
-        /// Gets the dictionary of <see cref="MemberData"/> for members with the
-        /// <see cref="BinaryMemberAttribute.Order"/> property set.
+        /// Gets the list of <see cref="MemberData"/> which are read and written.
         /// </summary>
-        internal SortedDictionary<int, MemberData> OrderedMembers { get; }
-
-        /// <summary>
-        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="BinaryMemberAttribute.Order"/>
-        /// property.
-        /// </summary>
-        internal SortedList<string, MemberData> UnorderedMembers { get; }
+        internal List<MemberData> Members { get; }
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
@@ -133,16 +125,7 @@ namespace Syroot.BinaryData
                         $"Field {field} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
                 }
 
-                // Store member in a deterministic order.
-                MemberData memberData = new MemberData(field, field.FieldType, attrib);
-                if (attrib.Order == Int32.MinValue)
-                {
-                    UnorderedMembers.Add(field.Name, memberData);
-                }
-                else
-                {
-                    OrderedMembers.Add(attrib.Order, memberData);
-                }
+                Members.Add(new MemberData(field, field.FieldType, attrib));
             }
         }
 
@@ -169,16 +152,7 @@ namespace Syroot.BinaryData
                         $"Property {prop} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
                 }
 
-                // Store member in a deterministic order.
-                MemberData memberData = new MemberData(prop, prop.PropertyType, attrib);
-                if (attrib.Order == Int32.MinValue)
-                {
-                    UnorderedMembers.Add(prop.Name, memberData);
-                }
-                else
-                {
-                    OrderedMembers.Add(attrib.Order, memberData);
-                }
+                Members.Add(new MemberData(prop, prop.PropertyType, attrib));
             }
         }
     }

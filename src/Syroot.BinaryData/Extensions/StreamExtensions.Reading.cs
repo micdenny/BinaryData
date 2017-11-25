@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Syroot.BinaryData.Core;
+using Syroot.BinaryData.Serialization;
 
 namespace Syroot.BinaryData.Extensions
 {  
@@ -18,21 +19,21 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="Boolean"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="BooleanDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <returns>The value read from the current stream.</returns>
         public static Boolean ReadBoolean(this Stream stream,
-            BooleanDataFormat format = BooleanDataFormat.Byte)
+            BooleanCoding format = BooleanCoding.Byte)
         {
             switch (format)
             {
-                case BooleanDataFormat.Byte:
+                case BooleanCoding.Byte:
                     return stream.ReadByte() != 0;
-                case BooleanDataFormat.Word:
+                case BooleanCoding.Word:
                     return ReadInt16(stream) != 0;
-                case BooleanDataFormat.Dword:
+                case BooleanCoding.Dword:
                     return ReadInt32(stream) != 0;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
             }
         }
 
@@ -41,36 +42,36 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="BooleanDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static Boolean[] ReadBooleans(this Stream stream, int count,
-            BooleanDataFormat format = BooleanDataFormat.Byte)
+            BooleanCoding format = BooleanCoding.Byte)
         {
             var values = new Boolean[count];
             lock (stream)
             {
                 switch (format)
                 {
-                    case BooleanDataFormat.Byte:
+                    case BooleanCoding.Byte:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = stream.ReadByte() != 0;
                         }
                         break;
-                    case BooleanDataFormat.Word:
+                    case BooleanCoding.Word:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadInt16(stream) != 0;
                         }
                         break;
-                    case BooleanDataFormat.Dword:
+                    case BooleanCoding.Dword:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadInt32(stream) != 0;
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
                 }
             }
             return values;
@@ -107,22 +108,22 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="DateTime"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="DateTimeDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static DateTime ReadDateTime(this Stream stream,
-            DateTimeDataFormat format = DateTimeDataFormat.NetTicks, ByteConverter converter = null)
+            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
         {
             switch (format)
             {
-                case DateTimeDataFormat.NetTicks:
+                case DateTimeCoding.NetTicks:
                     return new DateTime(ReadInt64(stream, converter));
-                case DateTimeDataFormat.CTime:
+                case DateTimeCoding.CTime:
                     return _cTimeBase.AddSeconds(ReadUInt32(stream, converter));
-                case DateTimeDataFormat.CTime64:
+                case DateTimeCoding.CTime64:
                     return _cTimeBase.AddSeconds(ReadInt64(stream, converter));
                 default:
-                    throw new ArgumentException($"Invalid {nameof(DateTimeDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(DateTimeCoding)}.", nameof(format));
             }
         }
 
@@ -131,37 +132,37 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="DateTimeDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static DateTime[] ReadDateTimes(this Stream stream, int count,
-            DateTimeDataFormat format = DateTimeDataFormat.NetTicks, ByteConverter converter = null)
+            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
         {
             var values = new DateTime[count];
             lock (stream)
             {
                 switch (format)
                 {
-                    case DateTimeDataFormat.NetTicks:
+                    case DateTimeCoding.NetTicks:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = new DateTime(ReadInt64(stream, converter));
                         }
                         break;
-                    case DateTimeDataFormat.CTime:
+                    case DateTimeCoding.CTime:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = _cTimeBase.AddSeconds(ReadUInt32(stream, converter));
                         }
                         break;
-                    case DateTimeDataFormat.CTime64:
+                    case DateTimeCoding.CTime64:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = _cTimeBase.AddSeconds(ReadInt64(stream, converter));
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
                 }
             }
             return values;
@@ -505,32 +506,32 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="String"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="StringDataFormat"/> format determining how the length of the string is
+        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the string is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static String ReadString(this Stream stream,
-            StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null,
+            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
             ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
             switch (format)
             {
-                case StringDataFormat.DynamicByteCount:
+                case StringCoding.DynamicByteCount:
                     return ReadStringWithLength(stream, Read7BitEncodedInt32(stream), false, encoding);
-                case StringDataFormat.ByteCharCount:
+                case StringCoding.ByteCharCount:
                     return ReadStringWithLength(stream, stream.ReadByte(), true, encoding);
-                case StringDataFormat.Int16CharCount:
+                case StringCoding.Int16CharCount:
                     return ReadStringWithLength(stream, ReadInt16(stream, converter), true, encoding);
-                case StringDataFormat.Int32CharCount:
+                case StringCoding.Int32CharCount:
                     return ReadStringWithLength(stream, ReadInt32(stream, converter), true, encoding);
-                case StringDataFormat.ZeroTerminated:
+                case StringCoding.ZeroTerminated:
                     return ReadStringZeroPostfix(stream, encoding);
                 default:
-                    throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
             }
         }
 
@@ -539,14 +540,14 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="StringDataFormat"/> format determining how the length of the strings is
+        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the strings is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static String[] ReadStrings(this Stream stream, int count,
-            StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null,
+            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
             ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
@@ -556,38 +557,38 @@ namespace Syroot.BinaryData.Extensions
             {
                 switch (format)
                 {
-                    case StringDataFormat.DynamicByteCount:
+                    case StringCoding.DynamicByteCount:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadStringWithLength(stream, Read7BitEncodedInt32(stream), false, encoding);
                         }
                         break;
-                    case StringDataFormat.ByteCharCount:
+                    case StringCoding.ByteCharCount:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadStringWithLength(stream, stream.ReadByte(), true, encoding);
                         }
                         break;
-                    case StringDataFormat.Int16CharCount:
+                    case StringCoding.Int16CharCount:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadStringWithLength(stream, ReadInt16(stream, converter), true, encoding);
                         }
                         break;
-                    case StringDataFormat.Int32CharCount:
+                    case StringCoding.Int32CharCount:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadStringWithLength(stream, ReadInt32(stream, converter), true, encoding);
                         }
                         break;
-                    case StringDataFormat.ZeroTerminated:
+                    case StringCoding.ZeroTerminated:
                         for (int i = 0; i < count; i++)
                         {
                             values[i] = ReadStringZeroPostfix(stream, encoding);
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
                 }
             }
             return values;
@@ -829,7 +830,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 if (type == typeof(String))
                 {
-                    if (attribute.StringFormat == StringDataFormat.Raw)
+                    if (attribute.StringFormat == StringCoding.Raw)
                         return stream.ReadString(attribute.Length);
                     else
                         return stream.ReadString(attribute.StringFormat, converter: converter);
@@ -905,7 +906,7 @@ namespace Syroot.BinaryData.Extensions
             else
             {
                 // Let a binary converter do all the work.
-                IBinaryConverter binaryConverter = BinaryConverterCache.GetConverter(attribute.Converter);
+                IDataConverter binaryConverter = DataConverterCache.GetConverter(attribute.Converter);
                 return binaryConverter.Read(stream, instance, attribute, converter);
             }
         }
@@ -923,64 +924,54 @@ namespace Syroot.BinaryData.Extensions
             }
 
             // Read members.
-            foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
+            foreach (MemberData member in typeData.Members)
             {
-                ReadMember(stream, instance, startOffset, converter, orderedMember.Value);
-            }
-            foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
-            {
-                ReadMember(stream, instance, startOffset, converter, unorderedMember.Value);
+                // If possible, reposition the stream according to offset.
+                if (stream.CanSeek)
+                {
+                    if (member.Attribute.OffsetOrigin == Origin.Set)
+                        stream.Position = startOffset + member.Attribute.Offset;
+                    else if (member.Attribute.Offset != 0)
+                        stream.Position += member.Attribute.Offset;
+                }
+                else
+                {
+                    if (member.Attribute.OffsetOrigin == Origin.Set || member.Attribute.Offset < 0)
+                        throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
+                    else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
+                        stream.ReadBytes(member.Attribute.Offset);
+                }
+                
+                // Read the value and respect settings stored in the member attribute.
+                object value;
+                Type elementType = member.Type.GetEnumerableElementType();
+                if (elementType == null)
+                {
+                    value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
+                }
+                else
+                {
+                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
+                    }
+                    value = values;
+                }
+
+                // Set the read value.
+                switch (member.MemberInfo)
+                {
+                    case FieldInfo field:
+                        field.SetValue(instance, value);
+                        break;
+                    case PropertyInfo property:
+                        property.SetValue(instance, value);
+                        break;
+                }
             }
 
             return instance;
-        }
-
-        private static void ReadMember(Stream stream, object instance, long startOffset, ByteConverter converter,
-            MemberData member)
-        {
-            // If possible, reposition the stream according to offset.
-            if (stream.CanSeek)
-            {
-                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
-                    stream.Position = startOffset + member.Attribute.Offset;
-                else if (member.Attribute.Offset != 0)
-                    stream.Position += member.Attribute.Offset;
-            }
-            else
-            {
-                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
-                    throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
-                else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
-                    stream.ReadBytes(member.Attribute.Offset);
-            }
-
-            // Read the value and respect settings stored in the member attribute.
-            object value;
-            Type elementType = member.Type.GetEnumerableElementType();
-            if (elementType == null)
-            {
-                value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
-            }
-            else
-            {
-                Array values = Array.CreateInstance(elementType, member.Attribute.Length);
-                for (int i = 0; i < values.Length; i++)
-                {
-                    values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
-                }
-                value = values;
-            }
-
-            // Set the read value.
-            switch (member.MemberInfo)
-            {
-                case FieldInfo field:
-                    field.SetValue(instance, value);
-                    break;
-                case PropertyInfo property:
-                    property.SetValue(instance, value);
-                    break;
-            }
         }
 
         private static string ReadStringWithLength(Stream stream, int length, bool lengthInChars, Encoding encoding)
@@ -1026,37 +1017,34 @@ namespace Syroot.BinaryData.Extensions
             List<byte> bytes = new List<byte>();
             bool isChar = true;
             byte[] buffer = Buffer;
-            lock (stream)
+            switch (encoding.GetByteCount("A"))
             {
-                switch (encoding.GetByteCount("A"))
-                {
-                    case sizeof(Byte):
-                        // Read single bytes.
-                        while (isChar)
+                case sizeof(Byte):
+                    // Read single bytes.
+                    while (isChar)
+                    {
+                        FillBuffer(stream, sizeof(Byte));
+                        if (isChar = buffer[0] != 0)
                         {
-                            FillBuffer(stream, sizeof(Byte));
-                            if (isChar = buffer[0] != 0)
-                            {
-                                bytes.Add(buffer[0]);
-                            }
+                            bytes.Add(buffer[0]);
                         }
-                        break;
-                    case sizeof(Int16):
-                        // Read word values of 2 bytes width.
-                        while (isChar)
+                    }
+                    break;
+                case sizeof(Int16):
+                    // Read word values of 2 bytes width.
+                    while (isChar)
+                    {
+                        FillBuffer(stream, sizeof(Int16));
+                        if (isChar = buffer[0] != 0 || buffer[1] != 0)
                         {
-                            FillBuffer(stream, sizeof(Int16));
-                            if (isChar = buffer[0] != 0 || buffer[1] != 0)
-                            {
-                                bytes.Add(buffer[0]);
-                                bytes.Add(buffer[1]);
-                            }
+                            bytes.Add(buffer[0]);
+                            bytes.Add(buffer[1]);
                         }
-                        break;
-                    default:
-                        throw new NotImplementedException(
-                            "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
-                }
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException(
+                        "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
             }
             // Convert to string.
             return encoding.GetString(bytes.ToArray());

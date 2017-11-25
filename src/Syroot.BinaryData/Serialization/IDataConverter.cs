@@ -1,11 +1,11 @@
 using System.IO;
 
-namespace Syroot.BinaryData
+namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
-    /// Represents a converter for reading and writing custom binary values.
+    /// Represents a converter for reading and writing custom values.
     /// </summary>
-    public interface IBinaryConverter
+    public interface IDataConverter
     {
         // ---- METHODS ------------------------------------------------------------------------------------------------
 

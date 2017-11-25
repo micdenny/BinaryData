@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syroot.BinaryData.Extensions;
+using Syroot.BinaryData.Serialization;
 
 namespace Syroot.BinaryData.UnitTest
 {
@@ -33,12 +33,10 @@ namespace Syroot.BinaryData.UnitTest
 
         private class TestClass
         {
-            [BinaryMember(Order = -2, Length = 3)] public byte[] ArrayStuff = new byte[] { 0x01, 0x02, 0x03 };
-            [BinaryMember(Order = -1, Length = 3)] public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
-            [BinaryMember(Order = 0)] public int X = 0x33330000;
-            [BinaryMember(Order = 1)] public byte Y = 0x44;
-            [BinaryMember(Order = 2, StringFormat = StringDataFormat.Int32CharCount)] public string Text = "Hello, Test!";
-            [BinaryMember(Order = 3)] public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
+            public int X = 0x33330000;
+            public byte Y = 0x44;
+            [BinaryMember(StringFormat = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
+            public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 
         private struct TestStruct
@@ -51,7 +49,7 @@ namespace Syroot.BinaryData.UnitTest
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private static readonly ByteConverter _reversedConverter
-            = BitConverter.IsLittleEndian ? ByteConverter.BigEndian : ByteConverter.LittleEndian;
+            = BitConverter.IsLittleEndian ? ByteConverter.Big : ByteConverter.Little;
 
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
@@ -70,32 +68,17 @@ namespace Syroot.BinaryData.UnitTest
         [TestMethod]
         public void ReadWriteObject()
         {
-            TestClass origInstance = new TestClass();
-            _stream.WriteObject(origInstance, ByteConverter.BigEndian);
+            TestClass testClass = new TestClass();
+            _stream.WriteObject(testClass, ByteConverter.Big);
 
             _stream.Position = 0;
-            TestClass readInstance = _stream.ReadObject<TestClass>(ByteConverter.BigEndian);
+            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.Big);
 
-            CollectionAssert.AreEqual(origInstance.ArrayStuff, readInstance.ArrayStuff);
-            CollectionAssert.AreEqual(origInstance.AnotherArray, readInstance.AnotherArray);
-            Assert.AreEqual(origInstance.X, readInstance.X);
-            Assert.AreEqual(origInstance.Y, readInstance.Y);
-            Assert.AreEqual(origInstance.Text, readInstance.Text);
-            Assert.AreEqual(origInstance.Struct.Green, readInstance.Struct.Green);
-            Assert.AreEqual(origInstance.Struct.Red, readInstance.Struct.Red);
-        }
-
-        [TestMethod]
-        public void ReadWriteRawString()
-        {
-            string expected = "0123456789";
-
-            _stream.Write(expected, StringDataFormat.Raw, Encoding.UTF8);
-
-            _stream.Position = 0;
-            string actual = _stream.ReadString(expected.Length, Encoding.UTF8);
-
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(testClass.X, readClass.X);
+            Assert.AreEqual(testClass.Y, readClass.Y);
+            Assert.AreEqual(testClass.Text, readClass.Text);
+            Assert.AreEqual(testClass.Struct.Green, readClass.Struct.Green);
+            Assert.AreEqual(testClass.Struct.Red, readClass.Struct.Red);
         }
     }
 }

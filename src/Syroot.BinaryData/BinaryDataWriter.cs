@@ -74,7 +74,7 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets or sets the byte order used to parse multibyte binary data with.
         /// </summary>
-        public ByteOrder ByteOrder
+        public Endian ByteOrder
         {
             get => ByteConverter.ByteOrder;
             set => ByteConverter = ByteConverter.GetConverter(value);
@@ -190,7 +190,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
-        public void Write(Boolean value, BooleanDataFormat format) => BaseStream.Write(value, format, ByteConverter);
+        public void Write(Boolean value, BooleanCoding format) => BaseStream.Write(value, format, ByteConverter);
 
         /// <summary>
         /// Writes an enumeration of <see cref="Boolean"/> values to the current stream, with 0 representing
@@ -198,7 +198,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Boolean"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="Boolean"/> will be written.</param>
-        public void Write(IEnumerable<Boolean> values, BooleanDataFormat format = BooleanDataFormat.Byte)
+        public void Write(IEnumerable<Boolean> values, BooleanCoding format = BooleanCoding.Byte)
             => BaseStream.Write(values, format, ByteConverter);
 
         // ---- DateTime ----
@@ -209,7 +209,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The <see cref="DateTime"/> value to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> will be written.</param>
-        public void Write(DateTime value, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
+        public void Write(DateTime value, DateTimeCoding format = DateTimeCoding.NetTicks)
             => BaseStream.Write(value, format, ByteConverter);
         
         /// <summary>
@@ -218,7 +218,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="DateTime"/> values to write.</param>
         /// <param name="format">The binary format in which the <see cref="DateTime"/> values will be written.</param>
-        public void Write(IEnumerable<DateTime> values, DateTimeDataFormat format = DateTimeDataFormat.NetTicks)
+        public void Write(IEnumerable<DateTime> values, DateTimeCoding format = DateTimeCoding.NetTicks)
             => BaseStream.Write(values, format, ByteConverter);
 
         // ---- Decimal ----
@@ -359,7 +359,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The <see cref="String"/> value to write.</param>
         /// <param name="format">The binary format in which the string will be written.</param>
         /// <param name="encoding">The encoding used for converting the string.</param>
-        public void Write(String value, StringDataFormat format, Encoding encoding = null)
+        public void Write(String value, StringCoding format, Encoding encoding = null)
             => BaseStream.Write(value, format, encoding, ByteConverter);
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The <see cref="String"/> values to write.</param>
         /// <param name="format">The binary format in which the strings will be written.</param>
         /// <param name="encoding">The encoding used for converting the strings.</param>
-        public void Write(IEnumerable<String> values, StringDataFormat format = StringDataFormat.DynamicByteCount,
+        public void Write(IEnumerable<String> values, StringCoding format = StringCoding.DynamicByteCount,
             Encoding encoding = null)
             => BaseStream.Write(values, format, encoding);
 

@@ -1,12 +1,12 @@
 using System;
 
-namespace Syroot.BinaryData
+namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
     /// Represents a class or struct configuration for reading and writing it as binary data.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public class BinaryObjectAttribute : Attribute
+    public class DataObjectAttribute : Attribute
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
