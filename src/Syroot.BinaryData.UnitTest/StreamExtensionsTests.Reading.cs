@@ -64,19 +64,19 @@ namespace Syroot.BinaryData.UnitTest
             _stream.Position = 0;
 
             Assert.AreEqual(true, _stream.ReadBoolean());
-            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Byte));
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanCoding.Byte));
             Assert.AreEqual(true, _stream.ReadBoolean());
-            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Byte));
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanCoding.Byte));
 
-            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Word));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Word));
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanCoding.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Word));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Word));
 
-            Assert.AreEqual(false, _stream.ReadBoolean(BooleanDataFormat.Dword));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
-            Assert.AreEqual(true, _stream.ReadBoolean(BooleanDataFormat.Dword));
+            Assert.AreEqual(false, _stream.ReadBoolean(BooleanCoding.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Dword));
+            Assert.AreEqual(true, _stream.ReadBoolean(BooleanCoding.Dword));
         }
 
         [TestMethod]
@@ -101,9 +101,9 @@ namespace Syroot.BinaryData.UnitTest
             _stream.Position = 0;
             Assert.AreEqual(value1, _stream.ReadDateTime());
             Assert.AreEqual(value2, _stream.ReadDateTime());
-            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeDataFormat.CTime));
-            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeDataFormat.CTime64));
-            Assert.AreEqual(value4, _stream.ReadDateTime(DateTimeDataFormat.CTime));
+            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeCoding.CTime));
+            Assert.AreEqual(value3, _stream.ReadDateTime(DateTimeCoding.CTime64));
+            Assert.AreEqual(value4, _stream.ReadDateTime(DateTimeCoding.CTime));
         }
 
         [TestMethod]
@@ -360,16 +360,16 @@ namespace Syroot.BinaryData.UnitTest
 
             // Read test values.
             _stream.Position = 0;
-            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
-            Assert.AreEqual(value2, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.UTF8));
-            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.Int32CharCount, Encoding.UTF8));
-            Assert.AreEqual(value2, _stream.ReadString(StringDataFormat.Int16CharCount, Encoding.UTF8));
-            Assert.AreEqual(value1, _stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.Unicode));
-            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
-            Assert.AreEqual(value4, _stream.ReadString(StringDataFormat.DynamicByteCount, Encoding.ASCII));
-            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.Int32CharCount, Encoding.ASCII));
-            Assert.AreEqual(value4, _stream.ReadString(StringDataFormat.ByteCharCount, Encoding.ASCII));
-            Assert.AreEqual(value3, _stream.ReadString(StringDataFormat.ZeroTerminated, Encoding.ASCII));
+            Assert.AreEqual(value1, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.UTF8));
+            Assert.AreEqual(value2, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.UTF8));
+            Assert.AreEqual(value1, _stream.ReadString(StringCoding.Int32CharCount, Encoding.UTF8));
+            Assert.AreEqual(value2, _stream.ReadString(StringCoding.Int16CharCount, Encoding.UTF8));
+            Assert.AreEqual(value1, _stream.ReadString(StringCoding.ZeroTerminated, Encoding.Unicode));
+            Assert.AreEqual(value3, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.ASCII));
+            Assert.AreEqual(value4, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.ASCII));
+            Assert.AreEqual(value3, _stream.ReadString(StringCoding.Int32CharCount, Encoding.ASCII));
+            Assert.AreEqual(value4, _stream.ReadString(StringCoding.ByteCharCount, Encoding.ASCII));
+            Assert.AreEqual(value3, _stream.ReadString(StringCoding.ZeroTerminated, Encoding.ASCII));
         }
 
         [TestMethod]

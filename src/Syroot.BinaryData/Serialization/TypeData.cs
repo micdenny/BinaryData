@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Syroot.BinaryData.Core;
 
-namespace Syroot.BinaryData
+namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
     /// Represents reflected type configuration required for reading and writing it as binary data.
@@ -21,7 +21,7 @@ namespace Syroot.BinaryData
             Type = type;
 
             // Get the type configuration.
-            Attribute = Type.GetCustomAttribute<BinaryObjectAttribute>() ?? new BinaryObjectAttribute();
+            Attribute = Type.GetCustomAttribute<DataObjectAttribute>() ?? new DataObjectAttribute();
             
             // Get the member configurations, and collect a parameterless constructor on the way.
             Members = new List<MemberData>();
@@ -52,11 +52,11 @@ namespace Syroot.BinaryData
         /// Gets the <see cref="Type"/> to which informations are stored.
         /// </summary>
         internal Type Type { get; }
-        
+
         /// <summary>
-        /// Gets the <see cref="BinaryObjectAttribute"/> configuring how the object is read and written.
+        /// Gets the <see cref="DataObjectAttribute"/> configuring how the object is read and written.
         /// </summary>
-        internal BinaryObjectAttribute Attribute { get; }
+        internal DataObjectAttribute Attribute { get; }
 
         /// <summary>
         /// Gets a parameterless <see cref="ConstructorInfo"/> to instantiate the class.

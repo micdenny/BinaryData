@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Syroot.BinaryData.Core;
+using Syroot.BinaryData.Serialization;
 
 namespace Syroot.BinaryData.Extensions
 {
@@ -20,30 +21,30 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
-        /// <param name="format">The <see cref="BooleanDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, Boolean value,
-            BooleanDataFormat format = BooleanDataFormat.Byte, ByteConverter converter = null)
+            BooleanCoding format = BooleanCoding.Byte, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             byte[] buffer;
             switch (format)
             {
-                case BooleanDataFormat.Byte:
+                case BooleanCoding.Byte:
                     stream.WriteByte((Byte)(value ? 1 : 0));
                     break;
-                case BooleanDataFormat.Word:
+                case BooleanCoding.Word:
                     buffer = Buffer;
                     converter.GetBytes((Int16)(value ? 1 : 0), buffer, 0);
                     stream.Write(Buffer, 0, sizeof(Int16));
                     break;
-                case BooleanDataFormat.Dword:
+                case BooleanCoding.Dword:
                     buffer = Buffer;
                     converter.GetBytes(value ? 1 : 0, buffer, 0);
                     stream.Write(Buffer, 0, sizeof(Int32));
                     break;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
             }
         }
 
@@ -52,10 +53,10 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
-        /// <param name="format">The <see cref="BooleanDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<Boolean> values,
-            BooleanDataFormat format = BooleanDataFormat.Byte, ByteConverter converter = null)
+            BooleanCoding format = BooleanCoding.Byte, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -63,13 +64,13 @@ namespace Syroot.BinaryData.Extensions
                 byte[] buffer;
                 switch (format)
                 {
-                    case BooleanDataFormat.Byte:
+                    case BooleanCoding.Byte:
                         foreach (var value in values)
                         {
                             stream.WriteByte((Byte)(value ? 1 : 0));
                         }
                         break;
-                    case BooleanDataFormat.Word:
+                    case BooleanCoding.Word:
                         buffer = Buffer;
                         foreach (var value in values)
                         {
@@ -77,7 +78,7 @@ namespace Syroot.BinaryData.Extensions
                             stream.Write(Buffer, 0, sizeof(Int16));
                         }
                         break;
-                    case BooleanDataFormat.Dword:
+                    case BooleanCoding.Dword:
                         buffer = Buffer;
                         foreach (var value in values)
                         {
@@ -86,7 +87,7 @@ namespace Syroot.BinaryData.Extensions
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(BooleanDataFormat)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
                 }
             }
         }
@@ -126,25 +127,25 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
-        /// <param name="format">The <see cref="DateTimeDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, DateTime value,
-            DateTimeDataFormat format = DateTimeDataFormat.NetTicks, ByteConverter converter = null)
+            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             switch (format)
             {
-                case DateTimeDataFormat.NetTicks:
+                case DateTimeCoding.NetTicks:
                     Write(stream, value.Ticks, converter);
                     break;
-                case DateTimeDataFormat.CTime:
+                case DateTimeCoding.CTime:
                     Write(stream, (uint)(new DateTime(1970, 1, 1) - value).TotalSeconds, converter);
                     break;
-                case DateTimeDataFormat.CTime64:
+                case DateTimeCoding.CTime64:
                     Write(stream, (ulong)(new DateTime(1970, 1, 1) - value).TotalSeconds, converter);
                     break;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(DateTimeDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(DateTimeCoding)}.", nameof(format));
             }
         }
 
@@ -153,10 +154,10 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
-        /// <param name="format">The <see cref="DateTimeDataFormat"/> format in which the data is stored.</param>
+        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<DateTime> values,
-            DateTimeDataFormat format = DateTimeDataFormat.NetTicks, ByteConverter converter = null)
+            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
         }
@@ -459,13 +460,13 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
-        /// <param name="format">The <see cref="StringDataFormat"/> format determining how the length of the string is
+        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the string is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, String value,
-            StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null,
+            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
             ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
@@ -473,25 +474,25 @@ namespace Syroot.BinaryData.Extensions
             byte[] textBuffer = encoding.GetBytes(value);
             switch (format)
             {
-                case StringDataFormat.DynamicByteCount:
+                case StringCoding.DynamicByteCount:
                     Write7BitEncodedInt(stream, textBuffer.Length);
                     stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
-                case StringDataFormat.ByteCharCount:
+                case StringCoding.ByteCharCount:
                     stream.WriteByte((byte)value.Length);
                     stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
-                case StringDataFormat.Int16CharCount:
+                case StringCoding.Int16CharCount:
                     converter.GetBytes((Int16)value.Length, Buffer, 0);
                     stream.Write(Buffer, 0, sizeof(Int16));
                     stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
-                case StringDataFormat.Int32CharCount:
+                case StringCoding.Int32CharCount:
                     converter.GetBytes(value.Length, Buffer, 0);
                     stream.Write(Buffer, 0, sizeof(Int32));
                     stream.Write(textBuffer, 0, textBuffer.Length);
                     break;
-                case StringDataFormat.ZeroTerminated:
+                case StringCoding.ZeroTerminated:
                     stream.Write(textBuffer, 0, textBuffer.Length);
                     switch (encoding.GetByteCount("A"))
                     {
@@ -505,7 +506,7 @@ namespace Syroot.BinaryData.Extensions
                     }
                     break;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
             }
         }
 
@@ -514,13 +515,13 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
-        /// <param name="format">The <see cref="StringDataFormat"/> format determining how the length of the strings is
+        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the strings is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<String> values,
-            StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null, 
+            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null, 
             ByteConverter converter = null)
         {
             // TODO: Add this!
@@ -785,7 +786,7 @@ namespace Syroot.BinaryData.Extensions
             else
             {
                 // Let a binary converter do all the work.
-                IBinaryConverter binaryConverter = BinaryConverterCache.GetConverter(attribute.Converter);
+                IDataConverter binaryConverter = DataConverterCache.GetConverter(attribute.Converter);
                 binaryConverter.Write(stream, instance, attribute, value, converter);
             }
         }
@@ -807,14 +808,14 @@ namespace Syroot.BinaryData.Extensions
                 // If possible, reposition the stream according to offset.
                 if (stream.CanSeek)
                 {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                    if (member.Attribute.OffsetOrigin == Origin.Set)
                         stream.Position = startOffset + member.Attribute.Offset;
                     else
                         stream.Position += member.Attribute.Offset;
                 }
                 else
                 {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
+                    if (member.Attribute.OffsetOrigin == Origin.Set || member.Attribute.Offset < 0)
                         throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
                     else if (member.Attribute.Offset > 0) // Simulate moving forward by writing bytes.
                         stream.Write(new byte[member.Attribute.Offset]);

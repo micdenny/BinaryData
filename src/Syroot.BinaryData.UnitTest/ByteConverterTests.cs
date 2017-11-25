@@ -13,11 +13,11 @@ namespace Syroot.BinaryData.UnitTest
         {
             if (BitConverter.IsLittleEndian)
             {
-                Assert.AreEqual(ByteConverter.System.ByteOrder, ByteOrder.LittleEndian);
+                Assert.AreEqual(ByteConverter.System.ByteOrder, Endian.Little);
             }
             else
             {
-                Assert.AreEqual(ByteConverter.System.ByteOrder, ByteOrder.BigEndian);
+                Assert.AreEqual(ByteConverter.System.ByteOrder, Endian.Big);
             }
         }
     }

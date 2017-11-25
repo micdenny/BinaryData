@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syroot.BinaryData.Extensions;
+using Syroot.BinaryData.Serialization;
 
 namespace Syroot.BinaryData.UnitTest
 {
@@ -34,7 +35,7 @@ namespace Syroot.BinaryData.UnitTest
         {
             public int X = 0x33330000;
             public byte Y = 0x44;
-            [BinaryMember(StringFormat = StringDataFormat.Int32CharCount)] public string Text = "Hello, Test!";
+            [BinaryMember(StringFormat = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
             public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 
@@ -48,7 +49,7 @@ namespace Syroot.BinaryData.UnitTest
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private static readonly ByteConverter _reversedConverter
-            = BitConverter.IsLittleEndian ? ByteConverter.BigEndian : ByteConverter.LittleEndian;
+            = BitConverter.IsLittleEndian ? ByteConverter.Big : ByteConverter.Little;
 
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
@@ -68,10 +69,10 @@ namespace Syroot.BinaryData.UnitTest
         public void ReadWriteObject()
         {
             TestClass testClass = new TestClass();
-            _stream.WriteObject(testClass, ByteConverter.BigEndian);
+            _stream.WriteObject(testClass, ByteConverter.Big);
 
             _stream.Position = 0;
-            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.BigEndian);
+            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.Big);
 
             Assert.AreEqual(testClass.X, readClass.X);
             Assert.AreEqual(testClass.Y, readClass.Y);

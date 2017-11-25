@@ -21,9 +21,9 @@ namespace Syroot.BinaryData
         /// </summary>
         static ByteConverter()
         {
-            LittleEndian = new ByteConverterLittleEndian();
-            BigEndian = new ByteConverterBigEndian();
-            System = BitConverter.IsLittleEndian ? LittleEndian : BigEndian;
+            Little = new ByteConverterLittle();
+            Big = new ByteConverterBig();
+            System = BitConverter.IsLittleEndian ? Little : Big;
         }
 
         /// <summary>
@@ -36,12 +36,12 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets a <see cref="ByteConverter"/> instance converting data stored in little endian byte order.
         /// </summary>
-        public static ByteConverter LittleEndian { get; }
+        public static ByteConverter Little { get; }
 
         /// <summary>
         /// Gets a <see cref="ByteConverter"/> instance converting data stored in big endian byte order.
         /// </summary>
-        public static ByteConverter BigEndian { get; }
+        public static ByteConverter Big { get; }
 
         /// <summary>
         /// Gets a <see cref="ByteConverter"/> instance converting data stored in the byte order of the system
@@ -50,9 +50,9 @@ namespace Syroot.BinaryData
         public static ByteConverter System { get; }
 
         /// <summary>
-        /// Gets the <see cref="BinaryData.ByteOrder"/> in which data is stored as converted by this instance.
+        /// Gets the <see cref="BinaryData.Endian"/> in which data is stored as converted by this instance.
         /// </summary>
-        public abstract ByteOrder ByteOrder { get; }
+        public abstract Endian ByteOrder { get; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
@@ -61,15 +61,15 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="byteOrder">The <see cref="ByteOrder"/> to retrieve a converter for.</param>
         /// <returns>The corresponding <see cref="ByteConverter"/> instance.</returns>
-        public static ByteConverter GetConverter(ByteOrder byteOrder)
+        public static ByteConverter GetConverter(Endian byteOrder)
         {
             switch (byteOrder)
             {
-                case ByteOrder.BigEndian:
-                    return BigEndian;
-                case ByteOrder.LittleEndian:
-                    return LittleEndian;
-                case ByteOrder.System:
+                case Endian.Big:
+                    return Big;
+                case Endian.Little:
+                    return Little;
+                case Endian.System:
                     return System;
                 default:
                     throw new ArgumentException($"Invalid {nameof(ByteOrder)}.", nameof(byteOrder));

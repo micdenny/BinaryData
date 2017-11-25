@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Syroot.BinaryData
+namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
     /// Represents information on a member of a type cached as <see cref="TypeData"/>.

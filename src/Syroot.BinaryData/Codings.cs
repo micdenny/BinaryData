@@ -5,7 +5,7 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents the set of formats of binary boolean encodings.
     /// </summary>
-    public enum BooleanDataFormat
+    public enum BooleanCoding
     {
         /// <summary>
         /// The boolean is stored in 1 byte and is <c>true</c> when the value is not 0. This is the .NET default.
@@ -26,7 +26,7 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents the set of formats of binary date and time encodings.
     /// </summary>
-    public enum DateTimeDataFormat
+    public enum DateTimeCoding
     {
         /// <summary>
         /// The <see cref="System.DateTime"/> is stored as the ticks of a .NET <see cref="System.DateTime"/> instance.
@@ -50,7 +50,7 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents formats of binary string encodings.
     /// </summary>
-    public enum StringDataFormat
+    public enum StringCoding
     {
         /// <summary>
         /// The string has a prefix of a 7-bit encoded integer of variable size determining the number of bytes out of
