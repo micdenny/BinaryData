@@ -797,7 +797,7 @@ namespace Syroot.BinaryData.Extensions
             TypeData typeData = TypeData.GetTypeData(type);
 
             // Write inherited members first if required.
-            if (typeData.Attribute.Inherit && typeData.Type.BaseType != null)
+            if (typeData.ClassConfig.Inherit && typeData.Type.BaseType != null)
             {
                 WriteCustomObject(stream, typeData.Type.BaseType, instance, startOffset, converter);
             }

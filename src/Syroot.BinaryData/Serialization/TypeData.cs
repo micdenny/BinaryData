@@ -21,8 +21,10 @@ namespace Syroot.BinaryData.Serialization
             Type = type;
 
             // Get the type configuration.
-            Attribute = Type.GetCustomAttribute<DataObjectAttribute>() ?? new DataObjectAttribute();
-            
+            ClassConfig = Type.GetCustomAttribute<DataClassAttribute>() ?? new DataClassAttribute();
+            OffsetStartConfig = Type.GetCustomAttribute<DataOffsetStartAttribute>();
+            OffsetEndConfig = Type.GetCustomAttribute<DataOffsetEndAttribute>();
+
             // Get the member configurations, and collect a parameterless constructor on the way.
             Members = new List<MemberData>();
             foreach (MemberInfo member in Type.GetMembers(
@@ -32,15 +34,13 @@ namespace Syroot.BinaryData.Serialization
                 {
                     case ConstructorInfo constructorInfo:
                         if (constructorInfo.GetParameters().Length == 0)
-                        {
                             Constructor = constructorInfo;
-                        }
                         break;
                     case FieldInfo field:
-                        ValidateFieldInfo(field);
+                        AnalyzeField(field);
                         break;
                     case PropertyInfo property:
-                        ValidatePropertyInfo(property);
+                        AnalyzeProperty(property);
                         break;
                 }
             }
@@ -54,9 +54,13 @@ namespace Syroot.BinaryData.Serialization
         internal Type Type { get; }
 
         /// <summary>
-        /// Gets the <see cref="DataObjectAttribute"/> configuring how the object is read and written.
+        /// Gets the <see cref="DataClassAttribute"/> configuring how the object is read and written.
         /// </summary>
-        internal DataObjectAttribute Attribute { get; }
+        internal DataClassAttribute ClassConfig { get; }
+
+        internal DataOffsetStartAttribute OffsetStartConfig { get; }
+
+        internal DataOffsetEndAttribute OffsetEndConfig { get; }
 
         /// <summary>
         /// Gets a parameterless <see cref="ConstructorInfo"/> to instantiate the class.
@@ -66,7 +70,7 @@ namespace Syroot.BinaryData.Serialization
         /// <summary>
         /// Gets the list of <see cref="MemberData"/> which are read and written.
         /// </summary>
-        internal List<MemberData> Members { get; }
+        internal IList<MemberData> Members { get; }
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
@@ -90,7 +94,7 @@ namespace Syroot.BinaryData.Serialization
         /// Invokes the parameterless constructor on the object.
         /// </summary>
         /// <returns>A new instance of the object.</returns>
-        internal object GetInstance()
+        internal object Instantiate()
         {
             // Invoke the automatic default constructor for structs.
             if (Type.IsValueType)
@@ -108,51 +112,67 @@ namespace Syroot.BinaryData.Serialization
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
-        private void ValidateFieldInfo(FieldInfo field)
+        private void AnalyzeField(FieldInfo field)
         {
-            // Get a possible binary member configuration or use the default one.
-            BinaryMemberAttribute attrib = field.GetCustomAttribute<BinaryMemberAttribute>();
-            bool hasAttrib = attrib != null;
-            attrib = attrib ?? new BinaryMemberAttribute();
+            // Get any possible attribute.
+            DataArrayAttribute arrayAttrib = field.GetCustomAttribute<DataArrayAttribute>();
+            DataBooleanAttribute booleanAttrib = field.GetCustomAttribute<DataBooleanAttribute>();
+            DataConverterAttribute converterAttrib = field.GetCustomAttribute<DataConverterAttribute>();
+            DataDateTimeAttribute dateTimeAttrib = field.GetCustomAttribute<DataDateTimeAttribute>();
+            DataEndianAttribute endianAttrib = field.GetCustomAttribute<DataEndianAttribute>();
+            DataEnumAttribute enumAttrib = field.GetCustomAttribute<DataEnumAttribute>();
+            DataMemberAttribute memberAttrib = field.GetCustomAttribute<DataMemberAttribute>();
+            DataOffsetAttribute offsetAttrib = field.GetCustomAttribute<DataOffsetAttribute>();
+            DataStringAttribute stringAttrib = field.GetCustomAttribute<DataStringAttribute>();
 
-            // Field must be decorated or public.
-            if (hasAttrib || (!Attribute.Explicit && field.IsPublic))
+            // Handle field if either the class is non-explicit, the field public, or if it has any attribute.
+            bool exported = (!ClassConfig.Explicit && field.IsPublic)
+                || arrayAttrib != null || booleanAttrib != null || converterAttrib != null || dateTimeAttrib != null
+                || endianAttrib != null || enumAttrib != null || memberAttrib != null || offsetAttrib != null
+                || stringAttrib != null;
+            if (exported)
             {
-                // For fields of enumerable type ElementCount must be specified.
-                if (field.FieldType.IsEnumerable() && attrib.Length <= 0)
+                // Fields of enumerable type must be decorated with the DataArrayAttribute.
+                if (field.FieldType.IsEnumerable() && arrayAttrib == null)
                 {
                     throw new InvalidOperationException(
-                        $"Field {field} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
+                        $"Enumerable field \"{field}\" must be decorated with a {nameof(DataArrayAttribute)}.");
                 }
-
-                Members.Add(new MemberData(field, field.FieldType, attrib));
+                Members.Add(new MemberData(field, field.FieldType, arrayAttrib, booleanAttrib, converterAttrib,
+                    dateTimeAttrib, endianAttrib, enumAttrib, memberAttrib, offsetAttrib, stringAttrib));
             }
         }
 
-        private void ValidatePropertyInfo(PropertyInfo prop)
+        private void AnalyzeProperty(PropertyInfo property)
         {
-            // Get a possible binary member configuration or use the default one.
-            BinaryMemberAttribute attrib = prop.GetCustomAttribute<BinaryMemberAttribute>();
-            bool hasAttrib = attrib != null;
-            attrib = attrib ?? new BinaryMemberAttribute();
+            // Get any possible attribute.
+            DataArrayAttribute arrayAttrib = property.GetCustomAttribute<DataArrayAttribute>();
+            DataBooleanAttribute booleanAttrib = property.GetCustomAttribute<DataBooleanAttribute>();
+            DataConverterAttribute converterAttrib = property.GetCustomAttribute<DataConverterAttribute>();
+            DataDateTimeAttribute dateTimeAttrib = property.GetCustomAttribute<DataDateTimeAttribute>();
+            DataEndianAttribute endianAttrib = property.GetCustomAttribute<DataEndianAttribute>();
+            DataEnumAttribute enumAttrib = property.GetCustomAttribute<DataEnumAttribute>();
+            DataMemberAttribute memberAttrib = property.GetCustomAttribute<DataMemberAttribute>();
+            DataOffsetAttribute offsetAttrib = property.GetCustomAttribute<DataOffsetAttribute>();
+            DataStringAttribute stringAttrib = property.GetCustomAttribute<DataStringAttribute>();
 
-            // Property must have getter and setter - if not, throw an exception if it is explicitly decorated.
-            if (hasAttrib && (prop.GetMethod == null || prop.SetMethod == null))
+            // Handle property of either the class is non-explicit, the property public, has any attribute, and has a
+            // getter and setter.
+            bool exported = (!ClassConfig.Explicit
+                && property.GetMethod?.IsPublic == true && property.SetMethod?.IsPublic == true)
+                || arrayAttrib != null || booleanAttrib != null || converterAttrib != null || dateTimeAttrib != null
+                || endianAttrib != null || enumAttrib != null || memberAttrib != null || offsetAttrib != null
+                || stringAttrib != null;
+            if (exported)
             {
-                throw new InvalidOperationException($"Getter and setter on property {prop} not found.");
-            }
-            // Property must be decorated or getter and setter public.
-            if (hasAttrib
-                || (!Attribute.Explicit && prop.GetMethod?.IsPublic == true && prop.SetMethod?.IsPublic == true))
-            {
-                // For properties of enumerable type ElementCount must be specified.
-                if (prop.PropertyType.IsEnumerable() && attrib.Length <= 0)
+                // Properties of enumerable type must be decorated with the DataArrayAttribute.
+                if (property.PropertyType.IsEnumerable() && arrayAttrib == null)
                 {
                     throw new InvalidOperationException(
-                        $"Property {prop} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
+                        $"Enumerable property \"{property}\" must be decorated with a {nameof(DataArrayAttribute)}.");
                 }
-
-                Members.Add(new MemberData(prop, prop.PropertyType, attrib));
+                Members.Add(new MemberData(property, property.PropertyType, arrayAttrib, booleanAttrib, converterAttrib,
+                    dateTimeAttrib, endianAttrib, enumAttrib, memberAttrib, offsetAttrib, stringAttrib));
             }
         }
     }
