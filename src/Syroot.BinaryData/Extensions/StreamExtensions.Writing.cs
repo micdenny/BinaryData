@@ -454,6 +454,8 @@ namespace Syroot.BinaryData.Extensions
             }
         }
 
+        // ---- String ----
+
         /// <summary>
         /// Writes a <see cref="String"/> value to the <paramref name="stream"/>.
         /// </summary>
@@ -471,41 +473,44 @@ namespace Syroot.BinaryData.Extensions
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
             byte[] textBuffer = encoding.GetBytes(value);
-            switch (format)
+            lock (stream)
             {
-                case StringDataFormat.DynamicByteCount:
-                    Write7BitEncodedInt(stream, textBuffer.Length);
-                    stream.Write(textBuffer, 0, textBuffer.Length);
-                    break;
-                case StringDataFormat.ByteCharCount:
-                    stream.WriteByte((byte)value.Length);
-                    stream.Write(textBuffer, 0, textBuffer.Length);
-                    break;
-                case StringDataFormat.Int16CharCount:
-                    converter.GetBytes((Int16)value.Length, Buffer, 0);
-                    stream.Write(Buffer, 0, sizeof(Int16));
-                    stream.Write(textBuffer, 0, textBuffer.Length);
-                    break;
-                case StringDataFormat.Int32CharCount:
-                    converter.GetBytes(value.Length, Buffer, 0);
-                    stream.Write(Buffer, 0, sizeof(Int32));
-                    stream.Write(textBuffer, 0, textBuffer.Length);
-                    break;
-                case StringDataFormat.ZeroTerminated:
-                    stream.Write(textBuffer, 0, textBuffer.Length);
-                    switch (encoding.GetByteCount("A"))
-                    {
-                        case sizeof(Byte):
-                            stream.WriteByte(0);
-                            break;
-                        case sizeof(Int16):
-                            stream.WriteByte(0);
-                            stream.WriteByte(0);
-                            break;
-                    }
-                    break;
-                default:
-                    throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
+                switch (format)
+                {
+                    case StringDataFormat.DynamicByteCount:
+                        Write7BitEncodedInt(stream, textBuffer.Length);
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
+                    case StringDataFormat.ByteCharCount:
+                        stream.WriteByte((byte)value.Length);
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
+                    case StringDataFormat.Int16CharCount:
+                        converter.GetBytes((Int16)value.Length, Buffer, 0);
+                        stream.Write(Buffer, 0, sizeof(Int16));
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
+                    case StringDataFormat.Int32CharCount:
+                        converter.GetBytes(value.Length, Buffer, 0);
+                        stream.Write(Buffer, 0, sizeof(Int32));
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
+                    case StringDataFormat.ZeroTerminated:
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        switch (encoding.GetByteCount("A"))
+                        {
+                            case sizeof(Byte):
+                                stream.WriteByte(0);
+                                break;
+                            case sizeof(Int16):
+                                stream.WriteByte(0);
+                                stream.WriteByte(0);
+                                break;
+                        }
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
+                }
             }
         }
 
