@@ -3,10 +3,10 @@ using System;
 namespace Syroot.BinaryData.Serialization
 {
     /// <summary>
-    /// Represents a class or struct configuration for reading and writing it as binary data.
+    /// Configures a class or struct for reading and writing it through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public class DataObjectAttribute : Attribute
+    public class DataClassAttribute : Attribute
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 

@@ -35,7 +35,7 @@ namespace Syroot.BinaryData.UnitTest
         {
             public int X = 0x33330000;
             public byte Y = 0x44;
-            [BinaryMember(StringFormat = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
+            [DataString(StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
             public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 

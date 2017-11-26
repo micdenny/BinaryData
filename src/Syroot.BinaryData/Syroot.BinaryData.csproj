@@ -5,11 +5,11 @@
 		<AssemblyName>Syroot.BinaryData</AssemblyName>
 		<AssemblyTitle>BinaryData</AssemblyTitle>
 		<Authors>Syroot</Authors>
-		<VersionPrefix>4.0.3</VersionPrefix>
+		<VersionPrefix>4.0.0-alpha1</VersionPrefix>
 
 		<PackageId>Syroot.IO.BinaryData</PackageId>
 		<PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-		<PackageReleaseNotes>Fix big endian byte converter Single and Double conversion.</PackageReleaseNotes>
+		<PackageReleaseNotes>New features extending binary serialiazion functionality.</PackageReleaseNotes>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
 		<PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
@@ -17,12 +17,12 @@
 		<RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
 
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Configurations>Debug;Release;Release_Signed</Configurations>
+		<Configurations>Debug;Release;Release (Signed)</Configurations>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Release_Signed'">
+	<PropertyGroup Condition="'$(Configuration)' == 'Release (Signed)'">
 		<PackageId>Syroot.IO.BinaryData.Signed</PackageId>
 		<AssemblyOriginatorKeyFile>Syroot.BinaryData.pfx</AssemblyOriginatorKeyFile>
 		<SignAssembly>true</SignAssembly>

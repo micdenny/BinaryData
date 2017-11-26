@@ -255,7 +255,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static T ReadEnum<T>(this Stream stream, bool strict = false, ByteConverter converter = null)
             where T : struct, IComparable, IFormattable
-            => (T)ReadEnum(stream, typeof(T), strict, converter);
+            => (T)ReadEnum(typeof(T), stream, strict, converter);
 
         /// <summary>
         /// Returns an array of <see cref="Enum"/> instances of type <typeparamref name="T"/> read from the
@@ -279,7 +279,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    values[i] = (T)ReadEnum(stream, enumType, strict, converter);
+                    values[i] = (T)ReadEnum(enumType, stream, strict, converter);
                 }
             }
             return values;
@@ -406,7 +406,7 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static T ReadObject<T>(this Stream stream, ByteConverter converter = null)
-            => (T)ReadObject(stream, null, BinaryMemberAttribute.Default, typeof(T), converter);
+            => (T)ReadObject(typeof(T), stream, null, BinaryMemberAttribute.Default, converter);
 
         /// <summary>
         /// Returns an array of objects of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
@@ -768,11 +768,11 @@ namespace Syroot.BinaryData.Extensions
             throw new InvalidDataException("Invalid 7-bit encoded integer.");
         }
 
-        private static object ReadEnum(Stream stream, Type enumType, bool strict, ByteConverter converter)
+        private static object ReadEnum(Type type, Stream stream, bool strict, ByteConverter converter)
         {
             converter = converter ?? ByteConverter.System;
 
-            Type valueType = Enum.GetUnderlyingType(enumType);
+            Type valueType = Enum.GetUnderlyingType(type);
             int valueSize = Marshal.SizeOf(valueType);
             object value;
 
@@ -818,13 +818,13 @@ namespace Syroot.BinaryData.Extensions
             // Check if the value is defined in the enumeration, if requested.
             if (strict)
             {
-                ValidateEnumValue(enumType, value);
+                ValidateEnumValue(type, value);
             }
             return value;
         }
 
-        private static object ReadObject(Stream stream, object instance, BinaryMemberAttribute attribute,
-            Type type, ByteConverter converter)
+        private static object ReadObject(Type type, Stream stream, object instance, BinaryMemberAttribute attribute,
+            ByteConverter converter)
         {
             if (attribute.Converter == null)
             {
@@ -893,7 +893,7 @@ namespace Syroot.BinaryData.Extensions
                 }
                 else if (type.IsEnum)
                 {
-                    return ReadEnum(stream, type, attribute.Strict, converter);
+                    return ReadEnum(type, stream, attribute.Strict, converter);
                 }
                 else
                 {
@@ -915,10 +915,10 @@ namespace Syroot.BinaryData.Extensions
             ByteConverter converter)
         {
             TypeData typeData = TypeData.GetTypeData(type);
-            instance = instance ?? typeData.GetInstance();
+            instance = instance ?? typeData.Instantiate();
 
             // Read inherited members first if required.
-            if (typeData.Attribute.Inherit && typeData.Type.BaseType != null)
+            if (typeData.ClassConfig.Inherit && typeData.Type.BaseType != null)
             {
                 ReadCustomObject(stream, typeData.Type.BaseType, instance, startOffset, converter);
             }
@@ -947,14 +947,14 @@ namespace Syroot.BinaryData.Extensions
                 Type elementType = member.Type.GetEnumerableElementType();
                 if (elementType == null)
                 {
-                    value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
+                    value = ReadObject(member.Type, stream, instance, member.Attribute, converter);
                 }
                 else
                 {
                     Array values = Array.CreateInstance(elementType, member.Attribute.Length);
                     for (int i = 0; i < values.Length; i++)
                     {
-                        values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
+                        values.SetValue(ReadObject(elementType, stream, instance, member.Attribute, converter), i);
                     }
                     value = values;
                 }
