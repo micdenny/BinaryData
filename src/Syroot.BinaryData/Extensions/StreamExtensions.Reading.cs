@@ -1016,34 +1016,37 @@ namespace Syroot.BinaryData.Extensions
             List<byte> bytes = new List<byte>();
             bool isChar = true;
             byte[] buffer = Buffer;
-            switch (encoding.GetByteCount("A"))
+            lock (stream)
             {
-                case sizeof(Byte):
-                    // Read single bytes.
-                    while (isChar)
-                    {
-                        FillBuffer(stream, sizeof(Byte));
-                        if (isChar = buffer[0] != 0)
+                switch (encoding.GetByteCount("A"))
+                {
+                    case sizeof(Byte):
+                        // Read single bytes.
+                        while (isChar)
                         {
-                            bytes.Add(buffer[0]);
+                            FillBuffer(stream, sizeof(Byte));
+                            if (isChar = buffer[0] != 0)
+                            {
+                                bytes.Add(buffer[0]);
+                            }
                         }
-                    }
-                    break;
-                case sizeof(Int16):
-                    // Read word values of 2 bytes width.
-                    while (isChar)
-                    {
-                        FillBuffer(stream, sizeof(Int16));
-                        if (isChar = buffer[0] != 0 || buffer[1] != 0)
+                        break;
+                    case sizeof(Int16):
+                        // Read word values of 2 bytes width.
+                        while (isChar)
                         {
-                            bytes.Add(buffer[0]);
-                            bytes.Add(buffer[1]);
+                            FillBuffer(stream, sizeof(Int16));
+                            if (isChar = buffer[0] != 0 || buffer[1] != 0)
+                            {
+                                bytes.Add(buffer[0]);
+                                bytes.Add(buffer[1]);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    throw new NotImplementedException(
-                        "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
+                        break;
+                    default:
+                        throw new NotImplementedException(
+                            "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
+                }
             }
             // Convert to string.
             return encoding.GetString(bytes.ToArray());
