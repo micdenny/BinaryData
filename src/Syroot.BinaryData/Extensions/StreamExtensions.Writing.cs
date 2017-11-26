@@ -523,7 +523,15 @@ namespace Syroot.BinaryData.Extensions
             StringDataFormat format = StringDataFormat.DynamicByteCount, Encoding encoding = null, 
             ByteConverter converter = null)
         {
-            // TODO: Add this!
+            encoding = encoding ?? Encoding.UTF8;
+            converter = converter ?? ByteConverter.System;
+            lock (stream)
+            {
+                foreach (var value in values)
+                {
+                    Write(stream, value, format, encoding, converter);
+                }
+            }
         }
 
         // ---- UInt16 ----
