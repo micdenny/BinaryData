@@ -29,3 +29,7 @@ new features and possible breaking changes.
 
 - A code-oriented feature tour is available [on the wiki](https://github.com/Syroot/BinaryData/wiki).
 - Complete MSDN-style API documentation is hosted on [docs.syroot.com](http://docs.syroot.com/binarydata).
+
+## Support
+
+You can ask questions and suggest features on Discord aswell. Feel free to [join the BinaryData channel on the Syroot server](https://discord.gg/KSaSWTV)!
