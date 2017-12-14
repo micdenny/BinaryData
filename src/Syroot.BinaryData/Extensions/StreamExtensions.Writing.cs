@@ -815,50 +815,60 @@ namespace Syroot.BinaryData.Extensions
             }
 
             // Write members.
-            foreach (MemberData member in typeData.Members)
+            foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
             {
-                // If possible, reposition the stream according to offset.
-                if (stream.CanSeek)
-                {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
-                        stream.Position = startOffset + member.Attribute.Offset;
-                    else
-                        stream.Position += member.Attribute.Offset;
-                }
-                else
-                {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
-                        throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
-                    else if (member.Attribute.Offset > 0) // Simulate moving forward by writing bytes.
-                        stream.Write(new byte[member.Attribute.Offset]);
-                }
+                WriteMember(stream, instance, startOffset, converter, orderedMember.Value);
+            }
+            foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
+            {
+                WriteMember(stream, instance, startOffset, converter, unorderedMember.Value);
+            }
+        }
 
-                // Get the value to write.
-                object value;
-                switch (member.MemberInfo)
-                {
-                    case FieldInfo field:
-                        value = field.GetValue(instance);
-                        break;
-                    case PropertyInfo property:
-                        value = property.GetValue(instance);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Tried to write an invalid member {member.MemberInfo}.");
-                }
-
-                // Write the value and respect settings stored in the member attribute.
-                Type elementType = member.Type.GetEnumerableElementType();
-                if (elementType == null)
-                {
-                    WriteObject(stream, instance, member.Attribute, member.Type, value, converter);
-                }
+        private static void WriteMember(Stream stream, object instance, long startOffset, ByteConverter converter,
+            MemberData member)
+        {
+            // If possible, reposition the stream according to offset.
+            if (stream.CanSeek)
+            {
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                    stream.Position = startOffset + member.Attribute.Offset;
                 else
+                    stream.Position += member.Attribute.Offset;
+            }
+            else
+            {
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
+                    throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
+                else if (member.Attribute.Offset > 0) // Simulate moving forward by writing bytes.
+                    stream.Write(new byte[member.Attribute.Offset]);
+            }
+
+            // Get the value to write.
+            object value;
+            switch (member.MemberInfo)
+            {
+                case FieldInfo field:
+                    value = field.GetValue(instance);
+                    break;
+                case PropertyInfo property:
+                    value = property.GetValue(instance);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Tried to write an invalid member {member.MemberInfo}.");
+            }
+
+            // Write the value and respect settings stored in the member attribute.
+            Type elementType = member.Type.GetEnumerableElementType();
+            if (elementType == null)
+            {
+                WriteObject(stream, instance, member.Attribute, member.Type, value, converter);
+            }
+            else
+            {
+                foreach (object element in (IEnumerable)value)
                 {
-                    foreach (object element in (IEnumerable)value)
-                    {
-                        WriteObject(stream, instance, member.Attribute, member.Type, element, converter);
-                    }
+                    WriteObject(stream, instance, member.Attribute, member.Type, element, converter);
                 }
             }
         }

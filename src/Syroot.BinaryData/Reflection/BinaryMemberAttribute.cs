@@ -14,7 +14,13 @@ namespace Syroot.BinaryData
         internal static readonly BinaryMemberAttribute Default = new BinaryMemberAttribute();
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
-        
+
+        /// <summary>
+        /// Gets or sets the number determining the order in which the member is read or written. If not specified, the
+        /// members are written in alphabetical order.
+        /// </summary>
+        public int Order { get; set; } = Int32.MinValue;
+
         /// <summary>
         /// Gets or sets offset of this field in bytes. Can be negative. Defaults to 0.
         /// </summary>

@@ -22,9 +22,10 @@ namespace Syroot.BinaryData
 
             // Get the type configuration.
             Attribute = Type.GetCustomAttribute<BinaryObjectAttribute>() ?? new BinaryObjectAttribute();
-            
+
             // Get the member configurations, and collect a parameterless constructor on the way.
-            Members = new List<MemberData>();
+            OrderedMembers = new SortedDictionary<int, MemberData>();
+            UnorderedMembers = new SortedList<string, MemberData>(StringComparer.Ordinal);
             foreach (MemberInfo member in Type.GetMembers(
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
@@ -64,9 +65,16 @@ namespace Syroot.BinaryData
         internal ConstructorInfo Constructor { get; }
 
         /// <summary>
-        /// Gets the list of <see cref="MemberData"/> which are read and written.
+        /// Gets the dictionary of <see cref="MemberData"/> for members with the
+        /// <see cref="BinaryMemberAttribute.Order"/> property set.
         /// </summary>
-        internal List<MemberData> Members { get; }
+        internal SortedDictionary<int, MemberData> OrderedMembers { get; }
+
+        /// <summary>
+        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="BinaryMemberAttribute.Order"/>
+        /// property.
+        /// </summary>
+        internal SortedList<string, MemberData> UnorderedMembers { get; }
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
@@ -125,7 +133,16 @@ namespace Syroot.BinaryData
                         $"Field {field} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
                 }
 
-                Members.Add(new MemberData(field, field.FieldType, attrib));
+                // Store member in a deterministic order.
+                MemberData memberData = new MemberData(field, field.FieldType, attrib);
+                if (attrib.Order == Int32.MinValue)
+                {
+                    UnorderedMembers.Add(field.Name, memberData);
+                }
+                else
+                {
+                    OrderedMembers.Add(attrib.Order, memberData);
+                }
             }
         }
 
@@ -152,7 +169,16 @@ namespace Syroot.BinaryData
                         $"Property {prop} requires an element count specified with a {nameof(BinaryMemberAttribute)}.");
                 }
 
-                Members.Add(new MemberData(prop, prop.PropertyType, attrib));
+                // Store member in a deterministic order.
+                MemberData memberData = new MemberData(prop, prop.PropertyType, attrib);
+                if (attrib.Order == Int32.MinValue)
+                {
+                    UnorderedMembers.Add(prop.Name, memberData);
+                }
+                else
+                {
+                    OrderedMembers.Add(attrib.Order, memberData);
+                }
             }
         }
     }

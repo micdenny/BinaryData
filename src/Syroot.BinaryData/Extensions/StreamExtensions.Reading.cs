@@ -923,54 +923,64 @@ namespace Syroot.BinaryData.Extensions
             }
 
             // Read members.
-            foreach (MemberData member in typeData.Members)
+            foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
             {
-                // If possible, reposition the stream according to offset.
-                if (stream.CanSeek)
-                {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
-                        stream.Position = startOffset + member.Attribute.Offset;
-                    else if (member.Attribute.Offset != 0)
-                        stream.Position += member.Attribute.Offset;
-                }
-                else
-                {
-                    if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
-                        throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
-                    else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
-                        stream.ReadBytes(member.Attribute.Offset);
-                }
-                
-                // Read the value and respect settings stored in the member attribute.
-                object value;
-                Type elementType = member.Type.GetEnumerableElementType();
-                if (elementType == null)
-                {
-                    value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
-                }
-                else
-                {
-                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
-                    }
-                    value = values;
-                }
-
-                // Set the read value.
-                switch (member.MemberInfo)
-                {
-                    case FieldInfo field:
-                        field.SetValue(instance, value);
-                        break;
-                    case PropertyInfo property:
-                        property.SetValue(instance, value);
-                        break;
-                }
+                ReadMember(stream, instance, startOffset, converter, orderedMember.Value);
+            }
+            foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
+            {
+                ReadMember(stream, instance, startOffset, converter, unorderedMember.Value);
             }
 
             return instance;
+        }
+
+        private static void ReadMember(Stream stream, object instance, long startOffset, ByteConverter converter,
+            MemberData member)
+        {
+            // If possible, reposition the stream according to offset.
+            if (stream.CanSeek)
+            {
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin)
+                    stream.Position = startOffset + member.Attribute.Offset;
+                else if (member.Attribute.Offset != 0)
+                    stream.Position += member.Attribute.Offset;
+            }
+            else
+            {
+                if (member.Attribute.OffsetOrigin == OffsetOrigin.Begin || member.Attribute.Offset < 0)
+                    throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
+                else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
+                    stream.ReadBytes(member.Attribute.Offset);
+            }
+
+            // Read the value and respect settings stored in the member attribute.
+            object value;
+            Type elementType = member.Type.GetEnumerableElementType();
+            if (elementType == null)
+            {
+                value = ReadObject(stream, instance, member.Attribute, member.Type, converter);
+            }
+            else
+            {
+                Array values = Array.CreateInstance(elementType, member.Attribute.Length);
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values.SetValue(ReadObject(stream, instance, member.Attribute, elementType, converter), i);
+                }
+                value = values;
+            }
+
+            // Set the read value.
+            switch (member.MemberInfo)
+            {
+                case FieldInfo field:
+                    field.SetValue(instance, value);
+                    break;
+                case PropertyInfo property:
+                    property.SetValue(instance, value);
+                    break;
+            }
         }
 
         private static string ReadStringWithLength(Stream stream, int length, bool lengthInChars, Encoding encoding)
