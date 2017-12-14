@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Syroot.BinaryData.Core
 {
@@ -11,52 +10,46 @@ namespace Syroot.BinaryData.Core
     internal static class TypeExtensions
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
-        
+
         private static readonly Type _iEnumerableType = typeof(IEnumerable);
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
-        
+
         /// <summary>
-        /// Returns a value indicating whether the given <paramref name="type"/> is enumerable. Returns <c>false</c> for
+        /// Returns a value indicating whether the given <paramref name="self"/> is enumerable. Returns <c>false</c> for
         /// non-enumerable objects and strings.
         /// </summary>
-        /// <param name="type">The type which should be checked.</param>
+        /// <param name="self">The extended <see cref="Type"/> instance.</param>
         /// <returns><c>true</c> if the type is enumerable and not a string; otherwise <c>false</c>.</returns>
-        internal static bool IsEnumerable(this Type type)
+        internal static bool IsEnumerable(this Type self)
         {
-            return type != typeof(String) && (type.IsArray || _iEnumerableType.IsAssignableFrom(type));
+            return self.IsArray || _iEnumerableType.IsAssignableFrom(self);
         }
 
         /// <summary>
-        /// Gets the element type of <see cref="IEnumerable"/> instances. Returns <c>null</c> for non-enumerable objects
-        /// and strings.
+        /// Gets the element type of <see cref="IEnumerable"/> instances. Returns <c>null</c> for non-enumerable
+        /// objects.
         /// </summary>
-        /// <param name="type">The type which element type should be returned.</param>
+        /// <param name="self">The extended <see cref="Type"/> instance.</param>
         /// <returns>The type of the elements, or <c>null</c>.</returns>
-        internal static Type GetEnumerableElementType(this Type type)
+        internal static Type GetEnumerableElementType(this Type self)
         {
-            // Do not handle strings as enumerables, they are stored differently.
-            if (type == typeof(String))
-            {
-                return null;
-            }
-
             // Check for array instances.
-            if (type.IsArray)
+            if (self.IsArray)
             {
                 Type elementType;
-                if (type.GetArrayRank() > 1 || (elementType = type.GetElementType()).IsArray)
+                if (self.GetArrayRank() > 1 || (elementType = self.GetElementType()).IsArray)
                 {
                     throw new NotImplementedException(
-                        $"Type {type} is a multidimensional array and not supported at the moment.");
+                        $"Type {self} is a multi-dimensional array and is not supported at the moment.");
                 }
                 return elementType;
             }
 
             // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-            if (_iEnumerableType.IsAssignableFrom(type))
+            if (_iEnumerableType.IsAssignableFrom(self))
             {
-                foreach (Type interfaceType in type.GetInterfaces())
+                foreach (Type interfaceType in self.GetInterfaces())
                 {
                     if (interfaceType.IsGenericType
                         && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
@@ -69,35 +62,31 @@ namespace Syroot.BinaryData.Core
             return null;
         }
 
-        internal static bool TryGetEnumerableElementType(this Type type, out Type elementType)
+        internal static bool TryGetEnumerableElementType(this Type self, out Type elementType)
         {
-            // Do not handle strings as enumerables, they are stored differently.
-            if (type != typeof(String))
+            // Check for array instances.
+            if (self.IsArray)
             {
-                // Check for array instances.
-                if (type.IsArray)
+                Type elemType;
+                if (self.GetArrayRank() > 1 || (elemType = self.GetElementType()).IsArray)
                 {
-                    Type elemType;
-                    if (type.GetArrayRank() > 1 || (elemType = type.GetElementType()).IsArray)
-                    {
-                        throw new NotImplementedException(
-                            $"Type {type} is a multidimensional array and not supported at the moment.");
-                    }
-                    elementType = elemType;
-                    return true;
+                    throw new NotImplementedException(
+                        $"Type {self} is a multidimensional array and is not supported at the moment.");
                 }
+                elementType = elemType;
+                return true;
+            }
 
-                // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-                if (_iEnumerableType.IsAssignableFrom(type))
+            // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
+            if (_iEnumerableType.IsAssignableFrom(self))
+            {
+                foreach (Type interfaceType in self.GetInterfaces())
                 {
-                    foreach (Type interfaceType in type.GetInterfaces())
+                    if (interfaceType.IsGenericType
+                        && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        if (interfaceType.IsGenericType
-                            && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        {
-                            elementType = interfaceType.GetGenericArguments()[0];
-                            return true;
-                        }
+                        elementType = interfaceType.GetGenericArguments()[0];
+                        return true;
                     }
                 }
             }

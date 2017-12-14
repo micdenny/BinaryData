@@ -9,7 +9,7 @@ namespace Syroot.BinaryData.Serialization
     public class DataBooleanAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataBooleanAttribute"/> class with the given configuration.
         /// </summary>

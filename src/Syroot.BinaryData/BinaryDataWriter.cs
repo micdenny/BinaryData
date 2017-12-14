@@ -331,7 +331,7 @@ namespace Syroot.BinaryData
         /// Writes an object or enumerable of objects to this stream.
         /// </summary>
         /// <param name="value">The object or enumerable of objects to write.</param>
-        public void WriteObject(object value) => BaseStream.WriteObject(value, ByteConverter);
+        //public void WriteObject(object value) => BaseStream.WriteObject(value, ByteConverter);
 
         // ---- Single ----
 
