@@ -21,9 +21,11 @@ The library is available in the following NuGet packages:
 - [Syroot.IO.BinaryData](https://www.nuget.org/packages/Syroot.IO.BinaryData) (unsigned)
 - [Syroot.IO.BinaryData.Signed](https://www.nuget.org/packages/Syroot.IO.BinaryData.Signed) (signed assembly)
 
-### Updated from 2.x.x to 3.x.x?
-Please read the [release notes](https://github.com/Syroot/BinaryData/releases/tag/3.0.0) to learn more about the many
-new features and possible breaking changes.
+### Are you using 3.x.x or earlier?
+If you used object serialization features, you **want to update to 4.x.x**:
+- Members in pre-4.x.x versions were not read or written in a deterministic order.
+- 4.x.x fixes this by serializing members alphabetically or with the given order specified through the new `BinaryMemberAttribute.Order` property.
+Please consult the [wiki page](https://github.com/Syroot/BinaryData/wiki/Object-Values#ordering-members) for guidance.
 
 ## Documentation
 
