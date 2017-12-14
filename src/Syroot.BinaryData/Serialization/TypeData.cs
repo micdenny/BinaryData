@@ -21,7 +21,7 @@ namespace Syroot.BinaryData.Serialization
             Type = type;
 
             // Get the type configuration.
-            ClassConfig = Type.GetCustomAttribute<DataClassAttribute>() ?? new DataClassAttribute();
+            ClassAttrib = Type.GetCustomAttribute<DataClassAttribute>() ?? new DataClassAttribute();
             OffsetStartConfig = Type.GetCustomAttribute<DataOffsetStartAttribute>();
             OffsetEndConfig = Type.GetCustomAttribute<DataOffsetEndAttribute>();
 
@@ -56,7 +56,7 @@ namespace Syroot.BinaryData.Serialization
         /// <summary>
         /// Gets the <see cref="DataClassAttribute"/> configuring how the object is read and written.
         /// </summary>
-        internal DataClassAttribute ClassConfig { get; }
+        internal DataClassAttribute ClassAttrib { get; }
 
         internal DataOffsetStartAttribute OffsetStartConfig { get; }
 
@@ -80,7 +80,7 @@ namespace Syroot.BinaryData.Serialization
         /// </summary>
         /// <param name="type">The <see cref="Type"/> to query information about.</param>
         /// <returns>The <see cref="TypeData"/> instance holding information about the type.</returns>
-        internal static TypeData GetTypeData(Type type)
+        internal static TypeData Get(Type type)
         {
             if (!_cache.TryGetValue(type, out TypeData typeData))
             {
@@ -126,7 +126,7 @@ namespace Syroot.BinaryData.Serialization
             DataStringAttribute stringAttrib = field.GetCustomAttribute<DataStringAttribute>();
 
             // Handle field if either the class is non-explicit, the field public, or if it has any attribute.
-            bool exported = (!ClassConfig.Explicit && field.IsPublic)
+            bool exported = (!ClassAttrib.Explicit && field.IsPublic)
                 || arrayAttrib != null || booleanAttrib != null || converterAttrib != null || dateTimeAttrib != null
                 || endianAttrib != null || enumAttrib != null || memberAttrib != null || offsetAttrib != null
                 || stringAttrib != null;
@@ -158,7 +158,7 @@ namespace Syroot.BinaryData.Serialization
 
             // Handle property of either the class is non-explicit, the property public, has any attribute, and has a
             // getter and setter.
-            bool exported = (!ClassConfig.Explicit
+            bool exported = (!ClassAttrib.Explicit
                 && property.GetMethod?.IsPublic == true && property.SetMethod?.IsPublic == true)
                 || arrayAttrib != null || booleanAttrib != null || converterAttrib != null || dateTimeAttrib != null
                 || endianAttrib != null || enumAttrib != null || memberAttrib != null || offsetAttrib != null

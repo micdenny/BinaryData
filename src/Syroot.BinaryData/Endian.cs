@@ -8,7 +8,7 @@
         /// <summary>
         /// Indicates the byte order of the system executing the assembly.
         /// </summary>
-        System,
+        System = 1,
 
         /// <summary>
         /// Indicates big endian byte order.

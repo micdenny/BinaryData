@@ -8,7 +8,7 @@ using Syroot.BinaryData.Core;
 using Syroot.BinaryData.Serialization;
 
 namespace Syroot.BinaryData.Extensions
-{  
+{
     public static partial class StreamExtensions
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
@@ -19,12 +19,11 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="Boolean"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <returns>The value read from the current stream.</returns>
-        public static Boolean ReadBoolean(this Stream stream,
-            BooleanCoding format = BooleanCoding.Byte)
+        public static Boolean ReadBoolean(this Stream stream, BooleanCoding coding = BooleanCoding.Byte)
         {
-            switch (format)
+            switch (coding)
             {
                 case BooleanCoding.Byte:
                     return stream.ReadByte() != 0;
@@ -33,7 +32,7 @@ namespace Syroot.BinaryData.Extensions
                 case BooleanCoding.Dword:
                     return ReadInt32(stream) != 0;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(coding));
             }
         }
 
@@ -42,15 +41,14 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
         /// <returns>The array of values read from the current stream.</returns>
-        public static Boolean[] ReadBooleans(this Stream stream, int count,
-            BooleanCoding format = BooleanCoding.Byte)
+        public static Boolean[] ReadBooleans(this Stream stream, int count, BooleanCoding coding = BooleanCoding.Byte)
         {
             var values = new Boolean[count];
             lock (stream)
             {
-                switch (format)
+                switch (coding)
                 {
                     case BooleanCoding.Byte:
                         for (int i = 0; i < count; i++)
@@ -71,7 +69,7 @@ namespace Syroot.BinaryData.Extensions
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(coding));
                 }
             }
             return values;
@@ -108,13 +106,13 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="DateTime"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
-        public static DateTime ReadDateTime(this Stream stream,
-            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
+        public static DateTime ReadDateTime(this Stream stream, DateTimeCoding coding = DateTimeCoding.NetTicks,
+            ByteConverter converter = null)
         {
-            switch (format)
+            switch (coding)
             {
                 case DateTimeCoding.NetTicks:
                     return new DateTime(ReadInt64(stream, converter));
@@ -123,7 +121,7 @@ namespace Syroot.BinaryData.Extensions
                 case DateTimeCoding.CTime64:
                     return _cTimeBase.AddSeconds(ReadInt64(stream, converter));
                 default:
-                    throw new ArgumentException($"Invalid {nameof(DateTimeCoding)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(DateTimeCoding)}.", nameof(coding));
             }
         }
 
@@ -132,16 +130,16 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static DateTime[] ReadDateTimes(this Stream stream, int count,
-            DateTimeCoding format = DateTimeCoding.NetTicks, ByteConverter converter = null)
+            DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null)
         {
             var values = new DateTime[count];
             lock (stream)
             {
-                switch (format)
+                switch (coding)
                 {
                     case DateTimeCoding.NetTicks:
                         for (int i = 0; i < count; i++)
@@ -162,7 +160,7 @@ namespace Syroot.BinaryData.Extensions
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(BooleanCoding)}.", nameof(coding));
                 }
             }
             return values;
@@ -255,7 +253,7 @@ namespace Syroot.BinaryData.Extensions
         /// <returns>The value read from the current stream.</returns>
         public static T ReadEnum<T>(this Stream stream, bool strict = false, ByteConverter converter = null)
             where T : struct, IComparable, IFormattable
-            => (T)ReadEnum(typeof(T), stream, strict, converter);
+            => (T)ReadEnum(stream, typeof(T), strict, converter);
 
         /// <summary>
         /// Returns an array of <see cref="Enum"/> instances of type <typeparamref name="T"/> read from the
@@ -279,7 +277,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 for (int i = 0; i < count; i++)
                 {
-                    values[i] = (T)ReadEnum(enumType, stream, strict, converter);
+                    values[i] = (T)ReadEnum(stream, enumType, strict, converter);
                 }
             }
             return values;
@@ -406,7 +404,7 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static T ReadObject<T>(this Stream stream, ByteConverter converter = null)
-            => (T)ReadObject(typeof(T), stream, null, BinaryMemberAttribute.Default, converter);
+            => (T)BinarySerialization.Read(stream, converter ?? ByteConverter.System, typeof(T), null, stream.Position);
 
         /// <summary>
         /// Returns an array of objects of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
@@ -506,19 +504,18 @@ namespace Syroot.BinaryData.Extensions
         /// Returns a <see cref="String"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the string is
+        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the string is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
-        public static String ReadString(this Stream stream,
-            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
-            ByteConverter converter = null)
+        public static String ReadString(this Stream stream, StringCoding coding = StringCoding.DynamicByteCount,
+            Encoding encoding = null, ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
-            switch (format)
+            switch (coding)
             {
                 case StringCoding.DynamicByteCount:
                     return ReadStringWithLength(stream, Read7BitEncodedInt32(stream), false, encoding);
@@ -531,7 +528,7 @@ namespace Syroot.BinaryData.Extensions
                 case StringCoding.ZeroTerminated:
                     return ReadStringZeroPostfix(stream, encoding);
                 default:
-                    throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
+                    throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(coding));
             }
         }
 
@@ -540,14 +537,14 @@ namespace Syroot.BinaryData.Extensions
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="format">The <see cref="StringCoding"/> format determining how the length of the strings is
+        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the strings is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static String[] ReadStrings(this Stream stream, int count,
-            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
+            StringCoding coding = StringCoding.DynamicByteCount, Encoding encoding = null,
             ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
@@ -555,7 +552,7 @@ namespace Syroot.BinaryData.Extensions
             var values = new String[count];
             lock (stream)
             {
-                switch (format)
+                switch (coding)
                 {
                     case StringCoding.DynamicByteCount:
                         for (int i = 0; i < count; i++)
@@ -588,7 +585,7 @@ namespace Syroot.BinaryData.Extensions
                         }
                         break;
                     default:
-                        throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
+                        throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(coding));
                 }
             }
             return values;
@@ -741,34 +738,9 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+        // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
-        private static void FillBuffer(Stream stream, int length)
-        {
-            if (stream.Read(Buffer, 0, length) < length)
-                throw new EndOfStreamException($"Could not read {length} bytes.");
-        }
-
-        private static Int32 Read7BitEncodedInt32(Stream stream)
-        {
-            // Endianness should not matter, as this value is stored byte by byte.
-            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
-            int value = 0;
-            for (int i = 0; i < sizeof(Int32) + 1; i++)
-            {
-                int readByte = stream.ReadByte();
-                if (readByte == -1)
-                    throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
-                value |= (readByte & 0b01111111) << i * 7;
-                if ((readByte & 0b10000000) == 0)
-                {
-                    return value;
-                }
-            }
-            throw new InvalidDataException("Invalid 7-bit encoded integer.");
-        }
-
-        private static object ReadEnum(Type type, Stream stream, bool strict, ByteConverter converter)
+        internal static object ReadEnum(this Stream stream, Type type, bool strict, ByteConverter converter)
         {
             converter = converter ?? ByteConverter.System;
 
@@ -814,7 +786,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 throw new NotImplementedException($"Unsupported enum type {valueType}.");
             }
-            
+
             // Check if the value is defined in the enumeration, if requested.
             if (strict)
             {
@@ -823,157 +795,33 @@ namespace Syroot.BinaryData.Extensions
             return value;
         }
 
-        private static object ReadObject(Type type, Stream stream, object instance, BinaryMemberAttribute attribute,
-            ByteConverter converter)
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private static void FillBuffer(Stream stream, int length)
         {
-            if (attribute.Converter == null)
-            {
-                if (type == typeof(String))
-                {
-                    if (attribute.StringFormat == StringCoding.Raw)
-                        return stream.ReadString(attribute.Length);
-                    else
-                        return stream.ReadString(attribute.StringFormat, converter: converter);
-                }
-                else if (type.IsEnumerable())
-                {
-                    throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
-                }
-                else if (type == typeof(Boolean))
-                {
-                    return stream.ReadBoolean(attribute.BooleanFormat);
-                }
-                else if (type == typeof(Byte))
-                {
-                    return stream.Read1Byte();
-                }
-                else if (type == typeof(DateTime))
-                {
-                    return stream.ReadDateTime(attribute.DateTimeFormat, converter);
-                }
-                else if (type == typeof(Decimal))
-                {
-                    return stream.ReadDecimal(converter);
-                }
-                else if (type == typeof(Double))
-                {
-                    return stream.ReadDouble(converter);
-                }
-                else if (type == typeof(Int16))
-                {
-                    return stream.ReadInt16(converter);
-                }
-                else if (type == typeof(Int32))
-                {
-                    return stream.ReadInt32(converter);
-                }
-                else if (type == typeof(Int64))
-                {
-                    return stream.ReadInt64(converter);
-                }
-                else if (type == typeof(SByte))
-                {
-                    return stream.ReadSByte();
-                }
-                else if (type == typeof(Single))
-                {
-                    return stream.ReadSingle(converter);
-                }
-                else if (type == typeof(UInt16))
-                {
-                    return stream.ReadUInt16(converter);
-                }
-                else if (type == typeof(UInt32))
-                {
-                    return stream.ReadUInt32(converter);
-                }
-                else if (type == typeof(UInt64))
-                {
-                    return stream.ReadUInt64(converter);
-                }
-                else if (type.IsEnum)
-                {
-                    return ReadEnum(type, stream, attribute.Strict, converter);
-                }
-                else
-                {
-                    if (stream.CanSeek)
-                        return ReadCustomObject(stream, type, null, stream.Position, converter);
-                    else
-                        return ReadCustomObject(stream, type, null, -1, converter);
-                }
-            }
-            else
-            {
-                // Let a binary converter do all the work.
-                IDataConverter binaryConverter = DataConverterCache.GetConverter(attribute.Converter);
-                return binaryConverter.Read(stream, instance, attribute, converter);
-            }
+            if (stream.Read(Buffer, 0, length) < length)
+                throw new EndOfStreamException($"Could not read {length} bytes.");
         }
 
-        private static object ReadCustomObject(Stream stream, Type type, object instance, long startOffset,
-            ByteConverter converter)
+        private static Int32 Read7BitEncodedInt32(Stream stream)
         {
-            TypeData typeData = TypeData.GetTypeData(type);
-            instance = instance ?? typeData.Instantiate();
-
-            // Read inherited members first if required.
-            if (typeData.ClassConfig.Inherit && typeData.Type.BaseType != null)
+            // Endianness should not matter, as this value is stored byte by byte.
+            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
+            int value = 0;
+            for (int i = 0; i < sizeof(Int32) + 1; i++)
             {
-                ReadCustomObject(stream, typeData.Type.BaseType, instance, startOffset, converter);
-            }
-
-            // Read members.
-            foreach (MemberData member in typeData.Members)
-            {
-                // If possible, reposition the stream according to offset.
-                if (stream.CanSeek)
+                int readByte = stream.ReadByte();
+                if (readByte == -1)
+                    throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
+                value |= (readByte & 0b01111111) << i * 7;
+                if ((readByte & 0b10000000) == 0)
                 {
-                    if (member.Attribute.OffsetOrigin == Origin.Set)
-                        stream.Position = startOffset + member.Attribute.Offset;
-                    else if (member.Attribute.Offset != 0)
-                        stream.Position += member.Attribute.Offset;
-                }
-                else
-                {
-                    if (member.Attribute.OffsetOrigin == Origin.Set || member.Attribute.Offset < 0)
-                        throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
-                    else if (member.Attribute.Offset > 0) // Simulate moving forward by reading bytes.
-                        stream.ReadBytes(member.Attribute.Offset);
-                }
-                
-                // Read the value and respect settings stored in the member attribute.
-                object value;
-                Type elementType = member.Type.GetEnumerableElementType();
-                if (elementType == null)
-                {
-                    value = ReadObject(member.Type, stream, instance, member.Attribute, converter);
-                }
-                else
-                {
-                    Array values = Array.CreateInstance(elementType, member.Attribute.Length);
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        values.SetValue(ReadObject(elementType, stream, instance, member.Attribute, converter), i);
-                    }
-                    value = values;
-                }
-
-                // Set the read value.
-                switch (member.MemberInfo)
-                {
-                    case FieldInfo field:
-                        field.SetValue(instance, value);
-                        break;
-                    case PropertyInfo property:
-                        property.SetValue(instance, value);
-                        break;
+                    return value;
                 }
             }
-
-            return instance;
+            throw new InvalidDataException("Invalid 7-bit encoded integer.");
         }
-
+        
         private static string ReadStringWithLength(Stream stream, int length, bool lengthInChars, Encoding encoding)
         {
             if (length == 0)
@@ -1017,34 +865,37 @@ namespace Syroot.BinaryData.Extensions
             List<byte> bytes = new List<byte>();
             bool isChar = true;
             byte[] buffer = Buffer;
-            switch (encoding.GetByteCount("A"))
+            lock (stream)
             {
-                case sizeof(Byte):
-                    // Read single bytes.
-                    while (isChar)
-                    {
-                        FillBuffer(stream, sizeof(Byte));
-                        if (isChar = buffer[0] != 0)
+                switch (encoding.GetByteCount("A"))
+                {
+                    case sizeof(Byte):
+                        // Read single bytes.
+                        while (isChar)
                         {
-                            bytes.Add(buffer[0]);
+                            FillBuffer(stream, sizeof(Byte));
+                            if (isChar = buffer[0] != 0)
+                            {
+                                bytes.Add(buffer[0]);
+                            }
                         }
-                    }
-                    break;
-                case sizeof(Int16):
-                    // Read word values of 2 bytes width.
-                    while (isChar)
-                    {
-                        FillBuffer(stream, sizeof(Int16));
-                        if (isChar = buffer[0] != 0 || buffer[1] != 0)
+                        break;
+                    case sizeof(Int16):
+                        // Read word values of 2 bytes width.
+                        while (isChar)
                         {
-                            bytes.Add(buffer[0]);
-                            bytes.Add(buffer[1]);
+                            FillBuffer(stream, sizeof(Int16));
+                            if (isChar = buffer[0] != 0 || buffer[1] != 0)
+                            {
+                                bytes.Add(buffer[0]);
+                                bytes.Add(buffer[1]);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    throw new NotImplementedException(
-                        "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
+                        break;
+                    default:
+                        throw new NotImplementedException(
+                            "Unhandled character byte count. Only 1- or 2-byte encodings are support at the moment.");
+                }
             }
             // Convert to string.
             return encoding.GetString(bytes.ToArray());

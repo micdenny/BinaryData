@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData.Serialization
 {

@@ -69,7 +69,11 @@ namespace Syroot.BinaryData.UnitTest
         public void ReadWriteObject()
         {
             TestClass testClass = new TestClass();
-            _stream.WriteObject(testClass, ByteConverter.Big);
+
+            byte[] data = new byte[] { 0x33, 0x33, 0x00, 0x00, 0x44, 0x0C, (byte)'H' };
+            _stream.Write(data);
+            
+            //_stream.WriteObject(testClass, ByteConverter.Big);
 
             _stream.Position = 0;
             TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.Big);
