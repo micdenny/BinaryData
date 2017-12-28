@@ -508,6 +508,9 @@ namespace Syroot.BinaryData.Extensions
                                 break;
                         }
                         break;
+                    case StringDataFormat.Raw:
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
                     default:
                         throw new ArgumentException($"Invalid {nameof(StringDataFormat)}.", nameof(format));
                 }
