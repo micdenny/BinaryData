@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syroot.BinaryData.Extensions;
 
@@ -78,6 +79,19 @@ namespace Syroot.BinaryData.UnitTest
             Assert.AreEqual(testClass.Text, readClass.Text);
             Assert.AreEqual(testClass.Struct.Green, readClass.Struct.Green);
             Assert.AreEqual(testClass.Struct.Red, readClass.Struct.Red);
+        }
+
+        [TestMethod]
+        public void ReadWriteRawString()
+        {
+            string expected = "0123456789";
+
+            _stream.Write(expected, StringDataFormat.Raw, Encoding.UTF8);
+
+            _stream.Position = 0;
+            string actual = _stream.ReadString(expected.Length, Encoding.UTF8);
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }
