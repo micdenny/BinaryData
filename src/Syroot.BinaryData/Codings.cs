@@ -3,6 +3,38 @@ using System;
 namespace Syroot.BinaryData
 {
     /// <summary>
+    /// Represents formats of array length encodings.
+    /// </summary>
+    public enum ArrayLengthCoding
+    {
+        /// <summary>
+        /// The array  has a prefix of a 7-bit encoded integer of variable size determining the number of elements out
+        /// of which the array consists.
+        /// </summary>
+        DynamicCount,
+
+        /// <summary>
+        /// The array has a prefix of 1 byte determining the number of elements out of which the array consists.
+        /// </summary>
+        ByteCount,
+
+        /// <summary>
+        /// The array has a prefix of 2 bytes determining the number of elements out of which the array consists.
+        /// </summary>
+        Int16Count,
+
+        /// <summary>
+        /// The array has a prefix of 4 bytes determining number of elements out of which the array consists.
+        /// </summary>
+        Int32Count,
+
+        /// <summary>
+        /// The array has a prefix of 2 bytes determining the number of elements out of which the array consists.
+        /// </summary>
+        UInt16Count
+    }
+
+    /// <summary>
     /// Represents the set of formats of binary boolean encodings.
     /// </summary>
     public enum BooleanCoding
@@ -29,20 +61,19 @@ namespace Syroot.BinaryData
     public enum DateTimeCoding
     {
         /// <summary>
-        /// The <see cref="System.DateTime"/> is stored as the ticks of a .NET <see cref="System.DateTime"/> instance.
+        /// The <see cref="DateTime"/> is stored as the ticks of a .NET <see cref="DateTime"/> instance.
         /// </summary>
         NetTicks,
 
         /// <summary>
-        /// The <see cref="System.DateTime"/> has the 32-bit time_t format of the C library.
+        /// The <see cref="DateTime"/> has the 32-bit time_t format of the C library.
         /// This is a <see cref="UInt32"/> which can store the seconds from 1970-01-01 until approx. 2106-02-07.
         /// </summary>
         CTime,
 
         /// <summary>
-        /// The <see cref="System.DateTime"/> has the 64-bit time_t format of the C library.
-        /// This is an <see cref="Int64"/> which can store the seconds from 1970-01-01 until approx.
-        /// 292277026596-12-04.
+        /// The <see cref="DateTime"/> has the 64-bit time_t format of the C library.
+        /// This is an <see cref="Int64"/> which can store the seconds from 1970-01-01 until approx. 292277026596-12-04.
         /// </summary>
         CTime64
     }

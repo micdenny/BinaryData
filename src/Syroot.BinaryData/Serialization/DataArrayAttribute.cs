@@ -30,6 +30,17 @@ namespace Syroot.BinaryData.Serialization
             CountProvider = countProvider;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
+        /// </summary>
+        /// <param name="coding">The <see cref="ArrayLengthCoding"/> to read or write the value in.</param>
+        /// <param name="endian">The <see cref="Endian"/> of this value.</param>
+        public DataArrayAttribute(ArrayLengthCoding coding, Endian endian = Endian.None)
+        {
+            Coding = coding;
+            CodingEndian = endian;
+        }
+
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -41,5 +52,15 @@ namespace Syroot.BinaryData.Serialization
         /// Gets or sets the name of the member or method to use for retrieving the number of elements to read.
         /// </summary>
         public string CountProvider { get; }
+
+        /// <summary>
+        /// Gets or sets the data format in which the length of the array is read or written.
+        /// </summary>
+        public ArrayLengthCoding Coding { get; }
+
+        /// <summary>
+        /// Gets or sets the endianness of the length value.
+        /// </summary>
+        public Endian CodingEndian { get; }
     }
 }

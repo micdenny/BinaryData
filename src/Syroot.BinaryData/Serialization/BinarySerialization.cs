@@ -36,7 +36,69 @@ namespace Syroot.BinaryData.Serialization
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
-        internal static object Read(Stream stream, ByteConverter byteConverter, Type type, MemberData memberData,
+        internal static object ReadClass(Stream stream, TypeData typeData, object instance, ByteConverter byteConverter)
+        {
+            instance = instance ?? typeData.Instantiate();
+            long instanceOffset = stream.CanSeek ? stream.Position : -1;
+
+            // Read inherited members.
+            if (typeData.Inherit && typeData.Type.BaseType != null)
+            {
+                ReadClass(stream, TypeData.Get(typeData.Type.BaseType), instance, byteConverter);
+            }
+
+            // Read ordered members.
+            foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
+            {
+                ReadMember(stream, orderedMember.Value, instance, byteConverter, instanceOffset);
+            }
+
+            // Read unordered / alphabetically sorted members.
+            foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
+            {
+                ReadMember(stream, unorderedMember.Value, instance, byteConverter, instanceOffset);
+            }
+            
+            return instance;
+        }
+
+        private static void ReadMember(Stream stream, MemberData memberData, object instance,
+            ByteConverter byteConverter, long instanceOffset)
+        {
+            object value;
+            int arrayCount = memberData.GetArrayCount(stream, byteConverter, instance);
+            if (arrayCount == 0)
+            {
+                // Read a single value.
+                value = ReadClass(stream, TypeData.Get(memberData.Type), null, byteConverter);
+            }
+            else
+            {
+                // Read an array of the retrieved number of elements.
+                Type elementType = memberData.Type.GetEnumerableElementType();
+                Array values = Array.CreateInstance(elementType, arrayCount);
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values.SetValue(ReadMemberValue(stream, byteConverter, elementType, memberData, stream.Position), i);
+                }
+                value = values;
+            }
+
+            // Set the read value.
+            switch (memberData.MemberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    fieldInfo.SetValue(instance, value);
+                    break;
+                case PropertyInfo propertyInfo:
+                    propertyInfo.SetValue(instance, value);
+                    break;
+            }
+        }
+
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        private static object ReadMemberValue(Stream stream, ByteConverter byteConverter, Type type, MemberData memberData,
             long parentOffset)
         {
             byteConverter = memberData.Endian == 0 ? byteConverter : ByteConverter.GetConverter(memberData.Endian);
@@ -48,13 +110,11 @@ namespace Syroot.BinaryData.Serialization
             object value;
             if (memberData.ConverterType == null)
             {
-                // Let a converter handle all the data after adjusting to the object offset.
+                // Let a converter handle all the data after adjusting to the offset.
                 TypeData typeData = TypeData.Get(type);
-                if (typeData.OffsetStartConfig != null)
-                    ApplyOffset(stream, parentOffset, typeData.OffsetStartConfig.Origin, typeData.OffsetStartConfig.Delta);
+                ApplyOffset(stream, parentOffset, typeData.StartOrigin, typeData.StartDelta);
                 value = memberData.ConverterAttrib.Read(stream, memberData);
-                if (typeData.OffsetEndConfig != null)
-                    ApplyOffset(stream, parentOffset, typeData.OffsetEndConfig.Origin, typeData.OffsetEndConfig.Delta);
+                ApplyOffset(stream, parentOffset, typeData.EndOrigin, typeData.EndDelta);
             }
             else if (_typeReaders.TryGetValue(type.TypeHandle, out var reader))
             {
@@ -64,20 +124,18 @@ namespace Syroot.BinaryData.Serialization
             else if (type.IsEnum)
             {
                 // Read an enumerable type.
-                value = memberData.EnumAttrib.Read(type, stream, byteConverter);
+                value = stream.ReadEnum(type, memberData.EnumStrict, byteConverter);
             }
             else
             {
                 // Read a custom type.
                 TypeData typeData = TypeData.Get(type);
-                typeData.OffsetStartConfig?.Apply(stream, parentOffset);
-                value = ReadClassData(stream, byteConverter, typeData, typeData.Instantiate());
-                typeData.OffsetEndConfig?.Apply(stream, parentOffset);
+                ApplyOffset(stream, parentOffset, typeData.StartOrigin, typeData.StartDelta);
+                value = ReadClass(stream, typeData, typeData.Instantiate(), byteConverter);
+                ApplyOffset(stream, parentOffset, typeData.EndOrigin, typeData.EndDelta);
             }
             return value;
         }
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
         private static object ReadString(Stream stream, ByteConverter byteConverter, MemberData memberData)
         {
@@ -132,57 +190,12 @@ namespace Syroot.BinaryData.Serialization
         private static object ReadUInt64(Stream stream, ByteConverter byteConverter, MemberData memberData)
             => stream.ReadUInt64(byteConverter);
 
-        private static object ReadClassData(Stream stream, ByteConverter byteConverter, TypeData typeData,
-            object instance)
-        {
-            // Read inherited members first if required.
-            if (typeData.ClassAttrib.Inherit && typeData.Type.BaseType != null)
-            {
-                ReadClassData(stream, byteConverter, TypeData.Get(typeData.Type.BaseType), instance);
-            }
-
-            // Read members.
-            foreach (MemberData memberData in typeData.Members)
-            {
-                // Read the value and respect settings stored in the member attribute.
-                object value;
-                if (memberData.ArrayCount == 0 && memberData.ArrayCountProvider == null)
-                {
-                    value = ReadClassData(stream, byteConverter, TypeData.Get(memberData.Type), null);
-                }
-                else
-                {
-                    Type elementType = memberData.Type.GetEnumerableElementType();
-                    Array values = Array.CreateInstance(elementType, memberData.GetArrayCount(instance));
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        values.SetValue(Read(stream, byteConverter, elementType, memberData, stream.Position), i);
-                    }
-                    value = values;
-                }
-
-                // Set the read value.
-                switch (memberData.MemberInfo)
-                {
-                    case FieldInfo fieldInfo:
-                        fieldInfo.SetValue(instance, value);
-                        break;
-                    case PropertyInfo propertyInfo:
-                        propertyInfo.SetValue(instance, value);
-                        break;
-                }
-            }
-
-            return instance;
-        }
-
-        private static void ApplyOffset(Stream stream, long parentOffset, Origin origin, int delta)
+        private static void ApplyOffset(Stream stream, long parentOffset, Origin origin, long delta)
         {
             switch (origin)
             {
-                // TODO: Rework Position and Align so it can work in seekable streams.
                 case Origin.Add:
-                    stream.Position += delta;
+                    stream.Move(delta);
                     break;
                 case Origin.Align:
                     stream.Align(delta);

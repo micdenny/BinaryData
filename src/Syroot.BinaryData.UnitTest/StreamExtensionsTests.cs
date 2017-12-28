@@ -33,9 +33,17 @@ namespace Syroot.BinaryData.UnitTest
 
         private class TestClass
         {
+            [DataOrder(0)]
             public int X = 0x33330000;
+
+            [DataOrder(2)]
             public byte Y = 0x44;
-            [DataString(StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
+
+            [DataOrder(-3)]
+            [DataString(StringCoding.Int32CharCount)]
+            public string Text = "Hello, Test!";
+
+            [DataOrder(1)]
             public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 
