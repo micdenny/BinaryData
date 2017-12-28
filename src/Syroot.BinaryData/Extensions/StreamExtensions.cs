@@ -48,7 +48,7 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="grow"><c>true</c> to enlarge the stream size to include the final position in case it is larger
         /// than the current stream length.</param>
         /// <returns>The new position within the current stream.</returns>
-        public static long Align(this Stream stream, int alignment, bool grow = false)
+        public static long Align(this Stream stream, long alignment, bool grow = false)
         {
             if (alignment <= 0)
                 throw new ArgumentOutOfRangeException("Alignment must be bigger than 0.");
@@ -69,6 +69,40 @@ namespace Syroot.BinaryData.Extensions
         public static bool IsEndOfStream(this Stream stream)
         {
             return stream.Position >= stream.Length;
+        }
+
+        /// <summary>
+        /// Sets the position within the current <paramref name="stream"/> relative to the current position. If the
+        /// stream is not seekable, it tries to simulates advancing the position by reading or writing 0-bytes.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="offset">A byte offset relative to the origin parameter.</param>
+        public static void Move(this Stream stream, long offset)
+        {
+            if (stream.CanSeek)
+            {
+                // No need to run any simulation.
+                stream.Seek(offset);
+            }
+            else
+            {
+                if (offset < 0)
+                {
+                    // Impossible to simulate seeking backwards in non-seekable stream.
+                    throw new NotSupportedException("Cannot simulate moving backwards in a non-seekable stream.");
+                }
+
+                // Simulate move by reading or writing bytes.
+                if (stream.CanRead)
+                {
+                    stream.ReadBytes((int)offset);
+                }
+                else if (stream.CanWrite)
+                {
+                    for (int i = 0; i < offset; i++)
+                        stream.WriteByte(0);
+                }
+            }
         }
 
         /// <summary>

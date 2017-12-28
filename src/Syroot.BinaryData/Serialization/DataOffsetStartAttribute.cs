@@ -15,6 +15,6 @@ namespace Syroot.BinaryData.Serialization
         /// </summary>
         /// <param name="origin">The anchor from which to manipulate the stream position by the given delta.</param>
         /// <param name="delta">The number of bytes to manipulate the stream position with.</param>
-        public DataOffsetStartAttribute(Origin origin, int delta) : base(origin, delta) { }
+        public DataOffsetStartAttribute(Origin origin, long delta) : base(origin, delta) { }
     }
 }

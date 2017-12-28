@@ -404,7 +404,8 @@ namespace Syroot.BinaryData.Extensions
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static T ReadObject<T>(this Stream stream, ByteConverter converter = null)
-            => (T)BinarySerialization.Read(stream, converter ?? ByteConverter.System, typeof(T), null, stream.Position);
+            => (T)BinarySerialization.ReadClass(stream, TypeData.Get(typeof(T)), null,
+                converter ?? ByteConverter.System);
 
         /// <summary>
         /// Returns an array of objects of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
@@ -518,7 +519,7 @@ namespace Syroot.BinaryData.Extensions
             switch (coding)
             {
                 case StringCoding.DynamicByteCount:
-                    return ReadStringWithLength(stream, Read7BitEncodedInt32(stream), false, encoding);
+                    return ReadStringWithLength(stream, stream.Read7BitEncodedInt32(), false, encoding);
                 case StringCoding.ByteCharCount:
                     return ReadStringWithLength(stream, stream.ReadByte(), true, encoding);
                 case StringCoding.Int16CharCount:
@@ -557,7 +558,7 @@ namespace Syroot.BinaryData.Extensions
                     case StringCoding.DynamicByteCount:
                         for (int i = 0; i < count; i++)
                         {
-                            values[i] = ReadStringWithLength(stream, Read7BitEncodedInt32(stream), false, encoding);
+                            values[i] = ReadStringWithLength(stream, stream.Read7BitEncodedInt32(), false, encoding);
                         }
                         break;
                     case StringCoding.ByteCharCount:
@@ -740,6 +741,25 @@ namespace Syroot.BinaryData.Extensions
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
+        internal static Int32 Read7BitEncodedInt32(this Stream stream)
+        {
+            // Endianness should not matter, as this value is stored byte by byte.
+            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
+            int value = 0;
+            for (int i = 0; i < sizeof(Int32) + 1; i++)
+            {
+                int readByte = stream.ReadByte();
+                if (readByte == -1)
+                    throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
+                value |= (readByte & 0b01111111) << i * 7;
+                if ((readByte & 0b10000000) == 0)
+                {
+                    return value;
+                }
+            }
+            throw new InvalidDataException("Invalid 7-bit encoded integer.");
+        }
+
         internal static object ReadEnum(this Stream stream, Type type, bool strict, ByteConverter converter)
         {
             converter = converter ?? ByteConverter.System;
@@ -803,25 +823,6 @@ namespace Syroot.BinaryData.Extensions
                 throw new EndOfStreamException($"Could not read {length} bytes.");
         }
 
-        private static Int32 Read7BitEncodedInt32(Stream stream)
-        {
-            // Endianness should not matter, as this value is stored byte by byte.
-            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
-            int value = 0;
-            for (int i = 0; i < sizeof(Int32) + 1; i++)
-            {
-                int readByte = stream.ReadByte();
-                if (readByte == -1)
-                    throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
-                value |= (readByte & 0b01111111) << i * 7;
-                if ((readByte & 0b10000000) == 0)
-                {
-                    return value;
-                }
-            }
-            throw new InvalidDataException("Invalid 7-bit encoded integer.");
-        }
-        
         private static string ReadStringWithLength(Stream stream, int length, bool lengthInChars, Encoding encoding)
         {
             if (length == 0)
