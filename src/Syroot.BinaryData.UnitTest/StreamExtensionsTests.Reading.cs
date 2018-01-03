@@ -9,6 +9,8 @@ namespace Syroot.BinaryData.UnitTest
 {
     public partial class StreamExtensionsTests
     {
+        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
+
         [TestMethod]
         public void Align()
         {
@@ -479,8 +481,6 @@ namespace Syroot.BinaryData.UnitTest
             Assert.AreEqual(value3r, _stream.ReadUInt64(converter: _reversedConverter));
             Assert.AreEqual(value4r, _stream.ReadUInt64(converter: _reversedConverter));
         }
-
-        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         [TestMethod]
         public void ThreadSafety()

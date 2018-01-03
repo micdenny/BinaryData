@@ -784,7 +784,7 @@ namespace Syroot.BinaryData.Extensions
                 }
                 else if (type == typeof(UInt64))
                 {
-                    Write(stream, (UInt32)value, converter);
+                    Write(stream, (UInt64)value, converter);
                 }
                 else if (type.IsEnum)
                 {
