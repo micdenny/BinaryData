@@ -5,11 +5,11 @@
 		<AssemblyName>Syroot.BinaryData</AssemblyName>
 		<AssemblyTitle>BinaryData</AssemblyTitle>
 		<Authors>Syroot</Authors>
-		<VersionPrefix>4.0.1</VersionPrefix>
+		<VersionPrefix>4.0.2-beta1</VersionPrefix>
 
 		<PackageId>Syroot.IO.BinaryData</PackageId>
 		<PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
-		<PackageReleaseNotes>Fix serializing UInt64 instances, add feature to write strings with raw representation.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix serializing enumerable members.</PackageReleaseNotes>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
 		<PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>

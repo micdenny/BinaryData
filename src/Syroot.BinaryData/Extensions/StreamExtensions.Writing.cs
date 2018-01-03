@@ -871,7 +871,7 @@ namespace Syroot.BinaryData.Extensions
             {
                 foreach (object element in (IEnumerable)value)
                 {
-                    WriteObject(stream, instance, member.Attribute, member.Type, element, converter);
+                    WriteObject(stream, instance, member.Attribute, elementType, element, converter);
                 }
             }
         }

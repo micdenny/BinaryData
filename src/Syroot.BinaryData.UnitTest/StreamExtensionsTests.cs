@@ -33,6 +33,8 @@ namespace Syroot.BinaryData.UnitTest
 
         private class TestClass
         {
+            [BinaryMember(Order = -2, Length = 3)] public byte[] ArrayStuff = new byte[] { 0x01, 0x02, 0x03 };
+            [BinaryMember(Order = -1, Length = 3)] public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
             [BinaryMember(Order = 0)] public int X = 0x33330000;
             [BinaryMember(Order = 1)] public byte Y = 0x44;
             [BinaryMember(Order = 2, StringFormat = StringDataFormat.Int32CharCount)] public string Text = "Hello, Test!";
@@ -68,17 +70,19 @@ namespace Syroot.BinaryData.UnitTest
         [TestMethod]
         public void ReadWriteObject()
         {
-            TestClass testClass = new TestClass();
-            _stream.WriteObject(testClass, ByteConverter.BigEndian);
+            TestClass origInstance = new TestClass();
+            _stream.WriteObject(origInstance, ByteConverter.BigEndian);
 
             _stream.Position = 0;
-            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.BigEndian);
+            TestClass readInstance = _stream.ReadObject<TestClass>(ByteConverter.BigEndian);
 
-            Assert.AreEqual(testClass.X, readClass.X);
-            Assert.AreEqual(testClass.Y, readClass.Y);
-            Assert.AreEqual(testClass.Text, readClass.Text);
-            Assert.AreEqual(testClass.Struct.Green, readClass.Struct.Green);
-            Assert.AreEqual(testClass.Struct.Red, readClass.Struct.Red);
+            CollectionAssert.AreEqual(origInstance.ArrayStuff, readInstance.ArrayStuff);
+            CollectionAssert.AreEqual(origInstance.AnotherArray, readInstance.AnotherArray);
+            Assert.AreEqual(origInstance.X, readInstance.X);
+            Assert.AreEqual(origInstance.Y, readInstance.Y);
+            Assert.AreEqual(origInstance.Text, readInstance.Text);
+            Assert.AreEqual(origInstance.Struct.Green, readInstance.Struct.Green);
+            Assert.AreEqual(origInstance.Struct.Red, readInstance.Struct.Red);
         }
 
         [TestMethod]
