@@ -509,6 +509,9 @@ namespace Syroot.BinaryData.Extensions
                                 break;
                         }
                         break;
+                    case StringCoding.Raw:
+                        stream.Write(textBuffer, 0, textBuffer.Length);
+                        break;
                     default:
                         throw new ArgumentException($"Invalid {nameof(StringCoding)}.", nameof(format));
                 }
@@ -526,7 +529,7 @@ namespace Syroot.BinaryData.Extensions
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<String> values,
-            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null, 
+            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
             ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
@@ -574,7 +577,7 @@ namespace Syroot.BinaryData.Extensions
                 }
             }
         }
-        
+
         // ---- UInt32 ----
 
         /// <summary>
@@ -695,7 +698,7 @@ namespace Syroot.BinaryData.Extensions
             }
             else if (valueType == typeof(UInt64))
             {
-                converter.GetBytes((Int64)value, buffer, 0);
+                converter.GetBytes((UInt64)value, buffer, 0);
             }
             else
             {
@@ -782,7 +785,7 @@ namespace Syroot.BinaryData.Extensions
         //        }
         //        else if (type == typeof(UInt64))
         //        {
-        //            Write(stream, (UInt32)value, converter);
+        //            Write(stream, (UInt64)value, converter);
         //        }
         //        else if (type.IsEnum)
         //        {
@@ -858,7 +861,7 @@ namespace Syroot.BinaryData.Extensions
         //        {
         //            foreach (object element in (IEnumerable)value)
         //            {
-        //                WriteObject(member.Type, stream, instance, member.Attribute, element, converter);
+        //                WriteObject(elementType, stream, instance, member.Attribute, element, converter);
         //            }
         //        }
         //    }
