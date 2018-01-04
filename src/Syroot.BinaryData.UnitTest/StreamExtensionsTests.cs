@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Syroot.BinaryData.Extensions;
 using Syroot.BinaryData.Serialization;
@@ -33,14 +34,19 @@ namespace Syroot.BinaryData.UnitTest
 
         private class TestClass
         {
+            [DataOrder(-2), DataArray(3)]
+            public byte[] ArrayStuff = new byte[] { 0x01, 0x02, 0x03 };
+
+            [DataOrder(-1), DataArray(3)]
+            public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
+
             [DataOrder(0)]
             public int X = 0x33330000;
 
             [DataOrder(2)]
             public byte Y = 0x44;
 
-            [DataOrder(-3)]
-            [DataString(StringCoding.Int32CharCount)]
+            [DataOrder(-3), DataString(StringCoding.Int32CharCount)]
             public string Text = "Hello, Test!";
 
             [DataOrder(1)]
@@ -76,21 +82,32 @@ namespace Syroot.BinaryData.UnitTest
         [TestMethod]
         public void ReadWriteObject()
         {
-            TestClass testClass = new TestClass();
-
-            byte[] data = new byte[] { 0x33, 0x33, 0x00, 0x00, 0x44, 0x0C, (byte)'H' };
-            _stream.Write(data);
-            
-            //_stream.WriteObject(testClass, ByteConverter.Big);
+            TestClass origInstance = new TestClass();
+            _stream.WriteObject(origInstance, ByteConverter.Big);
 
             _stream.Position = 0;
-            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.Big);
+            TestClass readInstance = _stream.ReadObject<TestClass>(ByteConverter.Big);
 
-            Assert.AreEqual(testClass.X, readClass.X);
-            Assert.AreEqual(testClass.Y, readClass.Y);
-            Assert.AreEqual(testClass.Text, readClass.Text);
-            Assert.AreEqual(testClass.Struct.Green, readClass.Struct.Green);
-            Assert.AreEqual(testClass.Struct.Red, readClass.Struct.Red);
+            CollectionAssert.AreEqual(origInstance.ArrayStuff, readInstance.ArrayStuff);
+            CollectionAssert.AreEqual(origInstance.AnotherArray, readInstance.AnotherArray);
+            Assert.AreEqual(origInstance.X, readInstance.X);
+            Assert.AreEqual(origInstance.Y, readInstance.Y);
+            Assert.AreEqual(origInstance.Text, readInstance.Text);
+            Assert.AreEqual(origInstance.Struct.Green, readInstance.Struct.Green);
+            Assert.AreEqual(origInstance.Struct.Red, readInstance.Struct.Red);
+        }
+        
+        [TestMethod]
+        public void ReadWriteRawString()
+        {
+            string expected = "0123456789";
+
+            _stream.Write(expected, StringCoding.Raw, Encoding.UTF8);
+
+            _stream.Position = 0;
+            string actual = _stream.ReadString(expected.Length, Encoding.UTF8);
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }
