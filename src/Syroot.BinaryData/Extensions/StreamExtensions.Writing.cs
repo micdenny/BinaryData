@@ -697,7 +697,7 @@ namespace Syroot.BinaryData.Extensions
             }
             else if (valueType == typeof(UInt64))
             {
-                converter.GetBytes((Int64)value, buffer, 0);
+                converter.GetBytes((UInt64)value, buffer, 0);
             }
             else
             {
