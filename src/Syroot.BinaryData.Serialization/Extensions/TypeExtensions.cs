@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Syroot.BinaryData.Core
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents a collection of extension methods for the <see cref="Type"/> class.

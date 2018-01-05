@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData
 {
@@ -312,23 +311,6 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of <see cref="Int64"/> values to read.</param>
         /// <returns>The <see cref="Int64"/> array read from the current stream.</returns>
         public Int64[] ReadInt64s(int count) => BaseStream.ReadInt64s(count, ByteConverter);
-
-        // ---- Object ----
-
-        /// <summary>
-        /// Reads an object of type <typeparamref name="T"/> from the current stream.
-        /// </summary>
-        /// <typeparam name="T">The type of the object to load.</typeparam>
-        /// <returns>The object read from the current stream.</returns>
-        public T ReadObject<T>() => BaseStream.ReadObject<T>(ByteConverter);
-
-        /// <summary>
-        /// Reads the specified number of objects of type <typeparamref name="T"/> from the current stream.
-        /// </summary>
-        /// <typeparam name="T">The type of the objects to load.</typeparam>
-        /// <param name="count">The number of objects to read.</param>
-        /// <returns>The objects array read from the current stream.</returns>
-        public T[] ReadObjects<T>(int count) => BaseStream.ReadObjects<T>(count, ByteConverter);
         
         // ---- SByte ----
 

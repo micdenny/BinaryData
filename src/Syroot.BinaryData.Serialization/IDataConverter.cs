@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents a converter for reading and writing custom values.

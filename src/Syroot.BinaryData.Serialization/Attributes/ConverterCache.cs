@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents a cache for <see cref="IDataConverter"/> instances.
     /// </summary>
-    internal static class DataConverterCache
+    internal static class ConverterCache
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 

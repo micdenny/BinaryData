@@ -2,8 +2,7 @@
 using System.IO;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Syroot.BinaryData.Extensions;
-using Syroot.BinaryData.Serialization;
+using Syroot.BinaryData;
 
 namespace Syroot.BinaryData.UnitTest
 {
@@ -31,25 +30,25 @@ namespace Syroot.BinaryData.UnitTest
             Strawberry,
             Peach
         }
-
+        
         private class TestClass
         {
-            [DataOrder(-2), DataArray(3)]
+            [Order(-2), Array(3)]
             public byte[] ArrayStuff = new byte[] { 0x01, 0x02, 0x03 };
 
-            [DataOrder(-1), DataArray(3)]
+            [Order(-1), Array(3)]
             public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
 
-            [DataOrder(0)]
+            [Order(0)]
             public int X = 0x33330000;
 
-            [DataOrder(2)]
+            [Order(2)]
             public byte Y = 0x44;
 
-            [DataOrder(-3), DataString(StringCoding.Int32CharCount)]
+            [Order(-3), String(StringCoding.Int32CharCount)]
             public string Text = "Hello, Test!";
 
-            [DataOrder(1)]
+            [Order(1)]
             public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 

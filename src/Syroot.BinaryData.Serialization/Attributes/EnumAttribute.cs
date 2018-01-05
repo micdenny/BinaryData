@@ -1,20 +1,20 @@
 using System;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Configures how an <see cref="Enum"/> member is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class DataEnumAttribute : Attribute
+    public class EnumAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataEnumAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="EnumAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="strict"><c>true</c> to validate the value when it is read or written.</param>
-        public DataEnumAttribute(bool strict)
+        public EnumAttribute(bool strict)
         {
             Strict = strict;
         }

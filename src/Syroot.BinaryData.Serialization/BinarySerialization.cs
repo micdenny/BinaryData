@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Syroot.BinaryData.Core;
-using Syroot.BinaryData.Extensions;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents logic to serialize and deserialize objects of any type.
@@ -113,7 +111,7 @@ namespace Syroot.BinaryData.Serialization
                 // Let a converter handle all the data after adjusting to the offset.
                 TypeData typeData = TypeData.Get(type);
                 ApplyOffset(stream, parentOffset, typeData.StartOrigin, typeData.StartDelta);
-                value = memberData.ConverterAttrib.Read(stream, memberData);
+                value = null;// TODO: memberData.ConverterAttrib.Read(stream, memberData);
                 ApplyOffset(stream, parentOffset, typeData.EndOrigin, typeData.EndDelta);
             }
             else if (_typeReaders.TryGetValue(type.TypeHandle, out var reader))

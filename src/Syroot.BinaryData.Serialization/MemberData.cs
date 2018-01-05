@@ -3,10 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Syroot.BinaryData.Core;
-using Syroot.BinaryData.Extensions;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents information on a member of a type read and written through binary serialiazion.
@@ -30,7 +28,7 @@ namespace Syroot.BinaryData.Serialization
             MemberInfo = memberInfo;
 
             // Get any possible attribute.
-            DataArrayAttribute arrayAttrib = MemberInfo.GetCustomAttribute<DataArrayAttribute>();
+            ArrayAttribute arrayAttrib = MemberInfo.GetCustomAttribute<ArrayAttribute>();
             if (arrayAttrib != null)
             {
                 IsExported = true;
@@ -39,55 +37,55 @@ namespace Syroot.BinaryData.Serialization
                 ArrayCountCoding = arrayAttrib.Coding;
                 ArrayCountCodingEndian = arrayAttrib.CodingEndian;
             }
-            DataBooleanAttribute booleanAttrib = MemberInfo.GetCustomAttribute<DataBooleanAttribute>();
+            BooleanAttribute booleanAttrib = MemberInfo.GetCustomAttribute<BooleanAttribute>();
             if (booleanAttrib != null)
             {
                 IsExported = true;
                 BooleanCoding = booleanAttrib.Coding;
             }
-            DataConverterAttribute converterAttrib = MemberInfo.GetCustomAttribute<DataConverterAttribute>();
+            ConverterAttribute converterAttrib = MemberInfo.GetCustomAttribute<ConverterAttribute>();
             if (converterAttrib != null)
             {
                 IsExported = true;
                 ConverterType = converterAttrib.ConverterType;
             }
-            DataDateTimeAttribute dateTimeAttrib = MemberInfo.GetCustomAttribute<DataDateTimeAttribute>();
+            DateTimeAttribute dateTimeAttrib = MemberInfo.GetCustomAttribute<DateTimeAttribute>();
             if (dateTimeAttrib != null)
             {
                 IsExported = true;
                 DateTimeCoding = dateTimeAttrib.Coding;
             }
-            DataEndianAttribute endianAttrib = MemberInfo.GetCustomAttribute<DataEndianAttribute>();
+            EndianAttribute endianAttrib = MemberInfo.GetCustomAttribute<EndianAttribute>();
             if (endianAttrib != null)
             {
                 IsExported = true;
                 Endian = endianAttrib.Endian;
             }
-            DataEnumAttribute enumAttrib = MemberInfo.GetCustomAttribute<DataEnumAttribute>();
+            EnumAttribute enumAttrib = MemberInfo.GetCustomAttribute<EnumAttribute>();
             if (enumAttrib != null)
             {
                 IsExported = true;
                 EnumStrict = enumAttrib.Strict;
             }
-            DataMemberAttribute memberAttrib = MemberInfo.GetCustomAttribute<DataMemberAttribute>();
+            MemberAttribute memberAttrib = MemberInfo.GetCustomAttribute<MemberAttribute>();
             if (memberAttrib != null)
             {
                 IsExported = true;
             }
-            DataOffsetAttribute offsetAttrib = MemberInfo.GetCustomAttribute<DataOffsetAttribute>();
+            OffsetAttribute offsetAttrib = MemberInfo.GetCustomAttribute<OffsetAttribute>();
             if (offsetAttrib != null)
             {
                 IsExported = true;
                 OffsetDelta = offsetAttrib.Delta;
                 OffsetOrigin = offsetAttrib.Origin;
             }
-            DataOrderAttribute orderAttrib = MemberInfo.GetCustomAttribute<DataOrderAttribute>();
+            OrderAttribute orderAttrib = MemberInfo.GetCustomAttribute<OrderAttribute>();
             if (orderAttrib != null)
             {
                 IsExported = true;
                 Index = orderAttrib.Index;
             }
-            DataStringAttribute stringAttrib = MemberInfo.GetCustomAttribute<DataStringAttribute>();
+            StringAttribute stringAttrib = MemberInfo.GetCustomAttribute<StringAttribute>();
             if (stringAttrib != null)
             {
                 IsExported = true;
@@ -100,7 +98,7 @@ namespace Syroot.BinaryData.Serialization
             if (Type.IsEnumerable() && arrayAttrib == null)
             {
                 throw new InvalidOperationException(
-                    $"Enumerable member \"{MemberInfo}\" must be decorated with a {nameof(DataArrayAttribute)}.");
+                    $"Enumerable member \"{MemberInfo}\" must be decorated with a {nameof(ArrayAttribute)}.");
             }
         }
 
@@ -219,7 +217,7 @@ namespace Syroot.BinaryData.Serialization
                 switch (ArrayCountCoding)
                 {
                     case ArrayLengthCoding.DynamicCount:
-                        return stream.Read7BitEncodedInt32();
+                        return stream.ReadDynamicInt32();
                     case ArrayLengthCoding.ByteCount:
                         return stream.ReadByte();
                     case ArrayLengthCoding.Int16Count:

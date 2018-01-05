@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Syroot.BinaryData.Core
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents a collection of methods extending enum types.
