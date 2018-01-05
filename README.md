@@ -8,22 +8,31 @@ variable-length prefixed .NET strings).
 Further, navigating in binary files is slightly tedious when it is required to skip to another chunk in the file and
 then navigate back. Also, aligning to specific block sizes might be a common task.
 
-This NuGet package adds all this and more functionality by offering a large set of extension methods for the `Stream`
-class of .NET 4.5 and .NET Standard 2.0. Additionally, serializing and deserializing complete class hierarchies can be
-done immediately.
-Additionally, `BinaryDataReader` and `BinaryDataWriter` classes are provided, usable like the default .NET
-`BinaryReader` and `BinaryWriter` so that new functionality can be added almost instantly to existing projects.
+The `Syroot.BinaryData` NuGet package adds all this and more functionality by offering a large set of extension methods
+for the `Stream` class of .NET 4.5 and .NET Standard 2.0. `BinaryDataReader` and `BinaryDataWriter` classes are
+provided, usable like the default .NET `BinaryReader` and `BinaryWriter` so that new functionality can be added almost
+instantly to existing projects.
+
+The `Syroot.BinaryData.Serialization` package can serialize and deserialize complete class hierarchies without any
+further code required.
 
 ## Installation
 
 The library is available in the following NuGet packages:
 
-- [Syroot.IO.BinaryData](https://www.nuget.org/packages/Syroot.IO.BinaryData) (unsigned)
-- [Syroot.IO.BinaryData.Signed](https://www.nuget.org/packages/Syroot.IO.BinaryData.Signed) (signed assembly)
+Core functionality:
+- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
+- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
 
-### Updated from 2.x.x to 3.x.x?
-Please read the [release notes](https://github.com/Syroot/BinaryData/releases/tag/3.0.0) to learn more about the many
-new features and possible breaking changes.
+Serialization functionality (includes the Core package):
+- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
+- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
+
+### Updated from `Syroot.IO.BinaryData`?
+The previous package has been split into the core and the serialization packages. Also, several enumeration members were
+shortened in name and the serialization logic has been completely rewritten with new, separate attributes. Please read
+the [release notes](https://github.com/Syroot/BinaryData/releases/tag/5.0.0) to learn more about the many new features
+and breaking changes.
 
 ## Documentation
 
