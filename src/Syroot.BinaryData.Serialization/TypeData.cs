@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents reflected type configuration required for reading and writing it as binary data.
@@ -20,19 +20,19 @@ namespace Syroot.BinaryData.Serialization
             Type = type;
 
             // Get any possible attribute.
-            DataClassAttribute classAttrib = Type.GetCustomAttribute<DataClassAttribute>();
+            ClassAttribute classAttrib = Type.GetCustomAttribute<ClassAttribute>();
             if (classAttrib != null)
             {
                 Inherit = classAttrib.Inherit;
                 Explicit = classAttrib.Explicit;
             }
-            DataOffsetStartAttribute offsetStartAttrib = Type.GetCustomAttribute<DataOffsetStartAttribute>();
+            OffsetStartAttribute offsetStartAttrib = Type.GetCustomAttribute<OffsetStartAttribute>();
             if (offsetStartAttrib != null)
             {
                 StartOrigin = offsetStartAttrib.Origin;
                 StartDelta = offsetStartAttrib.Delta;
             }
-            DataOffsetEndAttribute offsetEndAttrib = Type.GetCustomAttribute<DataOffsetEndAttribute>();
+            OffsetEndAttribute offsetEndAttrib = Type.GetCustomAttribute<OffsetEndAttribute>();
             if (offsetEndAttrib != null)
             {
                 EndOrigin = offsetEndAttrib.Origin;
@@ -76,16 +76,16 @@ namespace Syroot.BinaryData.Serialization
 
         /// <summary>
         /// Gets the dictionary of <see cref="MemberData"/> for members decorated with the
-        /// <see cref="DataOrderAttribute"/>.
+        /// <see cref="OrderAttribute"/>.
         /// </summary>
         internal SortedDictionary<int, MemberData> OrderedMembers { get; }
 
         /// <summary>
-        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="DataOrderAttribute"/>.
+        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="OrderAttribute"/>.
         /// </summary>
         internal SortedList<string, MemberData> UnorderedMembers { get; }
 
-        // ---- DataClassAttribute ----
+        // ---- ClassAttribute ----
 
         /// <summary>
         /// Gets or sets a value indicating whether inherited members are read and written first.
@@ -97,7 +97,7 @@ namespace Syroot.BinaryData.Serialization
         /// </summary>
         internal bool Explicit { get; }
 
-        // ---- DataOffsetStartAttribute ----
+        // ---- OffsetStartAttribute ----
 
         /// <summary>
         /// Gets or sets the anchor from which to manipulate the stream position by the delta before reading the
@@ -110,7 +110,7 @@ namespace Syroot.BinaryData.Serialization
         /// </summary>
         internal long StartDelta { get; }
 
-        // ---- DataOffsetEndAttribute ----
+        // ---- OffsetEndAttribute ----
 
         /// <summary>
         /// Gets or sets the anchor from which to manipulate the stream position by the delta after reading the
@@ -165,16 +165,12 @@ namespace Syroot.BinaryData.Serialization
         
         private void AnalyzeMember(MemberData memberData, bool isPublic)
         {
-            if (memberData.IsExported || (!ClassAttrib.Explicit && isPublic))
+            if (memberData.IsExported || (!Explicit && isPublic))
             {
                 if (memberData.Index == Int32.MinValue)
-                {
                     UnorderedMembers.Add(memberData.MemberInfo.Name, memberData);
-                }
                 else
-                {
                     OrderedMembers.Add(memberData.Index, memberData);
-                }
             }
         }
     }

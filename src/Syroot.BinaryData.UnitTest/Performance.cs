@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Syroot.BinaryData.Extensions;
+using Syroot.BinaryData;
 
 namespace Syroot.BinaryData.UnitTest
 {

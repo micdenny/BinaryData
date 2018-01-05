@@ -1,29 +1,35 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<AssemblyName>Syroot.BinaryData</AssemblyName>
-		<AssemblyTitle>BinaryData</AssemblyTitle>
+		<AssemblyName>Syroot.BinaryData.Serialization</AssemblyName>
+		<AssemblyTitle>BinaryData Serialization</AssemblyTitle>
 		<Authors>Syroot</Authors>
 		<Configurations>Debug;Release;Release (Signed)</Configurations>
 		<Copyright>(c) Syroot, licensed under MIT</Copyright>
-		<Description>.NET library extending binary reading and writing functionality.</Description>
+		<Description>.NET library automating binary serialization of classes and structs.</Description>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
-		<PackageId>Syroot.BinaryData</PackageId>
+		<PackageId>Syroot.BinaryData.Serialization</PackageId>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
 		<PackageReleaseNotes>Separated from Syroot.IO.BinaryData package.</PackageReleaseNotes>
-		<PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
+		<PackageTags>binary;data;io;binaryreader;binarywriter;serialization</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
 		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-		<VersionPrefix>5.0.0-alpha3</VersionPrefix>
+		<VersionPrefix>5.0.0-alpha1</VersionPrefix>
 	</PropertyGroup>
-
+	<ItemGroup Condition="'$(Configuration)' != 'Release (Signed)'">
+		<PackageReference Include="Syroot.BinaryData" Version="5.0.0-alpha3" />
+	</ItemGroup>
+	
 	<!-- Release (Signed) -->
 	<PropertyGroup Condition="'$(Configuration)' == 'Release (Signed)'">
-		<AssemblyOriginatorKeyFile>Syroot.BinaryData.pfx</AssemblyOriginatorKeyFile>
-		<PackageId>Syroot.BinaryData.Signed</PackageId>
+		<AssemblyOriginatorKeyFile>Syroot.BinaryData.Serialization.pfx</AssemblyOriginatorKeyFile>
+		<PackageId>Syroot.BinaryData.Serialization.Signed</PackageId>
 		<SignAssembly>true</SignAssembly>
 	</PropertyGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'Release (Signed)'">
+	  <PackageReference Include="Syroot.BinaryData.Signed" Version="5.0.0-alpha2" />
+	</ItemGroup>
 </Project>

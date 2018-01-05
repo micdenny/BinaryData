@@ -33,6 +33,8 @@
     <DocumentationSources>
       <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net45\Syroot.BinaryData.dll" />
       <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net45\Syroot.BinaryData.xml" />
+      <DocumentationSource sourceFile="..\Syroot.BinaryData.Serialization\bin\Release\net45\Syroot.BinaryData.Serialization.dll" />
+      <DocumentationSource sourceFile="..\Syroot.BinaryData.Serialization\bin\Release\net45\Syroot.BinaryData.Serialization.xml" />
     </DocumentationSources>
     <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
@@ -58,7 +60,8 @@
     <MissingTags>AutoDocumentCtors, AutoDocumentDispose</MissingTags>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Syroot.BinaryData" isDocumented="True">This namespace provides classes providing advanced binary data reading and writing functionality.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Syroot.BinaryData.Extensions" isDocumented="True">This namespace provides extension methods for the Stream class to add new reading and writing functionality.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="Syroot.BinaryData.Extensions" isDocumented="True">This namespace provides extension methods for the Stream class to add new reading and writing functionality.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <WebsiteSdkLinkType>Msdn</WebsiteSdkLinkType>
     <HtmlSdkLinkType>Msdn</HtmlSdkLinkType>
     <IncludeFavorites>False</IncludeFavorites>

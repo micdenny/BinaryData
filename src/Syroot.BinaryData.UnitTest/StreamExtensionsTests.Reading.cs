@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Syroot.BinaryData.Extensions;
+using Syroot.BinaryData;
 
 namespace Syroot.BinaryData.UnitTest
 {

@@ -1,4 +1,4 @@
-﻿namespace Syroot.BinaryData.Serialization
+﻿namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents the origins of offsets of a class, structure, or member.

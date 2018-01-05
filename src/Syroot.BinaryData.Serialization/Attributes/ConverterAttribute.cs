@@ -1,20 +1,20 @@
 using System;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Configures an <see cref="IDataConverter"/> to read or write the member with through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class DataConverterAttribute : Attribute
+    public class ConverterAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataConverterAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="ConverterAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="converterType">The type of the <see cref="IDataConverter"/> to use.</param>
-        public DataConverterAttribute(Type converterType)
+        public ConverterAttribute(Type converterType)
         {
             ConverterType = converterType;
         }

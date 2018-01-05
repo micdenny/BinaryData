@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Syroot.BinaryData.Core;
-using Syroot.BinaryData.Serialization;
 
-namespace Syroot.BinaryData.Extensions
+namespace Syroot.BinaryData
 {
     public static partial class StreamExtensions
     {
@@ -232,6 +228,44 @@ namespace Syroot.BinaryData.Extensions
             }
         }
 
+        // ---- DynamicInt32 ----
+
+        /// <summary>
+        /// Writes a variable-length <see cref="Int32"/> value to the <paramref name="stream"/> which can require up to
+        /// 5 bytes.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="value">The value to write.</param>
+        public static void WriteDynamicInt32(this Stream stream, int value)
+        {
+            // The highest bit determines whether to continue writing more bytes to form the Int32 value.
+            lock (stream)
+            {
+                while (value >= 0b10000000)
+                {
+                    stream.WriteByte((byte)(value | 0b10000000));
+                    value >>= 7;
+                }
+                stream.WriteByte((byte)value);
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="Int32"/> values to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="values">The values to write.</param>
+        public static void WriteDynamicInt32s(this Stream stream, IEnumerable<Int32> values)
+        {
+            lock (stream)
+            {
+                foreach (var value in values)
+                {
+                    stream.WriteDynamicInt32(value);
+                }
+            }
+        }
+
         // ---- Enum ----
 
         /// <summary>
@@ -377,17 +411,6 @@ namespace Syroot.BinaryData.Extensions
             }
         }
 
-        // ---- Object ----
-
-        /// <summary>
-        /// Writes an object or enumerable of objects to the <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="value">The object or enumerable of objects to write.</param>
-        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        //public static void WriteObject(this Stream stream, object value, ByteConverter converter = null)
-        //    => WriteObject(value.GetType(), stream, null, BinaryMemberAttribute.Default, value, converter);
-
         // ---- SByte ----
 
         /// <summary>
@@ -479,7 +502,7 @@ namespace Syroot.BinaryData.Extensions
                 switch (format)
                 {
                     case StringCoding.DynamicByteCount:
-                        Write7BitEncodedInt(stream, textBuffer.Length);
+                        WriteDynamicInt32(stream, textBuffer.Length);
                         stream.Write(textBuffer, 0, textBuffer.Length);
                         break;
                     case StringCoding.ByteCharCount:
@@ -649,17 +672,6 @@ namespace Syroot.BinaryData.Extensions
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private static void Write7BitEncodedInt(Stream stream, int value)
-        {
-            // The highest bit determines whether to continue writing more bytes to form the Int32 value.
-            while (value >= 0b10000000)
-            {
-                stream.WriteByte((byte)(value | 0b10000000));
-                value >>= 7;
-            }
-            stream.WriteByte((byte)value);
-        }
 
         private static void WriteEnum(Type type, Stream stream, object value, bool strict, ByteConverter converter)
         {

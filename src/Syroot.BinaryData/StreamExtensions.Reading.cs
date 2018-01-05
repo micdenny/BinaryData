@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Syroot.BinaryData.Core;
-using Syroot.BinaryData.Serialization;
 
-namespace Syroot.BinaryData.Extensions
+namespace Syroot.BinaryData
 {
     public static partial class StreamExtensions
     {
@@ -240,6 +237,56 @@ namespace Syroot.BinaryData.Extensions
             return values;
         }
 
+        // ---- DynamicInt32 ----
+
+        /// <summary>
+        /// Reads a variable-length <see cref="Int32"/> instance from the given <paramref name="stream"/> which can
+        /// require up to 5 bytes.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <returns>The value read from the current stream.</returns>
+        public static Int32 ReadDynamicInt32(this Stream stream)
+        {
+            // Endianness should not matter, as this value is stored byte by byte.
+            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
+            int value = 0;
+            lock (stream)
+            {
+                for (int i = 0; i < sizeof(Int32) + 1; i++)
+                {
+                    int readByte = stream.ReadByte();
+                    if (readByte == -1)
+                        throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
+                    value |= (readByte & 0b01111111) << i * 7;
+                    if ((readByte & 0b10000000) == 0)
+                    {
+                        return value;
+                    }
+                }
+            }
+            throw new InvalidDataException("Invalid 7-bit encoded integer.");
+        }
+
+        /// <summary>
+        /// Returns an array of variable-length <see cref="Int32"/> instances read from the <paramref name="stream"/>
+        /// which can require to 5 bytes each.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of values to read.</param>
+        /// <returns>The array of values read from the current stream.</returns>
+        public static Int32[] ReadDynamicInt32s(this Stream stream, int count)
+        {
+            var values = new Int32[count];
+            lock (stream)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    values[i] = ReadDynamicInt32(stream);
+                }
+            }
+            return values;
+        }
+
         // ---- Enum ----
 
         /// <summary>
@@ -278,6 +325,98 @@ namespace Syroot.BinaryData.Extensions
                 for (int i = 0; i < count; i++)
                 {
                     values[i] = (T)ReadEnum(stream, enumType, strict, converter);
+                }
+            }
+            return values;
+        }
+        
+        /// <summary>
+        /// Returns an <see cref="Enum"/> instance of the given <paramref name="type"/> from the
+        /// <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The value read from the current stream.</returns>
+        public static object ReadEnum(this Stream stream, Type type, bool strict = false,
+            ByteConverter converter = null)
+        {
+            converter = converter ?? ByteConverter.System;
+
+            Type valueType = Enum.GetUnderlyingType(type);
+            int valueSize = Marshal.SizeOf(valueType);
+            object value;
+
+            // Read enough bytes to form an enum value.
+            FillBuffer(stream, valueSize);
+            if (valueType == typeof(Byte))
+            {
+                value = Buffer[0];
+            }
+            else if (valueType == typeof(SByte))
+            {
+                value = (sbyte)Buffer[0];
+            }
+            else if (valueType == typeof(Int16))
+            {
+                value = converter.ToInt16(Buffer);
+            }
+            else if (valueType == typeof(Int32))
+            {
+                value = converter.ToInt32(Buffer);
+            }
+            else if (valueType == typeof(Int64))
+            {
+                value = converter.ToInt64(Buffer);
+            }
+            else if (valueType == typeof(UInt16))
+            {
+                value = converter.ToUInt16(Buffer);
+            }
+            else if (valueType == typeof(UInt32))
+            {
+                value = converter.ToUInt32(Buffer);
+            }
+            else if (valueType == typeof(UInt64))
+            {
+                value = converter.ToUInt64(Buffer);
+            }
+            else
+            {
+                throw new NotImplementedException($"Unsupported enum type {valueType}.");
+            }
+
+            // Check if the value is defined in the enumeration, if requested.
+            if (strict)
+            {
+                ValidateEnumValue(type, value);
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Returns an array of <see cref="Enum"/> instances of the given <paramref name="type"/> read from the
+        /// <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of values to read.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        /// <returns>The array of values read from the current stream.</returns>
+        public static object[] ReadEnums(this Stream stream, Type type, int count, bool strict = false,
+            ByteConverter converter = null)
+        {
+            converter = converter ?? ByteConverter.System;
+            var values = new object[count];
+            lock (stream)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    values[i] = ReadEnum(stream, type, strict, converter);
                 }
             }
             return values;
@@ -393,42 +532,7 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
-
-        // ---- Object ----
-
-        /// <summary>
-        /// Returns an object of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the object to read.</typeparam>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        /// <returns>The value read from the current stream.</returns>
-        public static T ReadObject<T>(this Stream stream, ByteConverter converter = null)
-            => (T)BinarySerialization.ReadClass(stream, TypeData.Get(typeof(T)), null,
-                converter ?? ByteConverter.System);
-
-        /// <summary>
-        /// Returns an array of objects of type <typeparamref name="T"/> read from the <paramref name="stream"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the object to load.</typeparam>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="count">The number of values to read.</param>
-        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        /// <returns>The array of values read from the current stream.</returns>
-        public static T[] ReadObjects<T>(this Stream stream, int count, ByteConverter converter = null)
-        {
-            converter = converter ?? ByteConverter.System;
-            var values = new T[count];
-            lock (stream)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    values[i] = stream.ReadObject<T>(converter);
-                }
-            }
-            return values;
-        }
-
+        
         // ---- SByte ----
 
         /// <summary>
@@ -519,7 +623,7 @@ namespace Syroot.BinaryData.Extensions
             switch (coding)
             {
                 case StringCoding.DynamicByteCount:
-                    return ReadStringWithLength(stream, stream.Read7BitEncodedInt32(), false, encoding);
+                    return ReadStringWithLength(stream, stream.ReadDynamicInt32(), false, encoding);
                 case StringCoding.ByteCharCount:
                     return ReadStringWithLength(stream, stream.ReadByte(), true, encoding);
                 case StringCoding.Int16CharCount:
@@ -558,7 +662,7 @@ namespace Syroot.BinaryData.Extensions
                     case StringCoding.DynamicByteCount:
                         for (int i = 0; i < count; i++)
                         {
-                            values[i] = ReadStringWithLength(stream, stream.Read7BitEncodedInt32(), false, encoding);
+                            values[i] = ReadStringWithLength(stream, stream.ReadDynamicInt32(), false, encoding);
                         }
                         break;
                     case StringCoding.ByteCharCount:
@@ -738,83 +842,7 @@ namespace Syroot.BinaryData.Extensions
             }
             return values;
         }
-
-        // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
-
-        internal static Int32 Read7BitEncodedInt32(this Stream stream)
-        {
-            // Endianness should not matter, as this value is stored byte by byte.
-            // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
-            int value = 0;
-            for (int i = 0; i < sizeof(Int32) + 1; i++)
-            {
-                int readByte = stream.ReadByte();
-                if (readByte == -1)
-                    throw new EndOfStreamException("Incomplete 7-bit encoded integer.");
-                value |= (readByte & 0b01111111) << i * 7;
-                if ((readByte & 0b10000000) == 0)
-                {
-                    return value;
-                }
-            }
-            throw new InvalidDataException("Invalid 7-bit encoded integer.");
-        }
-
-        internal static object ReadEnum(this Stream stream, Type type, bool strict, ByteConverter converter)
-        {
-            converter = converter ?? ByteConverter.System;
-
-            Type valueType = Enum.GetUnderlyingType(type);
-            int valueSize = Marshal.SizeOf(valueType);
-            object value;
-
-            // Read enough bytes to form an enum value.
-            FillBuffer(stream, valueSize);
-            if (valueType == typeof(Byte))
-            {
-                value = Buffer[0];
-            }
-            else if (valueType == typeof(SByte))
-            {
-                value = (sbyte)Buffer[0];
-            }
-            else if (valueType == typeof(Int16))
-            {
-                value = converter.ToInt16(Buffer);
-            }
-            else if (valueType == typeof(Int32))
-            {
-                value = converter.ToInt32(Buffer);
-            }
-            else if (valueType == typeof(Int64))
-            {
-                value = converter.ToInt64(Buffer);
-            }
-            else if (valueType == typeof(UInt16))
-            {
-                value = converter.ToUInt16(Buffer);
-            }
-            else if (valueType == typeof(UInt32))
-            {
-                value = converter.ToUInt32(Buffer);
-            }
-            else if (valueType == typeof(UInt64))
-            {
-                value = converter.ToUInt64(Buffer);
-            }
-            else
-            {
-                throw new NotImplementedException($"Unsupported enum type {valueType}.");
-            }
-
-            // Check if the value is defined in the enumeration, if requested.
-            if (strict)
-            {
-                ValidateEnumValue(type, value);
-            }
-            return value;
-        }
-
+        
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
         private static void FillBuffer(Stream stream, int length)

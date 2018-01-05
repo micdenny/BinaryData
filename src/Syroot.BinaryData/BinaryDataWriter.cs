@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Syroot.BinaryData.Core;
-using Syroot.BinaryData.Extensions;
 
 namespace Syroot.BinaryData
 {
@@ -324,15 +322,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="values">The <see cref="Int64"/> values to write.</param>
         public void Write(IEnumerable<Int64> values) => BaseStream.Write(values, ByteConverter);
-
-        // ---- Object ----
-
-        /// <summary>
-        /// Writes an object or enumerable of objects to this stream.
-        /// </summary>
-        /// <param name="value">The object or enumerable of objects to write.</param>
-        //public void WriteObject(object value) => BaseStream.WriteObject(value, ByteConverter);
-
+        
         // ---- Single ----
 
         /// <summary>

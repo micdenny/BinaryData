@@ -1,41 +1,41 @@
 using System;
 using System.Collections;
 
-namespace Syroot.BinaryData.Serialization
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Configures how many elements in an <see cref="IEnumerable"/> member are read through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class DataArrayAttribute : Attribute
+    public class ArrayAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="count">The number of elements to read.</param>
-        public DataArrayAttribute(int count)
+        public ArrayAttribute(int count)
         {
             Count = count;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="countProvider">The name of the member or method to use for retrieving the number of elements to
         /// read.</param>
-        public DataArrayAttribute(string countProvider)
+        public ArrayAttribute(string countProvider)
         {
             CountProvider = countProvider;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="coding">The <see cref="ArrayLengthCoding"/> to read or write the value in.</param>
         /// <param name="endian">The <see cref="Endian"/> of this value.</param>
-        public DataArrayAttribute(ArrayLengthCoding coding, Endian endian = Endian.None)
+        public ArrayAttribute(ArrayLengthCoding coding, Endian endian = Endian.None)
         {
             Coding = coding;
             CodingEndian = endian;

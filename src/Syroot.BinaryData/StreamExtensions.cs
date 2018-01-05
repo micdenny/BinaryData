@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using Syroot.BinaryData.Core;
 
-namespace Syroot.BinaryData.Extensions
+namespace Syroot.BinaryData
 {
     /// <summary>
     /// Represents static extension methods for read and write operations on <see cref="Stream"/> instances.
