@@ -8,30 +8,33 @@ variable-length prefixed .NET strings).
 Further, navigating in binary files is slightly tedious when it is required to skip to another chunk in the file and
 then navigate back. Also, aligning to specific block sizes might be a common task.
 
-This NuGet package adds all this and more functionality by offering a large set of extension methods for the `Stream`
-class of .NET 4.5 and .NET Standard 2.0. Additionally, serializing and deserializing complete class hierarchies can be
-done immediately.
-Additionally, `BinaryDataReader` and `BinaryDataWriter` classes are provided, usable like the default .NET
-`BinaryReader` and `BinaryWriter` so that new functionality can be added almost instantly to existing projects.
+The `Syroot.BinaryData` NuGet package adds all this and more functionality by offering a large set of extension methods
+for the `Stream` class of .NET 4.5 and .NET Standard 2.0. `BinaryDataReader` and `BinaryDataWriter` classes are
+provided, usable like the default .NET `BinaryReader` and `BinaryWriter` so that new functionality can be added almost
+instantly to existing projects.
+
+The `Syroot.BinaryData.Serialization` package can serialize and deserialize complete class hierarchies without any
+further code required.
 
 ## Installation
 
 The library is available in the following NuGet packages:
 
-- [Syroot.IO.BinaryData](https://www.nuget.org/packages/Syroot.IO.BinaryData) (unsigned)
-- [Syroot.IO.BinaryData.Signed](https://www.nuget.org/packages/Syroot.IO.BinaryData.Signed) (signed assembly)
+Core functionality:
+- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
+- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
 
-### Are you using 3.x.x or earlier?
-If you used object serialization features, you **want to update to 4.x.x**:
-- Members in pre-4.x.x versions were not read or written in a deterministic order.
-- 4.x.x fixes this by serializing members alphabetically or with the given order specified through the new `BinaryMemberAttribute.Order` property.
-Please consult the [wiki page](https://github.com/Syroot/BinaryData/wiki/Object-Values#ordering-members) for guidance.
+Serialization functionality (includes the Core package):
+- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
+- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
+
+### Updated from `Syroot.IO.BinaryData`?
+The previous package has been split into the core and the serialization packages. Also, several enumeration members were
+shortened in name and the serialization logic has been completely rewritten with new, separate attributes. Please read
+the [release notes](https://github.com/Syroot/BinaryData/releases/tag/5.0.0) to learn more about the many new features
+and breaking changes.
 
 ## Documentation
 
 - A code-oriented feature tour is available [on the wiki](https://github.com/Syroot/BinaryData/wiki).
 - Complete MSDN-style API documentation is hosted on [docs.syroot.com](http://docs.syroot.com/binarydata).
-
-## Support
-
-You can ask questions and suggest features on Discord aswell. Feel free to [join the BinaryData channel on the Syroot server](https://discord.gg/KSaSWTV)!
