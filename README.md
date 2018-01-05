@@ -24,9 +24,9 @@ Core functionality:
 - [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
 - [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
 
-Serialization functionality (includes the Core package):
-- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
-- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
+Serialization functionality (includes the core package):
+- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned)
+- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly)
 
 ### Updated from `Syroot.IO.BinaryData`?
 The previous package has been split into the core and the serialization packages. Also, several enumeration members were
