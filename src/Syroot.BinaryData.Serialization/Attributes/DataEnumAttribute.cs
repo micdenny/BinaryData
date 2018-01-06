@@ -6,15 +6,15 @@ namespace Syroot.BinaryData
     /// Configures how an <see cref="Enum"/> member is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class EnumAttribute : Attribute
+    public class DataEnumAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnumAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataEnumAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="strict"><c>true</c> to validate the value when it is read or written.</param>
-        public EnumAttribute(bool strict)
+        public DataEnumAttribute(bool strict)
         {
             Strict = strict;
         }

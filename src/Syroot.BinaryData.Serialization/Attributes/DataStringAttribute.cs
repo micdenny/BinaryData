@@ -7,28 +7,28 @@ namespace Syroot.BinaryData
     /// Configures how a <see cref="String"/> member is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class StringAttribute : Attribute
+    public class DataStringAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataStringAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="coding">The <see cref="StringCoding"/> to read or write the value in.</param>
         /// <param name="codePage">The code page of the <see cref="Encoding"/> to use.</param>
-        public StringAttribute(StringCoding coding, int codePage = 0)
+        public DataStringAttribute(StringCoding coding, int codePage = 0)
         {
             Coding = coding;
             CodePage = codePage;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataStringAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="length">The length of the string to read. Handles the string with
         /// <see cref="StringCoding.Raw"/>.</param>
         /// <param name="codePage">The code page of the <see cref="Encoding"/> to use.</param>
-        public StringAttribute(int length, int codePage = 0)
+        public DataStringAttribute(int length, int codePage = 0)
         {
             Length = length;
             CodePage = codePage;

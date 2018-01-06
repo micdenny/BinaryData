@@ -9,9 +9,9 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents logic to serialize and deserialize objects of any type.
     /// </summary>
-    internal static class BinarySerialization
+    internal class Serializer
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
+        // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private static readonly Dictionary<RuntimeTypeHandle, Func<Stream, ByteConverter, MemberData, object>>
             _typeReaders = new Dictionary<RuntimeTypeHandle, Func<Stream, ByteConverter, MemberData, object>>
@@ -32,35 +32,103 @@ namespace Syroot.BinaryData
                 [typeof(UInt64).TypeHandle] = ReadUInt64
             };
 
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
+        private readonly Dictionary<Type, TypeData> _typeCache;
+        private readonly Dictionary<Type, IDataConverter> _converterCache;
+        
+        // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
+
+        internal Serializer()
+        {
+            _typeCache = new Dictionary<Type, TypeData>();
+            _converterCache = new Dictionary<Type, IDataConverter>();
+        }
+
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
-        internal static object ReadClass(Stream stream, TypeData typeData, object instance, ByteConverter byteConverter)
+        /// <summary>
+        /// Reads the object of the given <paramref name="type"/> from the <paramref name="stream"/> and overrides the
+        /// <paramref name="byteConverter"/> used.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to read the data from.</param>
+        /// <param name="type">The <see cref="Type"/> of the object to read.</param>
+        /// <param name="byteConverter">The <see cref="ByteConverter"/> to use.</param>
+        /// <returns>The read instance.</returns>
+        internal object ReadObject(Stream stream, Type type, ByteConverter byteConverter)
+            => ReadObject(stream, GetTypeData(type), byteConverter, null);
+
+        /// <summary>
+        /// Writes the <paramref name="value"/> to the <paramref name="stream"/> and overrides the
+        /// <paramref name="byteConverter"/> used.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to write the data to.</param>
+        /// <param name="value">The object to write.</param>
+        /// <param name="byteConverter">The <see cref="ByteConverter"/> to use.</param>
+        internal void WriteObject(Stream stream, object value, ByteConverter byteConverter)
+            => throw new NotImplementedException();
+
+        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
+
+        // ---- Caches ----
+
+        private TypeData GetTypeData(Type type)
         {
+            lock (_typeCache)
+            {
+                if (!_typeCache.TryGetValue(type, out TypeData typeData))
+                {
+                    typeData = new TypeData(type);
+                    _typeCache.Add(type, typeData);
+                }
+                return typeData;
+            }
+        }
+
+        private IDataConverter GetConverter(Type type)
+        {
+            lock (_converterCache)
+            {
+                if (!_converterCache.TryGetValue(type, out IDataConverter converter))
+                {
+                    converter = (IDataConverter)Activator.CreateInstance(type);
+                    _converterCache.Add(type, converter);
+                }
+                return converter;
+            }
+        }
+
+        // ---- Reading ----
+
+        private object ReadObject(Stream stream, TypeData typeData, ByteConverter byteConverter, object instance)
+        {
+            // Instantiate the object if no child class instance was passed.
             instance = instance ?? typeData.Instantiate();
-            long instanceOffset = stream.CanSeek ? stream.Position : -1;
 
-            // Read inherited members.
-            if (typeData.Inherit && typeData.Type.BaseType != null)
+            // Read inherited members first.
+            lock (stream)
             {
-                ReadClass(stream, TypeData.Get(typeData.Type.BaseType), instance, byteConverter);
+                if (typeData.Inherit && typeData.Type.BaseType != null)
+                {
+                    ReadObject(stream, GetTypeData(typeData.Type.BaseType), byteConverter, instance);
+                }
+
+                // Read members.
+                long offset = stream.CanSeek ? stream.Position : -1;
+                foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
+                {
+                    ReadAndSetMember(stream, orderedMember.Value, instance, byteConverter, offset);
+                }
+                foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
+                {
+                    ReadAndSetMember(stream, unorderedMember.Value, instance, byteConverter, offset);
+                }
             }
 
-            // Read ordered members.
-            foreach (KeyValuePair<int, MemberData> orderedMember in typeData.OrderedMembers)
-            {
-                ReadMember(stream, orderedMember.Value, instance, byteConverter, instanceOffset);
-            }
-
-            // Read unordered / alphabetically sorted members.
-            foreach (KeyValuePair<string, MemberData> unorderedMember in typeData.UnorderedMembers)
-            {
-                ReadMember(stream, unorderedMember.Value, instance, byteConverter, instanceOffset);
-            }
-            
             return instance;
         }
 
-        private static void ReadMember(Stream stream, MemberData memberData, object instance,
+        private void ReadAndSetMember(Stream stream, MemberData memberData, object instance,
             ByteConverter byteConverter, long instanceOffset)
         {
             object value;
@@ -68,7 +136,7 @@ namespace Syroot.BinaryData
             if (arrayCount == 0)
             {
                 // Read a single value.
-                value = ReadClass(stream, TypeData.Get(memberData.Type), null, byteConverter);
+                value = ReadObject(stream, GetTypeData(memberData.Type), byteConverter, null);
             }
             else
             {
@@ -93,10 +161,8 @@ namespace Syroot.BinaryData
                     break;
             }
         }
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private static object ReadMemberValue(Stream stream, ByteConverter byteConverter, Type type, MemberData memberData,
+        
+        private object ReadMemberValue(Stream stream, ByteConverter byteConverter, Type type, MemberData memberData,
             long parentOffset)
         {
             byteConverter = memberData.Endian == 0 ? byteConverter : ByteConverter.GetConverter(memberData.Endian);
@@ -109,7 +175,7 @@ namespace Syroot.BinaryData
             if (memberData.ConverterType == null)
             {
                 // Let a converter handle all the data after adjusting to the offset.
-                TypeData typeData = TypeData.Get(type);
+                TypeData typeData = GetTypeData(type);
                 ApplyOffset(stream, parentOffset, typeData.StartOrigin, typeData.StartDelta);
                 value = null;// TODO: memberData.ConverterAttrib.Read(stream, memberData);
                 ApplyOffset(stream, parentOffset, typeData.EndOrigin, typeData.EndDelta);
@@ -127,9 +193,9 @@ namespace Syroot.BinaryData
             else
             {
                 // Read a custom type.
-                TypeData typeData = TypeData.Get(type);
+                TypeData typeData = GetTypeData(type);
                 ApplyOffset(stream, parentOffset, typeData.StartOrigin, typeData.StartDelta);
-                value = ReadClass(stream, typeData, typeData.Instantiate(), byteConverter);
+                value = ReadObject(stream, type, byteConverter);
                 ApplyOffset(stream, parentOffset, typeData.EndOrigin, typeData.EndDelta);
             }
             return value;
@@ -140,13 +206,9 @@ namespace Syroot.BinaryData
             Encoding encoding = memberData.StringCodePage == 0 ? null : Encoding.GetEncoding(memberData.StringCodePage);
 
             if (memberData.StringCoding == StringCoding.Raw)
-            {
                 return stream.ReadString(memberData.StringLength, encoding);
-            }
             else
-            {
                 return stream.ReadString(memberData.StringCoding, encoding, byteConverter);
-            }
         }
 
         private static object ReadBoolean(Stream stream, ByteConverter byteConverter, MemberData memberData)

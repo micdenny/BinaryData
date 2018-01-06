@@ -257,24 +257,49 @@ namespace Syroot.BinaryData
         /// Writes an enum value to this stream and advances the current position of the stream by the size of the
         /// underlying enum type size. Optionally validates the value to be defined in the enum type.
         /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
         /// <param name="value">The enum value to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         public void WriteEnum<T>(T value, bool strict = false)
             where T : struct, IComparable, IFormattable
-            => BaseStream.WriteEnum(value, strict, ByteConverter);
+            => BaseStream.WriteEnum(typeof(T), value, strict, ByteConverter);
 
         /// <summary>
         /// Writes an enumeration of enum values to this stream and advances the current position of the stream by the
         /// size of the underlying enum type size multiplied by the number of values. Optionally validates the values to
         /// be defined in the enum type.
         /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
         /// <param name="values">The enum values to write.</param>
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
         /// defined in the enum type.</param>
-        public void WriteEnums<T>(IEnumerable<T> values, bool strict = false)
+        public void WriteEnums<T>(IEnumerable values, bool strict = false)
             where T : struct, IComparable, IFormattable
-            => BaseStream.WriteEnums(values, strict, ByteConverter);
+            => BaseStream.WriteEnums(typeof(T), values, strict, ByteConverter);
+
+        /// <summary>
+        /// Writes an enum value to this stream and advances the current position of the stream by the size of the
+        /// underlying enum type size. Optionally validates the value to be defined in the enum type.
+        /// </summary>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="value">The enum value to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        public void WriteEnum(Type type, object value, bool strict = false)
+            => BaseStream.WriteEnum(type, value, strict, ByteConverter);
+
+        /// <summary>
+        /// Writes an enumeration of enum values to this stream and advances the current position of the stream by the
+        /// size of the underlying enum type size multiplied by the number of values. Optionally validates the values to
+        /// be defined in the enum type.
+        /// </summary>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="values">The enum values to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        public void WriteEnums(Type type, IEnumerable values, bool strict = false)
+            => BaseStream.WriteEnums(type, values, strict, ByteConverter);
 
         // ---- Int16 ----
 

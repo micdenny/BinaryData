@@ -6,15 +6,15 @@ namespace Syroot.BinaryData
     /// Configures how a <see cref="Boolean"/> member is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class BooleanAttribute : Attribute
+    public class DataBooleanAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BooleanAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataBooleanAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="coding">The <see cref="BooleanCoding"/> to read or write the value in.</param>
-        public BooleanAttribute(BooleanCoding coding)
+        public DataBooleanAttribute(BooleanCoding coding)
         {
             Coding = coding;
         }

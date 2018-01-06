@@ -28,7 +28,7 @@ namespace Syroot.BinaryData
             MemberInfo = memberInfo;
 
             // Get any possible attribute.
-            ArrayAttribute arrayAttrib = MemberInfo.GetCustomAttribute<ArrayAttribute>();
+            DataArrayAttribute arrayAttrib = MemberInfo.GetCustomAttribute<DataArrayAttribute>();
             if (arrayAttrib != null)
             {
                 IsExported = true;
@@ -37,55 +37,55 @@ namespace Syroot.BinaryData
                 ArrayCountCoding = arrayAttrib.Coding;
                 ArrayCountCodingEndian = arrayAttrib.CodingEndian;
             }
-            BooleanAttribute booleanAttrib = MemberInfo.GetCustomAttribute<BooleanAttribute>();
+            DataBooleanAttribute booleanAttrib = MemberInfo.GetCustomAttribute<DataBooleanAttribute>();
             if (booleanAttrib != null)
             {
                 IsExported = true;
                 BooleanCoding = booleanAttrib.Coding;
             }
-            ConverterAttribute converterAttrib = MemberInfo.GetCustomAttribute<ConverterAttribute>();
+            DataConverterAttribute converterAttrib = MemberInfo.GetCustomAttribute<DataConverterAttribute>();
             if (converterAttrib != null)
             {
                 IsExported = true;
                 ConverterType = converterAttrib.ConverterType;
             }
-            DateTimeAttribute dateTimeAttrib = MemberInfo.GetCustomAttribute<DateTimeAttribute>();
+            DataDateTimeAttribute dateTimeAttrib = MemberInfo.GetCustomAttribute<DataDateTimeAttribute>();
             if (dateTimeAttrib != null)
             {
                 IsExported = true;
                 DateTimeCoding = dateTimeAttrib.Coding;
             }
-            EndianAttribute endianAttrib = MemberInfo.GetCustomAttribute<EndianAttribute>();
+            DataEndianAttribute endianAttrib = MemberInfo.GetCustomAttribute<DataEndianAttribute>();
             if (endianAttrib != null)
             {
                 IsExported = true;
                 Endian = endianAttrib.Endian;
             }
-            EnumAttribute enumAttrib = MemberInfo.GetCustomAttribute<EnumAttribute>();
+            DataEnumAttribute enumAttrib = MemberInfo.GetCustomAttribute<DataEnumAttribute>();
             if (enumAttrib != null)
             {
                 IsExported = true;
                 EnumStrict = enumAttrib.Strict;
             }
-            MemberAttribute memberAttrib = MemberInfo.GetCustomAttribute<MemberAttribute>();
+            DataMemberAttribute memberAttrib = MemberInfo.GetCustomAttribute<DataMemberAttribute>();
             if (memberAttrib != null)
             {
                 IsExported = true;
             }
-            OffsetAttribute offsetAttrib = MemberInfo.GetCustomAttribute<OffsetAttribute>();
+            DataOffsetAttribute offsetAttrib = MemberInfo.GetCustomAttribute<DataOffsetAttribute>();
             if (offsetAttrib != null)
             {
                 IsExported = true;
                 OffsetDelta = offsetAttrib.Delta;
                 OffsetOrigin = offsetAttrib.Origin;
             }
-            OrderAttribute orderAttrib = MemberInfo.GetCustomAttribute<OrderAttribute>();
+            DataOrderAttribute orderAttrib = MemberInfo.GetCustomAttribute<DataOrderAttribute>();
             if (orderAttrib != null)
             {
                 IsExported = true;
                 Index = orderAttrib.Index;
             }
-            StringAttribute stringAttrib = MemberInfo.GetCustomAttribute<StringAttribute>();
+            DataStringAttribute stringAttrib = MemberInfo.GetCustomAttribute<DataStringAttribute>();
             if (stringAttrib != null)
             {
                 IsExported = true;
@@ -98,7 +98,7 @@ namespace Syroot.BinaryData
             if (Type.IsEnumerable() && arrayAttrib == null)
             {
                 throw new InvalidOperationException(
-                    $"Enumerable member \"{MemberInfo}\" must be decorated with a {nameof(ArrayAttribute)}.");
+                    $"Enumerable member \"{MemberInfo}\" must be decorated with a {nameof(DataArrayAttribute)}.");
             }
         }
 

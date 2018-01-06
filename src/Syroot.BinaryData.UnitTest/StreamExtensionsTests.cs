@@ -33,22 +33,22 @@ namespace Syroot.BinaryData.UnitTest
         
         private class TestClass
         {
-            [Order(-2), Array(3)]
+            [DataOrderAttribute(-2), DataArrayAttribute(3)]
             public byte[] ArrayStuff = new byte[] { 0x01, 0x02, 0x03 };
 
-            [Order(-1), Array(3)]
+            [DataOrderAttribute(-1), DataArrayAttribute(3)]
             public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
 
-            [Order(0)]
+            [DataOrderAttribute(0)]
             public int X = 0x33330000;
 
-            [Order(2)]
+            [DataOrderAttribute(2)]
             public byte Y = 0x44;
 
-            [Order(-3), String(StringCoding.Int32CharCount)]
+            [DataOrderAttribute(-3), DataString(StringCoding.Int32CharCount)]
             public string Text = "Hello, Test!";
 
-            [Order(1)]
+            [DataOrderAttribute(1)]
             public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 
@@ -81,19 +81,28 @@ namespace Syroot.BinaryData.UnitTest
         [TestMethod]
         public void ReadWriteObject()
         {
-            TestClass origInstance = new TestClass();
-            _stream.WriteObject(origInstance, ByteConverter.Big);
-
+            TestStruct origStruct = new TestStruct
+            {
+                Green = 123,
+                Red = 234
+            };
+            _stream.WriteObject(origStruct);
             _stream.Position = 0;
-            TestClass readInstance = _stream.ReadObject<TestClass>(ByteConverter.Big);
+            TestStruct readStruct = _stream.ReadObject<TestStruct>();
+            Assert.AreEqual(origStruct.Green, readStruct.Green);
+            Assert.AreEqual(origStruct.Red, readStruct.Red);
 
-            CollectionAssert.AreEqual(origInstance.ArrayStuff, readInstance.ArrayStuff);
-            CollectionAssert.AreEqual(origInstance.AnotherArray, readInstance.AnotherArray);
-            Assert.AreEqual(origInstance.X, readInstance.X);
-            Assert.AreEqual(origInstance.Y, readInstance.Y);
-            Assert.AreEqual(origInstance.Text, readInstance.Text);
-            Assert.AreEqual(origInstance.Struct.Green, readInstance.Struct.Green);
-            Assert.AreEqual(origInstance.Struct.Red, readInstance.Struct.Red);
+            TestClass origClass = new TestClass();
+            _stream.WriteObject(origClass, ByteConverter.Big);
+            _stream.Position = 0;
+            TestClass readClass = _stream.ReadObject<TestClass>(ByteConverter.Big);
+            CollectionAssert.AreEqual(origClass.ArrayStuff, readClass.ArrayStuff);
+            CollectionAssert.AreEqual(origClass.AnotherArray, readClass.AnotherArray);
+            Assert.AreEqual(origClass.X, readClass.X);
+            Assert.AreEqual(origClass.Y, readClass.Y);
+            Assert.AreEqual(origClass.Text, readClass.Text);
+            Assert.AreEqual(origClass.Struct.Green, readClass.Struct.Green);
+            Assert.AreEqual(origClass.Struct.Red, readClass.Struct.Red);
         }
         
         [TestMethod]

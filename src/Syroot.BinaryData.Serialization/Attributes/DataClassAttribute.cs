@@ -6,7 +6,7 @@ namespace Syroot.BinaryData
     /// Configures a class or struct for reading and writing it through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public class ClassAttribute : Attribute
+    public class DataClassAttribute : Attribute
     {
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
