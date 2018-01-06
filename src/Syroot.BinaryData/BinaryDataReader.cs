@@ -258,6 +258,29 @@ namespace Syroot.BinaryData
             where T : struct, IComparable, IFormattable
             => BaseStream.ReadEnums<T>(count, strict, ByteConverter);
 
+        /// <summary>
+        /// Reads the specified enum value from the current stream and advances the current position by the size of the
+        /// underlying enum type. Optionally validates the value to be defined in the enum type.
+        /// </summary>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        /// <returns>The enum value read from the current stream.</returns>
+        public object ReadEnum(Type type, bool strict = false)
+            => BaseStream.ReadEnum(type, strict, ByteConverter);
+
+        /// <summary>
+        /// Reads the specified number of enum values from the current stream into an array of the enum type. Optionally
+        /// validates values to be defined in the enum type.
+        /// </summary>
+        /// <param name="count">The number of enum values to read.</param>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if a value is not
+        /// defined in the enum type.</param>
+        /// <returns>The enum values array read from the current stream.</returns>
+        public object[] ReadEnums(Type type, int count, bool strict = false)
+            => BaseStream.ReadEnums(type, count, strict, ByteConverter);
+
         // ---- Int16 ----
 
         /// <summary>

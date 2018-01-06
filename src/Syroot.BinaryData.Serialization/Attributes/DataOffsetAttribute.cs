@@ -6,16 +6,16 @@ namespace Syroot.BinaryData
     /// Configures an offset at which the value is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class OffsetAttribute : Attribute
+    public class DataOffsetAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OffsetAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataOffsetAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="origin">The anchor from which to manipulate the stream position by the given delta.</param>
         /// <param name="delta">The number of bytes to manipulate the stream position with.</param>
-        public OffsetAttribute(Origin origin, long delta)
+        public DataOffsetAttribute(Origin origin, long delta)
         {
             Origin = origin;
             Delta = delta;

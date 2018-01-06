@@ -7,35 +7,35 @@ namespace Syroot.BinaryData
     /// Configures how many elements in an <see cref="IEnumerable"/> member are read through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ArrayAttribute : Attribute
+    public class DataArrayAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="count">The number of elements to read.</param>
-        public ArrayAttribute(int count)
+        public DataArrayAttribute(int count)
         {
             Count = count;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="countProvider">The name of the member or method to use for retrieving the number of elements to
         /// read.</param>
-        public ArrayAttribute(string countProvider)
+        public DataArrayAttribute(string countProvider)
         {
             CountProvider = countProvider;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArrayAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataArrayAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="coding">The <see cref="ArrayLengthCoding"/> to read or write the value in.</param>
         /// <param name="endian">The <see cref="Endian"/> of this value.</param>
-        public ArrayAttribute(ArrayLengthCoding coding, Endian endian = Endian.None)
+        public DataArrayAttribute(ArrayLengthCoding coding, Endian endian = Endian.None)
         {
             Coding = coding;
             CodingEndian = endian;

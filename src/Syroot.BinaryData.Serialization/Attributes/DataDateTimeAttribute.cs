@@ -7,15 +7,15 @@ namespace Syroot.BinaryData
     /// Configures how a <see cref="DateTime"/> member is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class DateTimeAttribute : Attribute
+    public class DataDateTimeAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DateTimeAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataDateTimeAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="coding">The <see cref="DateTimeCoding"/> to read or write the value in.</param>
-        public DateTimeAttribute(DateTimeCoding coding)
+        public DataDateTimeAttribute(DateTimeCoding coding)
         {
             Coding = coding;
         }

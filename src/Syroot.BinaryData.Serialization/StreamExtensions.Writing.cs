@@ -15,6 +15,6 @@ namespace Syroot.BinaryData
         /// <param name="value">The object or enumerable of objects to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void WriteObject(this Stream stream, object value, ByteConverter converter = null)
-            => WriteObject(value.GetType(), stream, null, BinaryMemberAttribute.Default, value, converter);
+            => _serializer.WriteObject(stream, value, converter);
     }
 }

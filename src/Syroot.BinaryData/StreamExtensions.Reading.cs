@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Syroot.BinaryData
@@ -93,7 +92,9 @@ namespace Syroot.BinaryData
         public static Byte[] ReadBytes(this Stream stream, int count)
         {
             byte[] buffer = new byte[count];
-            stream.Read(buffer, 0, count);
+            int bytesRead = stream.Read(buffer, 0, count);
+            if (bytesRead < count)
+                throw new EndOfStreamException($"Could not read {count} bytes.");
             return buffer;
         }
 
@@ -319,12 +320,12 @@ namespace Syroot.BinaryData
         {
             converter = converter ?? ByteConverter.System;
             var values = new T[count];
-            Type enumType = typeof(T);
+            Type type = typeof(T);
             lock (stream)
             {
                 for (int i = 0; i < count; i++)
                 {
-                    values[i] = (T)ReadEnum(stream, enumType, strict, converter);
+                    values[i] = (T)ReadEnum(stream, type, strict, converter);
                 }
             }
             return values;
@@ -344,43 +345,48 @@ namespace Syroot.BinaryData
             ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
-
-            Type valueType = Enum.GetUnderlyingType(type);
-            int valueSize = Marshal.SizeOf(valueType);
-            object value;
-
+            
             // Read enough bytes to form an enum value.
-            FillBuffer(stream, valueSize);
+            Type valueType = Enum.GetUnderlyingType(type);
+            object value;
             if (valueType == typeof(Byte))
             {
+                FillBuffer(stream, sizeof(Byte));
                 value = Buffer[0];
             }
             else if (valueType == typeof(SByte))
             {
+                FillBuffer(stream, sizeof(SByte));
                 value = (sbyte)Buffer[0];
             }
             else if (valueType == typeof(Int16))
             {
+                FillBuffer(stream, sizeof(Int16));
                 value = converter.ToInt16(Buffer);
             }
             else if (valueType == typeof(Int32))
             {
+                FillBuffer(stream, sizeof(Int32));
                 value = converter.ToInt32(Buffer);
             }
             else if (valueType == typeof(Int64))
             {
+                FillBuffer(stream, sizeof(Int64));
                 value = converter.ToInt64(Buffer);
             }
             else if (valueType == typeof(UInt16))
             {
+                FillBuffer(stream, sizeof(UInt16));
                 value = converter.ToUInt16(Buffer);
             }
             else if (valueType == typeof(UInt32))
             {
+                FillBuffer(stream, sizeof(UInt32));
                 value = converter.ToUInt32(Buffer);
             }
             else if (valueType == typeof(UInt64))
             {
+                FillBuffer(stream, sizeof(UInt64));
                 value = converter.ToUInt64(Buffer);
             }
             else

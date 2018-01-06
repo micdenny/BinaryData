@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -215,6 +216,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<Double> values, ByteConverter converter = null)
+
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -280,7 +282,7 @@ namespace Syroot.BinaryData
         public static void WriteEnum<T>(this Stream stream, T value, bool strict = false,
             ByteConverter converter = null)
             where T : struct, IComparable, IFormattable
-            => WriteEnum(typeof(T), stream, value, strict, converter);
+            => WriteEnum(stream, typeof(T), value, strict, converter);
 
         /// <summary>
         /// Writes an array of <see cref="Enum"/> values of type <typeparamref name="T"/> to the
@@ -292,16 +294,73 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void WriteEnums<T>(this Stream stream, IEnumerable<T> values, bool strict = false,
+        public static void WriteEnums<T>(this Stream stream, IEnumerable values, bool strict = false,
+            ByteConverter converter = null)
+            => WriteEnums(stream, typeof(T), values, strict, converter);
+
+        /// <summary>
+        /// Writes an <see cref="Enum"/> value of the given <paramref name="type"/> to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="value">The value to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        public static void WriteEnum(this Stream stream, Type type, object value, bool strict = false,
+            ByteConverter converter = null)
+        {
+            // Check if the value is defined in the enumeration, if requested.
+            if (strict)
+            {
+                ValidateEnumValue(type, value);
+            }
+
+            converter = converter ?? ByteConverter.System;
+            Type valueType = Enum.GetUnderlyingType(type);
+
+            // Get the bytes of the enum value and write them to the stream.
+            byte[] buffer = Buffer;
+            if (valueType == typeof(Byte))
+                Buffer[0] = (byte)value;
+            else if (valueType == typeof(SByte))
+                Buffer[0] = (byte)(sbyte)value;
+            else if (valueType == typeof(Int16))
+                converter.GetBytes((Int16)value, buffer, 0);
+            else if (valueType == typeof(Int32))
+                converter.GetBytes((Int32)value, buffer, 0);
+            else if (valueType == typeof(Int64))
+                converter.GetBytes((Int64)value, buffer, 0);
+            else if (valueType == typeof(UInt16))
+                converter.GetBytes((UInt16)value, buffer, 0);
+            else if (valueType == typeof(UInt32))
+                converter.GetBytes((UInt32)value, buffer, 0);
+            else if (valueType == typeof(UInt64))
+                converter.GetBytes((UInt64)value, buffer, 0);
+            else
+                throw new NotImplementedException($"Unsupported enum type {valueType}.");
+            stream.Write(buffer, 0, Marshal.SizeOf(valueType));
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="Enum"/> values of the given <paramref name="type"/> to the
+        /// <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="type">The type of the enum.</param>
+        /// <param name="values">The values to write.</param>
+        /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
+        /// defined in the enum type.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        public static void WriteEnums(this Stream stream, Type type, IEnumerable values, bool strict = false,
             ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
-            Type enumType = typeof(T);
             lock (stream)
             {
                 foreach (var value in values)
                 {
-                    WriteEnum(enumType, stream, value, strict, converter);
+                    WriteEnum(stream, type, value, strict, converter);
                 }
             }
         }
@@ -670,213 +729,5 @@ namespace Syroot.BinaryData
                 }
             }
         }
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private static void WriteEnum(Type type, Stream stream, object value, bool strict, ByteConverter converter)
-        {
-            converter = converter ?? ByteConverter.System;
-            Type valueType = Enum.GetUnderlyingType(type);
-
-            // Write the enum value.
-            byte[] buffer = Buffer;
-            if (valueType == typeof(Byte))
-            {
-                Buffer[0] = (byte)value;
-            }
-            else if (valueType == typeof(SByte))
-            {
-                Buffer[0] = (byte)(sbyte)value;
-            }
-            else if (valueType == typeof(Int16))
-            {
-                converter.GetBytes((Int16)value, buffer, 0);
-            }
-            else if (valueType == typeof(Int32))
-            {
-                converter.GetBytes((Int32)value, buffer, 0);
-            }
-            else if (valueType == typeof(Int64))
-            {
-                converter.GetBytes((Int64)value, buffer, 0);
-            }
-            else if (valueType == typeof(UInt16))
-            {
-                converter.GetBytes((UInt16)value, buffer, 0);
-            }
-            else if (valueType == typeof(UInt32))
-            {
-                converter.GetBytes((UInt32)value, buffer, 0);
-            }
-            else if (valueType == typeof(UInt64))
-            {
-                converter.GetBytes((UInt64)value, buffer, 0);
-            }
-            else
-            {
-                throw new NotImplementedException($"Unsupported enum type {valueType}.");
-            }
-
-            // Check if the value is defined in the enumeration, if requested.
-            if (strict)
-            {
-                ValidateEnumValue(type, value);
-            }
-            stream.Write(buffer, 0, Marshal.SizeOf(valueType));
-        }
-
-        //private static void WriteObject(Type type, Stream stream, object instance, BinaryMemberAttribute attribute,
-        //    object value, ByteConverter converter)
-        //{
-        //    converter = converter ?? ByteConverter.System;
-
-        //    if (attribute.Converter == null)
-        //    {
-        //        if (value == null)
-        //        {
-        //            return;
-        //        }
-        //        else if (type == typeof(String))
-        //        {
-        //            Write(stream, (String)value, attribute.StringFormat, converter: converter);
-        //        }
-        //        else if (type.TryGetEnumerableElementType(out Type elementType))
-        //        {
-        //            foreach (object element in (IEnumerable)value)
-        //            {
-        //                WriteObject(elementType, stream, null, BinaryMemberAttribute.Default, element, converter);
-        //            }
-        //        }
-        //        else if (type == typeof(Boolean))
-        //        {
-        //            Write(stream, (Boolean)value, attribute.BooleanFormat, converter);
-        //        }
-        //        else if (type == typeof(Byte))
-        //        {
-        //            Write(stream, (Byte)value);
-        //        }
-        //        else if (type == typeof(DateTime))
-        //        {
-        //            Write(stream, (DateTime)value, attribute.DateTimeFormat, converter);
-        //        }
-        //        else if (type == typeof(Decimal))
-        //        {
-        //            Write(stream, (Decimal)value, converter);
-        //        }
-        //        else if (type == typeof(Double))
-        //        {
-        //            Write(stream, (Double)value, converter);
-        //        }
-        //        else if (type == typeof(Int16))
-        //        {
-        //            Write(stream, (Int16)value, converter);
-        //        }
-        //        else if (type == typeof(Int32))
-        //        {
-        //            Write(stream, (Int32)value, converter);
-        //        }
-        //        else if (type == typeof(Int64))
-        //        {
-        //            Write(stream, (Int64)value, converter);
-        //        }
-        //        else if (type == typeof(SByte))
-        //        {
-        //            Write(stream, (SByte)value);
-        //        }
-        //        else if (type == typeof(Single))
-        //        {
-        //            Write(stream, (Single)value, converter);
-        //        }
-        //        else if (type == typeof(UInt16))
-        //        {
-        //            Write(stream, (UInt16)value, converter);
-        //        }
-        //        else if (type == typeof(UInt32))
-        //        {
-        //            Write(stream, (UInt32)value, converter);
-        //        }
-        //        else if (type == typeof(UInt64))
-        //        {
-        //            Write(stream, (UInt64)value, converter);
-        //        }
-        //        else if (type.IsEnum)
-        //        {
-        //            WriteEnum(type, stream, value, attribute.Strict, converter);
-        //        }
-        //        else
-        //        {
-        //            if (stream.CanSeek)
-        //                WriteCustomObject(stream, type, value, stream.Position, converter);
-        //            else
-        //                WriteCustomObject(stream, type, value, -1, converter);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // Let a data converter do all the work.
-        //        IDataConverter binaryConverter = DataConverterCache.GetConverter(attribute.Converter);
-        //        binaryConverter.Write(stream, instance, attribute, value, converter);
-        //    }
-        //}
-
-        //private static void WriteCustomObject(Stream stream, Type type, object instance, long startOffset,
-        //    ByteConverter converter)
-        //{
-        //    TypeData typeData = TypeData.Get(type);
-
-        //    // Write inherited members first if required.
-        //    if (typeData.Attribute.Inherit && typeData.Type.BaseType != null)
-        //    {
-        //        WriteCustomObject(stream, typeData.Type.BaseType, instance, startOffset, converter);
-        //    }
-
-        //    // Write members.
-        //    foreach (MemberData member in typeData.Members)
-        //    {
-        //        // If possible, reposition the stream according to offset.
-        //        if (stream.CanSeek)
-        //        {
-        //            if (member.Attribute.Origin == Origin.Set)
-        //                stream.Position = startOffset + member.Attribute.Offset;
-        //            else
-        //                stream.Position += member.Attribute.Offset;
-        //        }
-        //        else
-        //        {
-        //            if (member.Attribute.Origin == Origin.Set || member.Attribute.Offset < 0)
-        //                throw new NotSupportedException("Cannot reposition the stream as it is not seekable.");
-        //            else if (member.Attribute.Offset > 0) // Simulate moving forward by writing bytes.
-        //                stream.Write(new byte[member.Attribute.Offset]);
-        //        }
-
-        //        // Get the value to write.
-        //        object value;
-        //        switch (member.MemberInfo)
-        //        {
-        //            case FieldInfo field:
-        //                value = field.GetValue(instance);
-        //                break;
-        //            case PropertyInfo property:
-        //                value = property.GetValue(instance);
-        //                break;
-        //            default:
-        //                throw new InvalidOperationException($"Tried to write an invalid member {member.MemberInfo}.");
-        //        }
-
-        //        // Write the value and respect settings stored in the member attribute.
-        //        Type elementType = member.Type.GetEnumerableElementType();
-        //        if (elementType == null)
-        //        {
-        //            WriteObject(member.Type, stream, instance, member.Attribute, value, converter);
-        //        }
-        //        else
-        //        {
-        //            foreach (object element in (IEnumerable)value)
-        //            {
-        //                WriteObject(elementType, stream, instance, member.Attribute, element, converter);
-        //            }
-        //        }
-        //    }
-        //}
     }
 }

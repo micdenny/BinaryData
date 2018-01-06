@@ -7,15 +7,15 @@ namespace Syroot.BinaryData
     /// serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class OrderAttribute : Attribute
+    public class DataOrderAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataOrderAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="index">The index determining the order when the value is read or written.</param>
-        public OrderAttribute(int index)
+        public DataOrderAttribute(int index)
         {
             Index = index;
         }

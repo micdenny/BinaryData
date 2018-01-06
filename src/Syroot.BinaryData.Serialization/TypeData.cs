@@ -9,30 +9,26 @@ namespace Syroot.BinaryData
     /// </summary>
     internal class TypeData
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private static readonly Dictionary<Type, TypeData> _cache = new Dictionary<Type, TypeData>();
-        
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
-        private TypeData(Type type)
+        internal TypeData(Type type)
         {
             Type = type;
 
             // Get any possible attribute.
-            ClassAttribute classAttrib = Type.GetCustomAttribute<ClassAttribute>();
+            DataClassAttribute classAttrib = Type.GetCustomAttribute<DataClassAttribute>();
             if (classAttrib != null)
             {
                 Inherit = classAttrib.Inherit;
                 Explicit = classAttrib.Explicit;
             }
-            OffsetStartAttribute offsetStartAttrib = Type.GetCustomAttribute<OffsetStartAttribute>();
+            DataOffsetStartAttribute offsetStartAttrib = Type.GetCustomAttribute<DataOffsetStartAttribute>();
             if (offsetStartAttrib != null)
             {
                 StartOrigin = offsetStartAttrib.Origin;
                 StartDelta = offsetStartAttrib.Delta;
             }
-            OffsetEndAttribute offsetEndAttrib = Type.GetCustomAttribute<OffsetEndAttribute>();
+            DataOffsetEndAttribute offsetEndAttrib = Type.GetCustomAttribute<DataOffsetEndAttribute>();
             if (offsetEndAttrib != null)
             {
                 EndOrigin = offsetEndAttrib.Origin;
@@ -76,12 +72,12 @@ namespace Syroot.BinaryData
 
         /// <summary>
         /// Gets the dictionary of <see cref="MemberData"/> for members decorated with the
-        /// <see cref="OrderAttribute"/>.
+        /// <see cref="DataOrderAttribute"/>.
         /// </summary>
         internal SortedDictionary<int, MemberData> OrderedMembers { get; }
 
         /// <summary>
-        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="OrderAttribute"/>.
+        /// Gets the list of <see cref="MemberData"/> for members missing the <see cref="DataOrderAttribute"/>.
         /// </summary>
         internal SortedList<string, MemberData> UnorderedMembers { get; }
 
@@ -126,22 +122,6 @@ namespace Syroot.BinaryData
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
         
         /// <summary>
-        /// Gets the <see cref="TypeData"/> instance for the given <paramref name="type"/> and caches the information on
-        /// it if necessary.
-        /// </summary>
-        /// <param name="type">The <see cref="Type"/> to query information about.</param>
-        /// <returns>The <see cref="TypeData"/> instance holding information about the type.</returns>
-        internal static TypeData Get(Type type)
-        {
-            if (!_cache.TryGetValue(type, out TypeData typeData))
-            {
-                typeData = new TypeData(type);
-                _cache.Add(type, typeData);
-            }
-            return typeData;
-        }
-
-        /// <summary>
         /// Invokes the parameterless constructor on the object.
         /// </summary>
         /// <returns>A new instance of the object.</returns>
@@ -149,15 +129,11 @@ namespace Syroot.BinaryData
         {
             // Invoke the automatic default constructor for structs.
             if (Type.IsValueType)
-            {
                 return Activator.CreateInstance(Type);
-            }
 
             // Invoke an explicit parameterless constructor for classes.
             if (Constructor == null)
-            {
                 throw new MissingMethodException($"No parameterless constructor found for {Type}.");
-            }
             return Constructor.Invoke(null);
         }
 

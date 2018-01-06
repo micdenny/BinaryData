@@ -12,6 +12,8 @@ namespace Syroot.BinaryData
 
         [ThreadStatic] private static byte[] _buffer;
 
+        private static Serializer _serializer = new Serializer();
+
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         private static byte[] Buffer

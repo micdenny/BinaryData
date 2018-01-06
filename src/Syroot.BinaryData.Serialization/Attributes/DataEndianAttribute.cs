@@ -6,15 +6,15 @@ namespace Syroot.BinaryData
     /// Configures in which endianness a value is read or written through binary serialization.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class EndianAttribute : Attribute
+    public class DataEndianAttribute : Attribute
     {
         // ---- CONSTRUCTORS & DESTRUCTOR ------------------------------------------------------------------------------
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EndianAttribute"/> class with the given configuration.
+        /// Initializes a new instance of the <see cref="DataEndianAttribute"/> class with the given configuration.
         /// </summary>
         /// <param name="endian">The endianness in which to read or write the value.</param>
-        public EndianAttribute(Endian endian)
+        public DataEndianAttribute(Endian endian)
         {
             Endian = endian;
         }
