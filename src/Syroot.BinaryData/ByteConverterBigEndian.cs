@@ -159,7 +159,7 @@ namespace Syroot.BinaryData
                 | (long)buffer[startIndex + 5] << 16
                 | (long)buffer[startIndex + 6] << 8
                 | buffer[startIndex + 7];
-            return *(Double*)raw;
+            return *(Double*)&raw;
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Syroot.BinaryData
                 | buffer[startIndex + 1] << 16
                 | buffer[startIndex + 2] << 8
                 | buffer[startIndex + 3];
-            return *(Single*)raw;
+            return *(Single*)&raw;
         }
 
         /// <summary>

@@ -306,19 +306,16 @@ namespace Syroot.BinaryData.UnitTest
             const Single value4 = Single.NaN;
 
             // Write test values.
-            using (BinaryWriter writer = new BinaryWriter(_stream, Encoding.UTF8, true))
-            {
-                writer.Write(value1);
-                writer.Write(value2);
-                writer.Write(value3);
-                writer.Write(value4);
-            }
+            _stream.Write(value1, ByteConverter.BigEndian);
+            _stream.Write(value2);
+            _stream.Write(value3, ByteConverter.BigEndian);
+            _stream.Write(value4);
 
             // Read in system endianness.
             _stream.Position = 0;
-            Assert.AreEqual(value1, _stream.ReadSingle());
+            Assert.AreEqual(value1, _stream.ReadSingle(ByteConverter.BigEndian));
             Assert.AreEqual(value2, _stream.ReadSingle());
-            Assert.AreEqual(value3, _stream.ReadSingle());
+            Assert.AreEqual(value3, _stream.ReadSingle(ByteConverter.BigEndian));
             Assert.AreEqual(value4, _stream.ReadSingle());
         }
 

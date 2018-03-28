@@ -91,7 +91,7 @@ namespace Syroot.BinaryData
         public bool EndOfStream => BaseStream.IsEndOfStream();
 
         /// <summary>
-        /// Gets the length in bytes of the stream in bytes.
+        /// Gets the length of the stream in bytes.
         /// </summary>
         public long Length => BaseStream.Length;
         
