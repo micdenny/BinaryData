@@ -11,6 +11,44 @@ namespace Syroot.BinaryData
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
+        // ---- 7BitEncodedInt32 ----
+
+        /// <summary>
+        /// Writes a variable-length <see cref="Int32"/> value to the <paramref name="stream"/> which can require up to
+        /// 5 bytes.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="value">The value to write.</param>
+        public static void Write7BitEncodedInt32(this Stream stream, int value)
+        {
+            // The highest bit determines whether to continue writing more bytes to form the Int32 value.
+            lock (stream)
+            {
+                while (value >= 0b10000000)
+                {
+                    stream.WriteByte((byte)(value | 0b10000000));
+                    value >>= 7;
+                }
+                stream.WriteByte((byte)value);
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of <see cref="Int32"/> values to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="values">The values to write.</param>
+        public static void Write7BitEncodedInt32s(this Stream stream, IEnumerable<Int32> values)
+        {
+            lock (stream)
+            {
+                foreach (var value in values)
+                {
+                    stream.Write7BitEncodedInt32(value);
+                }
+            }
+        }
+
         // ---- Boolean ----
 
         /// <summary>
@@ -167,7 +205,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Decimal value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Decimal value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -180,7 +219,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Decimal> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Decimal> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -202,7 +242,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Double value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Double value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -215,7 +256,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Double> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Double> values,
+            ByteConverter converter = null)
 
         {
             converter = converter ?? ByteConverter.System;
@@ -226,44 +268,6 @@ namespace Syroot.BinaryData
                 {
                     converter.GetBytes(value, buffer, 0);
                     stream.Write(buffer, 0, sizeof(Double));
-                }
-            }
-        }
-
-        // ---- DynamicInt32 ----
-
-        /// <summary>
-        /// Writes a variable-length <see cref="Int32"/> value to the <paramref name="stream"/> which can require up to
-        /// 5 bytes.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="value">The value to write.</param>
-        public static void WriteDynamicInt32(this Stream stream, int value)
-        {
-            // The highest bit determines whether to continue writing more bytes to form the Int32 value.
-            lock (stream)
-            {
-                while (value >= 0b10000000)
-                {
-                    stream.WriteByte((byte)(value | 0b10000000));
-                    value >>= 7;
-                }
-                stream.WriteByte((byte)value);
-            }
-        }
-
-        /// <summary>
-        /// Writes an array of <see cref="Int32"/> values to the <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="values">The values to write.</param>
-        public static void WriteDynamicInt32s(this Stream stream, IEnumerable<Int32> values)
-        {
-            lock (stream)
-            {
-                foreach (var value in values)
-                {
-                    stream.WriteDynamicInt32(value);
                 }
             }
         }
@@ -279,8 +283,8 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void WriteEnum<T>(this Stream stream, T value, bool strict = false,
-            ByteConverter converter = null)
+        public static void WriteEnum<T>(this Stream stream, T value,
+            bool strict = false, ByteConverter converter = null)
             where T : struct, IComparable, IFormattable
             => WriteEnum(stream, typeof(T), value, strict, converter);
 
@@ -294,8 +298,8 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void WriteEnums<T>(this Stream stream, IEnumerable values, bool strict = false,
-            ByteConverter converter = null)
+        public static void WriteEnums<T>(this Stream stream, IEnumerable values,
+            bool strict = false, ByteConverter converter = null)
             => WriteEnums(stream, typeof(T), values, strict, converter);
 
         /// <summary>
@@ -307,8 +311,8 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void WriteEnum(this Stream stream, Type type, object value, bool strict = false,
-            ByteConverter converter = null)
+        public static void WriteEnum(this Stream stream, Type type, object value,
+            bool strict = false, ByteConverter converter = null)
         {
             // Check if the value is defined in the enumeration, if requested.
             if (strict)
@@ -352,8 +356,8 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void WriteEnums(this Stream stream, Type type, IEnumerable values, bool strict = false,
-            ByteConverter converter = null)
+        public static void WriteEnums(this Stream stream, Type type, IEnumerable values,
+            bool strict = false, ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -373,7 +377,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Int16 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Int16 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -386,7 +391,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Int16> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Int16> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -408,7 +414,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Int32 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Int32 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -421,7 +428,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Int32> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Int32> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -443,7 +451,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Int64 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Int64 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -456,7 +465,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Int64> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Int64> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -510,7 +520,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, Single value, ByteConverter converter = null)
+        public static void Write(this Stream stream, Single value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -523,7 +534,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Single> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<Single> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -550,8 +562,7 @@ namespace Syroot.BinaryData
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, String value,
-            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
-            ByteConverter converter = null)
+            StringCoding format = StringCoding.VariableByteCount, Encoding encoding = null, ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
@@ -560,8 +571,8 @@ namespace Syroot.BinaryData
             {
                 switch (format)
                 {
-                    case StringCoding.DynamicByteCount:
-                        WriteDynamicInt32(stream, textBuffer.Length);
+                    case StringCoding.VariableByteCount:
+                        Write7BitEncodedInt32(stream, textBuffer.Length);
                         stream.Write(textBuffer, 0, textBuffer.Length);
                         break;
                     case StringCoding.ByteCharCount:
@@ -611,8 +622,7 @@ namespace Syroot.BinaryData
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void Write(this Stream stream, IEnumerable<String> values,
-            StringCoding format = StringCoding.DynamicByteCount, Encoding encoding = null,
-            ByteConverter converter = null)
+            StringCoding format = StringCoding.VariableByteCount, Encoding encoding = null, ByteConverter converter = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
@@ -633,7 +643,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, UInt16 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, UInt16 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -646,7 +657,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<UInt16> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<UInt16> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -668,7 +680,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, UInt32 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, UInt32 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -681,7 +694,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<UInt32> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<UInt32> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)
@@ -703,7 +717,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="value">The value to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, UInt64 value, ByteConverter converter = null)
+        public static void Write(this Stream stream, UInt64 value,
+            ByteConverter converter = null)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -716,7 +731,8 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<UInt64> values, ByteConverter converter = null)
+        public static void Write(this Stream stream, IEnumerable<UInt64> values,
+            ByteConverter converter = null)
         {
             converter = converter ?? ByteConverter.System;
             lock (stream)

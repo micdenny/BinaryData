@@ -16,11 +16,11 @@
 		<PackageTags>binary;data;io;binaryreader;binarywriter;serialization</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
-		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-		<VersionPrefix>5.0.0-alpha1</VersionPrefix>
+		<TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+		<VersionPrefix>5.0.0-alpha5</VersionPrefix>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(Configuration)' != 'Release (Signed)'">
-		<PackageReference Include="Syroot.BinaryData" Version="5.0.0-alpha3" />
+		<PackageReference Include="Syroot.BinaryData" Version="5.0.0-alpha0" />
 	</ItemGroup>
 	
 	<!-- Release (Signed) -->
@@ -30,6 +30,6 @@
 		<SignAssembly>true</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(Configuration)' == 'Release (Signed)'">
-	  <PackageReference Include="Syroot.BinaryData.Signed" Version="5.0.0-alpha2" />
+	  <PackageReference Include="Syroot.BinaryData.Signed" Version="5.0.0-alpha0" />
 	</ItemGroup>
 </Project>

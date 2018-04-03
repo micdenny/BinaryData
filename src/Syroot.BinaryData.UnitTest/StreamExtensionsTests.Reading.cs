@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Syroot.BinaryData;
 
 namespace Syroot.BinaryData.UnitTest
 {
@@ -359,13 +358,13 @@ namespace Syroot.BinaryData.UnitTest
 
             // Read test values.
             _stream.Position = 0;
-            Assert.AreEqual(value1, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.UTF8));
-            Assert.AreEqual(value2, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.UTF8));
+            Assert.AreEqual(value1, _stream.ReadString(StringCoding.VariableByteCount, Encoding.UTF8));
+            Assert.AreEqual(value2, _stream.ReadString(StringCoding.VariableByteCount, Encoding.UTF8));
             Assert.AreEqual(value1, _stream.ReadString(StringCoding.Int32CharCount, Encoding.UTF8));
             Assert.AreEqual(value2, _stream.ReadString(StringCoding.Int16CharCount, Encoding.UTF8));
             Assert.AreEqual(value1, _stream.ReadString(StringCoding.ZeroTerminated, Encoding.Unicode));
-            Assert.AreEqual(value3, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.ASCII));
-            Assert.AreEqual(value4, _stream.ReadString(StringCoding.DynamicByteCount, Encoding.ASCII));
+            Assert.AreEqual(value3, _stream.ReadString(StringCoding.VariableByteCount, Encoding.ASCII));
+            Assert.AreEqual(value4, _stream.ReadString(StringCoding.VariableByteCount, Encoding.ASCII));
             Assert.AreEqual(value3, _stream.ReadString(StringCoding.Int32CharCount, Encoding.ASCII));
             Assert.AreEqual(value4, _stream.ReadString(StringCoding.ByteCharCount, Encoding.ASCII));
             Assert.AreEqual(value3, _stream.ReadString(StringCoding.ZeroTerminated, Encoding.ASCII));

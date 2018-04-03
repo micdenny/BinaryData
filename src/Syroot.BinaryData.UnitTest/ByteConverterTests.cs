@@ -12,13 +12,9 @@ namespace Syroot.BinaryData.UnitTest
         public void DetectSystemEndianness()
         {
             if (BitConverter.IsLittleEndian)
-            {
                 Assert.AreEqual(ByteConverter.System.ByteOrder, Endian.Little);
-            }
             else
-            {
                 Assert.AreEqual(ByteConverter.System.ByteOrder, Endian.Big);
-            }
         }
     }
 }

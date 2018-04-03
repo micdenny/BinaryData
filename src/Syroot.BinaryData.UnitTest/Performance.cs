@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Syroot.BinaryData;
 
 namespace Syroot.BinaryData.UnitTest
 {
@@ -39,21 +38,7 @@ namespace Syroot.BinaryData.UnitTest
             using (BinaryWriter writer = new BinaryWriter(_stream))
             {
                 for (int i = 0; i < _writeCount; i++)
-                {
                     writer.Write(_random.Next(Int32.MaxValue));
-                }
-            }
-        }
-
-        [TestMethod]
-        public void Writing_System_BinaryDataWriter()
-        {
-            using (BinaryDataWriter writer = new BinaryDataWriter(_stream))
-            {
-                for (int i = 0; i < _writeCount; i++)
-                {
-                    writer.Write(_random.Next(Int32.MaxValue));
-                }
             }
         }
 
@@ -61,18 +46,14 @@ namespace Syroot.BinaryData.UnitTest
         public void Writing_System_StreamExtension()
         {
             for (int i = 0; i < _writeCount; i++)
-            {
                 _stream.Write(_random.Next(Int32.MaxValue));
-            }
         }
 
         [TestMethod]
         public void Writing_System_StreamExtension_ExplicitConverter()
         {
             for (int i = 0; i < _writeCount; i++)
-            {
                 _stream.Write(_random.Next(Int32.MaxValue), ByteConverter.System);
-            }
         }
 
         // ---- Non-System Endianness ----
@@ -105,25 +86,10 @@ namespace Syroot.BinaryData.UnitTest
         }
 
         [TestMethod]
-        public void Writing_NonSystem_BinaryDataWriter()
-        {
-            using (BinaryDataWriter writer = new BinaryDataWriter(_stream))
-            {
-                writer.ByteConverter = _nonSystemConverter;
-                for (int i = 0; i < _writeCount; i++)
-                {
-                    writer.Write(_random.Next(Int32.MaxValue));
-                }
-            }
-        }
-
-        [TestMethod]
         public void Writing_NonSystem_StreamExtension()
         {
             for (int i = 0; i < _writeCount; i++)
-            {
                 _stream.Write(_random.Next(Int32.MaxValue), _nonSystemConverter);
-            }
         }
     }
 }

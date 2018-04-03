@@ -16,20 +16,21 @@ namespace Syroot.BinaryData
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Returns whether <paramref name="value"/> is a defined value in the enum of the given <paramref name="type"/>
-        /// or a valid set of flags for enums decorated with the <see cref="FlagsAttribute"/>.
+        /// Returns whether <paramref name="value"/> is a defined value in the enum of the given
+        /// <paramref name="enumType"/> or a valid set of flags for enums decorated with the
+        /// <see cref="FlagsAttribute"/>.
         /// </summary>
-        /// <param name="type">The type of the enum.</param>
+        /// <param name="enumType">The type of the enum.</param>
         /// <param name="value">The value to check against the enum type.</param>
         /// <returns><c>true</c> if the value is valid; otherwise <c>false</c>.</returns>
-        internal static bool IsValid(Type type, object value)
+        internal static bool IsValid(Type enumType, object value)
         {
             // For enumerations decorated with the FlagsAttribute, allow sets of flags.
-            bool valid = Enum.IsDefined(type, value);
-            if (!valid && IsFlagsEnum(type))
+            bool valid = Enum.IsDefined(enumType, value);
+            if (!valid && IsFlagsEnum(enumType))
             {
                 long mask = 0;
-                foreach (object definedValue in Enum.GetValues(type))
+                foreach (object definedValue in Enum.GetValues(enumType))
                 {
                     mask |= Convert.ToInt64(definedValue);
                 }

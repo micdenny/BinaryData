@@ -10,7 +10,7 @@
         /// which the string consists and no postfix. This is the .NET <see cref="System.IO.BinaryReader"/> and
         /// <see cref="System.IO.BinaryWriter"/> default.
         /// </summary>
-        DynamicByteCount,
+        VariableByteCount,
 
         /// <summary>
         /// The string has a prefix of 1 byte determining the number of chars out of which the string consists and no

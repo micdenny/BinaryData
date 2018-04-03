@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Syroot.BinaryData
 {
@@ -12,7 +15,7 @@ namespace Syroot.BinaryData
 
         [ThreadStatic] private static byte[] _buffer;
         [ThreadStatic] private static char[] _charBuffer;
-
+        private static readonly ConcurrentDictionary<Stream, SemaphoreSlim> _streamSemaphores = new ConcurrentDictionary<Stream, SemaphoreSlim>();
         private static readonly DateTime _cTimeBase = new DateTime(1970, 1, 1);
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
@@ -49,8 +52,11 @@ namespace Syroot.BinaryData
         /// <returns>The new position within the current stream.</returns>
         public static long Align(this Stream stream, long alignment, bool grow = false)
         {
-            if (alignment <= 0)
-                throw new ArgumentOutOfRangeException("Alignment must be bigger than 0.");
+            if (alignment < 0)
+                throw new ArgumentOutOfRangeException("Alignment must be bigger than or equal to 0.");
+            else if (alignment < 2)
+                return stream.Position;
+
             long position = stream.Seek((-stream.Position % alignment + alignment) % alignment, SeekOrigin.Current);
             if (grow && position > stream.Length)
             {
@@ -85,11 +91,9 @@ namespace Syroot.BinaryData
             }
             else
             {
+                // Impossible to simulate seeking backwards in non-seekable stream.
                 if (offset < 0)
-                {
-                    // Impossible to simulate seeking backwards in non-seekable stream.
                     throw new NotSupportedException("Cannot simulate moving backwards in a non-seekable stream.");
-                }
 
                 // Simulate move by reading or writing bytes.
                 if (stream.CanRead)
@@ -116,49 +120,59 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Creates a <see cref="SeekTask"/> to restore the current position after it has been disposed.
+        /// Creates a <see cref="BinaryData.Seek"/> to restore the current position after it has been disposed.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to restore to the current position.</returns>
-        public static SeekTask TemporarySeek(this Stream stream)
+        /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to restore to the current position.</returns>
+        public static Seek TemporarySeek(this Stream stream)
         {
             return stream.TemporarySeek(0, SeekOrigin.Current);
         }
 
         /// <summary>
-        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
+        /// Creates a <see cref="BinaryData.Seek"/> with the given parameters. As soon as the returned <see cref="BinaryData.Seek"/>
         /// is disposed, the previous stream position will be restored.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="offset">A byte offset relative to the current position in the stream.</param>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public static SeekTask TemporarySeek(this Stream stream, long offset)
+        /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to undo the seek.</returns>
+        public static Seek TemporarySeek(this Stream stream, long offset)
         {
             return stream.TemporarySeek(offset, SeekOrigin.Current);
         }
 
         /// <summary>
-        /// Creates a <see cref="SeekTask"/> with the given parameters. As soon as the returned <see cref="SeekTask"/>
+        /// Creates a <see cref="BinaryData.Seek"/> with the given parameters. As soon as the returned <see cref="BinaryData.Seek"/>
         /// is disposed, the previous stream position will be restored.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="offset">A byte offset relative to the origin parameter.</param>
         /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
         /// the new position.</param>
-        /// <returns>The <see cref="SeekTask"/> to be disposed to undo the seek.</returns>
-        public static SeekTask TemporarySeek(this Stream stream, long offset, SeekOrigin origin)
+        /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to undo the seek.</returns>
+        public static Seek TemporarySeek(this Stream stream, long offset, SeekOrigin origin)
         {
-            return new SeekTask(stream, offset, origin);
+            return new Seek(stream, offset, origin);
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
+        private static Task AcquireStreamLock(Stream stream, CancellationToken cancellationToken)
+        {
+            return _streamSemaphores.GetOrAdd(stream, (x) => new SemaphoreSlim(1, 1))
+                .WaitAsync(cancellationToken);
+        }
+
+        private static void ReleaseStream(Stream stream)
+        {
+            _streamSemaphores.TryRemove(stream, out SemaphoreSlim semaphore);
+            semaphore.Release();
+        }
+
         private static void ValidateEnumValue(Type enumType, object value)
         {
             if (!EnumExtensions.IsValid(enumType, value))
-            {
                 throw new InvalidDataException($"Read value {value} is not defined in the enum type {enumType}.");
-            }
         }
     }
 }
