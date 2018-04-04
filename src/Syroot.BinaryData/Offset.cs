@@ -25,12 +25,12 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets the <see cref="Stream"/> in which the allocation is made.
         /// </summary>
-        public Stream Stream { get; private set; }
+        public Stream Stream { get; }
 
         /// <summary>
         /// Gets the address at which the allocation is made.
         /// </summary>
-        public uint Position { get; private set; }
+        public uint Position { get; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 

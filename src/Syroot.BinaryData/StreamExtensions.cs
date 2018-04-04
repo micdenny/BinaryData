@@ -15,7 +15,6 @@ namespace Syroot.BinaryData
 
         [ThreadStatic] private static byte[] _buffer;
         [ThreadStatic] private static char[] _charBuffer;
-        private static readonly ConcurrentDictionary<Stream, SemaphoreSlim> _streamSemaphores = new ConcurrentDictionary<Stream, SemaphoreSlim>();
         private static readonly DateTime _cTimeBase = new DateTime(1970, 1, 1);
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
@@ -156,18 +155,6 @@ namespace Syroot.BinaryData
         }
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private static Task AcquireStreamLock(Stream stream, CancellationToken cancellationToken)
-        {
-            return _streamSemaphores.GetOrAdd(stream, (x) => new SemaphoreSlim(1, 1))
-                .WaitAsync(cancellationToken);
-        }
-
-        private static void ReleaseStream(Stream stream)
-        {
-            _streamSemaphores.TryRemove(stream, out SemaphoreSlim semaphore);
-            semaphore.Release();
-        }
 
         private static void ValidateEnumValue(Type enumType, object value)
         {
