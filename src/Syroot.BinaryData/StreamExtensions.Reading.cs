@@ -48,7 +48,8 @@ namespace Syroot.BinaryData
         // ---- 7BitInt32 ----
 
         /// <summary>
-        /// Returns a variable-length <see cref="Int32"/> instance read from the given <paramref name="stream"/> which can require up to 5 bytes.
+        /// Returns a variable-length <see cref="Int32"/> instance read from the given <paramref name="stream"/> which
+        /// can require up to 5 bytes.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <returns>The value read from the current stream.</returns>
@@ -70,7 +71,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Returns a variable-length <see cref="Int32"/> instance read asynchronously from the given <paramref name="stream"/> which can require up to 5 bytes.
+        /// Returns a variable-length <see cref="Int32"/> instance read asynchronously from the given
+        /// <paramref name="stream"/> which can require up to 5 bytes.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
@@ -94,7 +96,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Returns an array of variable-length <see cref="Int32"/> instances read from the <paramref name="stream"/> which can require to 5 bytes each.
+        /// Returns an array of variable-length <see cref="Int32"/> instances read from the <paramref name="stream"/>
+        /// which can require to 5 bytes each.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
@@ -106,7 +109,8 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Returns an array of variable-length <see cref="Int32"/> instances read asynchronously from the <paramref name="stream"/> which can require to 5 bytes each.
+        /// Returns an array of variable-length <see cref="Int32"/> instances read asynchronously from the
+        /// <paramref name="stream"/> which can require to 5 bytes each.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
