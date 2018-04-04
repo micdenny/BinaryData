@@ -45,14 +45,14 @@ namespace Syroot.BinaryData
             return values;
         }
 
-        // ---- 7BitEncodedInt32 ----
+        // ---- 7BitInt32 ----
 
         /// <summary>
         /// Returns a variable-length <see cref="Int32"/> instance read from the given <paramref name="stream"/> which can require up to 5 bytes.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <returns>The value read from the current stream.</returns>
-        public static Int32 Read7BitEncodedInt32(this Stream stream)
+        public static Int32 Read7BitInt32(this Stream stream)
         {
             // Endianness should not matter, as this value is stored byte by byte.
             // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
@@ -75,7 +75,7 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
-        public static async Task<Int32> Read7BitEncodedInt32Async(this Stream stream,
+        public static async Task<Int32> Read7BitInt32Async(this Stream stream,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             // Endianness should not matter, as this value is stored byte by byte.
@@ -99,10 +99,10 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
         /// <returns>The array of values read from the current stream.</returns>
-        public static Int32[] Read7BitEncodedInt32s(this Stream stream, int count)
+        public static Int32[] Read7BitInt32s(this Stream stream, int count)
         {
             return ReadMany(stream, count,
-                () => Read7BitEncodedInt32(stream));
+                () => Read7BitInt32(stream));
         }
 
         /// <summary>
@@ -112,11 +112,11 @@ namespace Syroot.BinaryData
         /// <param name="count">The number of values to read.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
-        public static async Task<Int32[]> Read7BitEncodedInt32sAsync(this Stream stream, int count,
+        public static async Task<Int32[]> Read7BitInt32sAsync(this Stream stream, int count,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return await ReadManyAsync(stream, count,
-                () => Read7BitEncodedInt32Async(stream, cancellationToken));
+                () => Read7BitInt32Async(stream, cancellationToken));
         }
 
         // ---- Boolean ----
@@ -1008,7 +1008,7 @@ namespace Syroot.BinaryData
             switch (coding)
             {
                 case StringCoding.VariableByteCount:
-                    return ReadStringWithLength(stream, stream.Read7BitEncodedInt32(), false, encoding);
+                    return ReadStringWithLength(stream, stream.Read7BitInt32(), false, encoding);
                 case StringCoding.ByteCharCount:
                     return ReadStringWithLength(stream, stream.ReadByte(), true, encoding);
                 case StringCoding.Int16CharCount:
@@ -1042,7 +1042,7 @@ namespace Syroot.BinaryData
             switch (coding)
             {
                 case StringCoding.VariableByteCount:
-                    return await ReadStringWithLengthAsync(stream, stream.Read7BitEncodedInt32(), false, encoding,
+                    return await ReadStringWithLengthAsync(stream, stream.Read7BitInt32(), false, encoding,
                         cancellationToken);
                 case StringCoding.ByteCharCount:
                     return await ReadStringWithLengthAsync(stream, stream.ReadByte(), true, encoding,
