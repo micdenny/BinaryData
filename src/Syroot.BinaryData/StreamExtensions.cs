@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Syroot.BinaryData
 {
@@ -11,8 +14,6 @@ namespace Syroot.BinaryData
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         [ThreadStatic] private static byte[] _buffer;
-        [ThreadStatic] private static char[] _charBuffer;
-        private static readonly DateTime _cTimeBase = new DateTime(1970, 1, 1);
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -23,16 +24,6 @@ namespace Syroot.BinaryData
                 if (_buffer == null)
                     _buffer = new byte[16];
                 return _buffer;
-            }
-        }
-
-        private static char[] CharBuffer
-        {
-            get
-            {
-                if (_charBuffer == null)
-                    _charBuffer = new char[16];
-                return _charBuffer;
             }
         }
 
@@ -151,12 +142,83 @@ namespace Syroot.BinaryData
             return new Seek(stream, offset, origin);
         }
 
+        // ---- Read ----
+
+        /// <summary>
+        /// Returns <paramref name="count"/> instances of type <typeparamref name="T"/> continually read from the
+        /// <paramref name="stream"/> by calling the <paramref name="readCallback"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the instances to read.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of instances to read.</param>
+        /// <param name="readCallback">The read callback function invoked for each instance read.</param>
+        /// <returns>The array of read instances.</returns>
+        public static T[] ReadMany<T>(this Stream stream, int count, Func<T> readCallback)
+        {
+            T[] values = new T[count];
+            for (int i = 0; i < count; i++)
+                values[i] = readCallback();
+            return values;
+        }
+
+        /// <summary>
+        /// Returns <paramref name="count"/> instances of type <typeparamref name="T"/> continually read asynchronously
+        /// from the <paramref name="stream"/> by calling the <paramref name="readCallback"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the instances to read.</typeparam>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="count">The number of instances to read.</param>
+        /// <param name="readCallback">The read callback function invoked for each instance read.</param>
+        /// <returns>The array of read instances.</returns>
+        public static async Task<T[]> ReadManyAsync<T>(this Stream stream, int count, Func<Task<T>> readCallback)
+        {
+            T[] values = new T[count];
+            for (int i = 0; i < count; i++)
+                values[i] = await readCallback();
+            return values;
+        }
+
+        // ---- Write ----
+
+        /// <summary>
+        /// Writes the <paramref name="values"/> to the <paramref name="stream"/> through the
+        /// <paramref name="writeCallback"/> invoked for each value.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="values">The values to write.</param>
+        /// <param name="writeCallback">The callback invoked to write each value.</param>
+        public static void WriteMany<T>(this Stream stream, IEnumerable<T> values, Action<T> writeCallback)
+        {
+            foreach (T value in values)
+                writeCallback(value);
+        }
+
+        /// <summary>
+        /// Writes the <paramref name="values"/> to the <paramref name="stream"/> asynchronously through the
+        /// <paramref name="writeCallback"/> invoked for each value.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="values">The values to write.</param>
+        /// <param name="writeCallback">The callback invoked to write each value.</param>
+        public static async void WriteManyAsync<T>(this Stream stream, IEnumerable<T> values,
+            Func<T, Task> writeCallback)
+        {
+            foreach (T value in values)
+                await writeCallback(value);
+        }
+
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
-        private static void ValidateEnumValue(Type enumType, object value)
+        private static void FillBuffer(Stream stream, int length)
         {
-            if (!EnumExtensions.IsValid(enumType, value))
-                throw new InvalidDataException($"Read value {value} is not defined in the enum type {enumType}.");
+            if (stream.Read(Buffer, 0, length) < length)
+                throw new EndOfStreamException($"Could not read {length} bytes.");
+        }
+
+        private static async Task FillBufferAsync(Stream stream, int length, CancellationToken cancellationToken)
+        {
+            if (await stream.ReadAsync(Buffer, 0, length, cancellationToken) < length)
+                throw new EndOfStreamException($"Could not read {length} bytes.");
         }
     }
 }
