@@ -13,35 +13,35 @@ namespace Syroot.BinaryData
 
         /// <summary>
         /// Returns <paramref name="count"/> instances of type <typeparamref name="T"/> continually read from the
-        /// <paramref name="stream"/> by calling the <paramref name="readFunc"/>.
+        /// <paramref name="stream"/> by calling the <paramref name="readCallback"/>.
         /// </summary>
         /// <typeparam name="T">The type of the instances to read.</typeparam>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of instances to read.</param>
-        /// <param name="readFunc">The read callback function invoked for each instance read.</param>
+        /// <param name="readCallback">The read callback function invoked for each instance read.</param>
         /// <returns>The array of read instances.</returns>
-        public static T[] ReadMany<T>(this Stream stream, int count, Func<T> readFunc)
+        public static T[] ReadMany<T>(this Stream stream, int count, Func<T> readCallback)
         {
             T[] values = new T[count];
             for (int i = 0; i < count; i++)
-                values[i] = readFunc();
+                values[i] = readCallback();
             return values;
         }
 
         /// <summary>
         /// Returns <paramref name="count"/> instances of type <typeparamref name="T"/> continually read asynchronously
-        /// from the <paramref name="stream"/> by calling the <paramref name="readFunc"/>.
+        /// from the <paramref name="stream"/> by calling the <paramref name="readCallback"/>.
         /// </summary>
         /// <typeparam name="T">The type of the instances to read.</typeparam>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of instances to read.</param>
-        /// <param name="readFunc">The read callback function invoked for each instance read.</param>
+        /// <param name="readCallback">The read callback function invoked for each instance read.</param>
         /// <returns>The array of read instances.</returns>
-        public static async Task<T[]> ReadManyAsync<T>(this Stream stream, int count, Func<Task<T>> readFunc)
+        public static async Task<T[]> ReadManyAsync<T>(this Stream stream, int count, Func<Task<T>> readCallback)
         {
             T[] values = new T[count];
             for (int i = 0; i < count; i++)
-                values[i] = await readFunc();
+                values[i] = await readCallback();
             return values;
         }
 
@@ -129,7 +129,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="Boolean"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> in which the data is stored.</param>
         /// <returns>The value read from the current stream.</returns>
         public static Boolean ReadBoolean(this Stream stream, BooleanCoding coding = BooleanCoding.Byte)
         {
@@ -150,7 +150,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="Boolean"/> instance read asynchronously from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> in which the data is stored.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<Boolean> ReadBooleanAsync(this Stream stream,
@@ -174,7 +174,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> in which the data is stored.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static Boolean[] ReadBooleans(this Stream stream, int count, BooleanCoding coding = BooleanCoding.Byte)
         {
@@ -187,7 +187,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="BooleanCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="BooleanCoding"/> in which the data is stored.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<Boolean[]> ReadBooleansAsync(this Stream stream, int count,
@@ -260,7 +260,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="DateTime"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static DateTime ReadDateTime(this Stream stream, DateTimeCoding coding = DateTimeCoding.NetTicks,
@@ -283,7 +283,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="DateTime"/> instance read asynchronously from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
@@ -309,7 +309,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static DateTime[] ReadDateTimes(this Stream stream, int count,
@@ -325,7 +325,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="DateTimeCoding"/> format in which the data is stored.</param>
+        /// <param name="coding">The <see cref="DateTimeCoding"/> in which the data is stored.</param>
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
@@ -998,7 +998,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="String"/> instance read from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the string is
+        /// <param name="coding">The <see cref="StringCoding"/> determining how the length of the string is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
@@ -1030,7 +1030,7 @@ namespace Syroot.BinaryData
         /// Returns a <see cref="String"/> instance read asynchronously from the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the string is
+        /// <param name="coding">The <see cref="StringCoding"/> determining how the length of the string is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
@@ -1069,7 +1069,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the strings is
+        /// <param name="coding">The <see cref="StringCoding"/> determining how the length of the strings is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
@@ -1089,7 +1089,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="coding">The <see cref="StringCoding"/> format determining how the length of the strings is
+        /// <param name="coding">The <see cref="StringCoding"/> determining how the length of the strings is
         /// stored.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
