@@ -107,37 +107,15 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Creates a <see cref="BinaryData.Seek"/> to restore the current position after it has been disposed.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to restore to the current position.</returns>
-        public static Seek TemporarySeek(this Stream stream)
-        {
-            return stream.TemporarySeek(0, SeekOrigin.Current);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="BinaryData.Seek"/> with the given parameters. As soon as the returned <see cref="BinaryData.Seek"/>
-        /// is disposed, the previous stream position will be restored.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="offset">A byte offset relative to the current position in the stream.</param>
-        /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to undo the seek.</returns>
-        public static Seek TemporarySeek(this Stream stream, long offset)
-        {
-            return stream.TemporarySeek(offset, SeekOrigin.Current);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="BinaryData.Seek"/> with the given parameters. As soon as the returned <see cref="BinaryData.Seek"/>
-        /// is disposed, the previous stream position will be restored.
+        /// Creates a <see cref="BinaryData.Seek"/> with the given parameters. As soon as the returned
+        /// <see cref="BinaryData.Seek"/> is disposed, the previous stream position will be restored.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="offset">A byte offset relative to the origin parameter.</param>
         /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain
         /// the new position.</param>
         /// <returns>The <see cref="BinaryData.Seek"/> to be disposed to undo the seek.</returns>
-        public static Seek TemporarySeek(this Stream stream, long offset, SeekOrigin origin)
+        public static Seek TemporarySeek(this Stream stream, long offset = 0, SeekOrigin origin = SeekOrigin.Current)
         {
             return new Seek(stream, offset, origin);
         }
@@ -200,7 +178,7 @@ namespace Syroot.BinaryData
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="values">The values to write.</param>
         /// <param name="writeCallback">The callback invoked to write each value.</param>
-        public static async void WriteManyAsync<T>(this Stream stream, IEnumerable<T> values,
+        public static async Task WriteManyAsync<T>(this Stream stream, IEnumerable<T> values,
             Func<T, Task> writeCallback)
         {
             foreach (T value in values)

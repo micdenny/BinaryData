@@ -84,19 +84,6 @@ namespace Syroot.BinaryData
         }
 
         /// <summary>
-        /// Writes an enumerable of <see cref="Decimal"/> values to the <paramref name="stream"/>.
-        /// </summary>
-        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="values">The values to write.</param>
-        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
-        public static void Write(this Stream stream, IEnumerable<Decimal> values, ByteConverter converter = null)
-        {
-            converter = converter ?? ByteConverter.System;
-            foreach (var value in values)
-                Write(stream, value, converter);
-        }
-
-        /// <summary>
         /// Writes a <see cref="Decimal"/> value asynchronously to the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
@@ -109,6 +96,19 @@ namespace Syroot.BinaryData
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
             await stream.WriteAsync(buffer, 0, sizeof(Decimal), cancellationToken);
+        }
+
+        /// <summary>
+        /// Writes an enumerable of <see cref="Decimal"/> values to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
+        /// <param name="values">The values to write.</param>
+        /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
+        public static void Write(this Stream stream, IEnumerable<Decimal> values, ByteConverter converter = null)
+        {
+            converter = converter ?? ByteConverter.System;
+            foreach (var value in values)
+                Write(stream, value, converter);
         }
 
         /// <summary>
