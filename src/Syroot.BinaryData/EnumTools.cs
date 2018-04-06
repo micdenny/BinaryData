@@ -7,13 +7,13 @@ namespace Syroot.BinaryData
     /// <summary>
     /// Represents a collection of methods extending enum types.
     /// </summary>
-    internal static class EnumExtensions
+    internal static class EnumTools
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
         private static Dictionary<Type, bool> _flagEnums = new Dictionary<Type, bool>();
 
-        // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
+        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
         /// Returns whether <paramref name="value"/> is a defined value in the enum of the given
@@ -23,7 +23,7 @@ namespace Syroot.BinaryData
         /// <param name="enumType">The type of the enum.</param>
         /// <param name="value">The value to check against the enum type.</param>
         /// <returns><c>true</c> if the value is valid; otherwise <c>false</c>.</returns>
-        internal static bool IsValid(Type enumType, object value)
+        public static bool IsValid(Type enumType, object value)
         {
             // For enumerations decorated with the FlagsAttribute, allow sets of flags.
             bool valid = Enum.IsDefined(enumType, value);
@@ -31,9 +31,7 @@ namespace Syroot.BinaryData
             {
                 long mask = 0;
                 foreach (object definedValue in Enum.GetValues(enumType))
-                {
                     mask |= Convert.ToInt64(definedValue);
-                }
                 long longValue = Convert.ToInt64(value);
                 valid = (mask & longValue) == longValue;
             }

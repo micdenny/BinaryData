@@ -476,7 +476,7 @@ namespace Syroot.BinaryData
 
         private static void ValidateEnumValue(Type enumType, object value)
         {
-            if (!EnumExtensions.IsValid(enumType, value))
+            if (!EnumTools.IsValid(enumType, value))
                 throw new InvalidDataException($"Read value {value} is not defined in the enum type {enumType}.");
         }
     }

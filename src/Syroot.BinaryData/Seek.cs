@@ -8,6 +8,10 @@ namespace Syroot.BinaryData
     /// </summary>
     public class Seek : IDisposable
     {
+        // ---- FIELDS -------------------------------------------------------------------------------------------------
+
+        private bool _disposed;
+
         // ---- CONSTRUCTORS -------------------------------------------------------------------------------------------
 
         /// <summary>
@@ -41,11 +45,29 @@ namespace Syroot.BinaryData
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Rewinds the <see cref="Stream"/> to its previous position.
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            Stream.Seek(PreviousPosition, SeekOrigin.Begin);
+            // Do not change this code. Put cleanup code in Dispose(bool disposing).
+            Dispose(true);
+        }
+
+        // ---- METHODS (PROTECTED) ------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Rewinds the stream to t he previous position.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to rewind the stream.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                    Stream.Seek(PreviousPosition, SeekOrigin.Begin);
+
+                _disposed = true;
+            }
         }
     }
 }

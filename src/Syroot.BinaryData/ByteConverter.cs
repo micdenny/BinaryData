@@ -50,7 +50,7 @@ namespace Syroot.BinaryData
         public static ByteConverter System { get; }
 
         /// <summary>
-        /// Gets the <see cref="BinaryData.Endian"/> in which data is stored as converted by this instance.
+        /// Gets the <see cref="Endian"/> in which data is stored as converted by this instance.
         /// </summary>
         public abstract Endian ByteOrder { get; }
 
@@ -82,7 +82,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The value to convert.</param>
         /// <param name="buffer">The byte array to store the value in.</param>
         /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
-        public void GetBytes(Decimal value, byte[] buffer, int startIndex = 0)
+        public static void GetBytes(Decimal value, byte[] buffer, int startIndex = 0)
         {
             if (buffer?.Length - startIndex < sizeof(Decimal))
                 throw BufferException;
@@ -170,7 +170,7 @@ namespace Syroot.BinaryData
         /// <param name="buffer">The byte array storing the raw data.</param>
         /// <param name="startIndex">The index at which to start writing values into the buffer.</param>
         /// <returns>The converted value.</returns>
-        public Decimal ToDecimal(byte[] buffer, int startIndex = 0)
+        public static Decimal ToDecimal(byte[] buffer, int startIndex = 0)
         {
             if (buffer?.Length - startIndex < sizeof(Decimal))
                 throw BufferException;
