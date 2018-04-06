@@ -4,7 +4,7 @@ using System.Security;
 namespace Syroot.BinaryData
 {
     /// <summary>
-    /// Represents a <see cref="ByteConverter"/> which handles little endianness.
+    /// Represents a <see cref="ByteConverter"/> which handles big endianness.
     /// </summary>
     [SecuritySafeCritical]
     public sealed class ByteConverterBig : ByteConverter

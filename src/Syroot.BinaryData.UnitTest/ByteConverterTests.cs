@@ -188,6 +188,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
             }
         }
+
         [TestMethod]
         public void ToDouble()
         {
