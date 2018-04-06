@@ -12,12 +12,12 @@
 		<PackageId>Syroot.BinaryData</PackageId>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/Syroot/BinaryData</PackageProjectUrl>
-		<PackageReleaseNotes>Separated from Syroot.IO.BinaryData package.</PackageReleaseNotes>
+		<PackageReleaseNotes>Async support, BinaryStream replacing BinaryDataReader/Writer, serialization split into separate package.</PackageReleaseNotes>
 		<PackageTags>binary;data;io;binaryreader;binarywriter</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
-		<TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
-		<VersionPrefix>5.0.0-alpha5</VersionPrefix>
+		<TargetFrameworks>net452;netstandard20</TargetFrameworks>
+		<VersionPrefix>5.0.0-alpha1</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- Release (Signed) -->

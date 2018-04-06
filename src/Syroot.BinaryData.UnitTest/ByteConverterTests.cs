@@ -46,7 +46,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -63,7 +63,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -81,7 +81,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -99,7 +99,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -117,7 +117,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -134,7 +134,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -151,7 +151,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -169,7 +169,7 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
 
                 Array.Reverse(bitConvert);
-                GetReversedConverter().GetBytes(value, byteConvert);
+                TestTools.ReverseByteConverter.GetBytes(value, byteConvert);
                 CollectionAssert.AreEqual(bitConvert, byteConvert);
             }
         }
@@ -201,7 +201,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToDouble(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToDouble(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -217,7 +217,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToInt16(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToInt16(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -234,7 +234,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToInt32(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToInt32(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -251,7 +251,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToInt64(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToInt64(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -268,7 +268,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToSingle(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToSingle(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -284,7 +284,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToUInt16(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToUInt16(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -300,7 +300,7 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToUInt32(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToUInt32(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
         }
@@ -317,16 +317,9 @@ namespace Syroot.BinaryData.UnitTest
                 Assert.AreEqual(value, parsedValue);
 
                 Array.Reverse(bytes);
-                parsedValue = GetReversedConverter().ToUInt64(bytes);
+                parsedValue = TestTools.ReverseByteConverter.ToUInt64(bytes);
                 Assert.AreEqual(value, parsedValue);
             }
-        }
-
-        // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
-
-        private ByteConverter GetReversedConverter()
-        {
-            return ByteConverter.System.Endian == Endian.Little ? ByteConverter.Big : ByteConverter.Little;
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Syroot.BinaryData
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
-        [ThreadStatic] private static byte[] _buffer;
+        [ThreadStatic]
+        private static byte[] _buffer;
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
@@ -39,9 +40,9 @@ namespace Syroot.BinaryData
         /// <returns>The new position within the current stream.</returns>
         public static long Align(this Stream stream, long alignment, bool grow = false)
         {
-            if (alignment < 0)
+            if (alignment < 1)
                 throw new ArgumentOutOfRangeException("Alignment must be bigger than or equal to 0.");
-            else if (alignment < 2)
+            if (alignment == 1)
                 return stream.Position;
 
             long position = stream.Seek((-stream.Position % alignment + alignment) % alignment, SeekOrigin.Current);

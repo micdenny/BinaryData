@@ -9,7 +9,7 @@ namespace Syroot.BinaryData
         /// The array  has a prefix of a 7-bit encoded integer of variable size determining the number of elements out
         /// of which the array consists.
         /// </summary>
-        DynamicCount,
+        VariableCount,
 
         /// <summary>
         /// The array has a prefix of 1 byte determining the number of elements out of which the array consists.

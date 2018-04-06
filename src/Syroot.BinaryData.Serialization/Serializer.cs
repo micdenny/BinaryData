@@ -221,7 +221,7 @@ namespace Syroot.BinaryData
             => stream.ReadDateTime(memberData.DateTimeCoding, byteConverter);
 
         private static object ReadDecimal(Stream stream, ByteConverter byteConverter, MemberData memberData)
-            => stream.ReadDecimal(byteConverter);
+            => stream.ReadDecimal();
 
         private static object ReadDouble(Stream stream, ByteConverter byteConverter, MemberData memberData)
             => stream.ReadDouble(byteConverter);

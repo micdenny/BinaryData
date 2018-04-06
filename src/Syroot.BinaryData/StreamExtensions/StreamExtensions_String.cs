@@ -11,7 +11,8 @@ namespace Syroot.BinaryData
     {
         // ---- FIELDS -------------------------------------------------------------------------------------------------
 
-        [ThreadStatic] private static char[] _charBuffer;
+        [ThreadStatic]
+        private static char[] _charBuffer;
 
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 

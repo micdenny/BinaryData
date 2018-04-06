@@ -216,8 +216,8 @@ namespace Syroot.BinaryData
                     ? byteConverter : ByteConverter.GetConverter(ArrayCountCodingEndian);
                 switch (ArrayCountCoding)
                 {
-                    case ArrayLengthCoding.DynamicCount:
-                        return stream.ReadDynamicInt32();
+                    case ArrayLengthCoding.VariableCount:
+                        return stream.Read7BitInt32();
                     case ArrayLengthCoding.ByteCount:
                         return stream.ReadByte();
                     case ArrayLengthCoding.Int16Count:

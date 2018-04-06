@@ -5,15 +5,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Syroot.BinaryData.UnitTest
 {
     [TestClass]
-    public class Performance
+    public class PerformanceTests
     {
         // ---- CONSTANTS ----------------------------------------------------------------------------------------------
 
         private const int _writeCount = 10_000_000;
 
         private static readonly Random _random = new Random();
-        private static readonly ByteConverter _nonSystemConverter
-            = BitConverter.IsLittleEndian ? ByteConverter.Big : ByteConverter.Little;
         private static readonly byte[] _buffer = new byte[sizeof(Int32)];
         
         // ---- FIELDS -------------------------------------------------------------------------------------------------
@@ -79,7 +77,7 @@ namespace Syroot.BinaryData.UnitTest
             {
                 for (int i = 0; i < _writeCount; i++)
                 {
-                    _nonSystemConverter.GetBytes(_random.Next(Int32.MaxValue), _buffer);
+                    TestTools.ReverseByteConverter.GetBytes(_random.Next(Int32.MaxValue), _buffer);
                     writer.Write(_buffer);
                 }
             }
@@ -89,7 +87,7 @@ namespace Syroot.BinaryData.UnitTest
         public void Writing_NonSystem_StreamExtension()
         {
             for (int i = 0; i < _writeCount; i++)
-                _stream.Write(_random.Next(Int32.MaxValue), _nonSystemConverter);
+                _stream.Write(_random.Next(Int32.MaxValue), TestTools.ReverseByteConverter);
         }
     }
 }
