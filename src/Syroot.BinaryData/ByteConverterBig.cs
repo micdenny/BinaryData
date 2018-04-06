@@ -12,9 +12,9 @@ namespace Syroot.BinaryData
         // ---- PROPERTIES ---------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Gets the <see cref="Endian"/> in which data is stored as converted by this instance.
+        /// Gets the <see cref="BinaryData.Endian"/> in which data is stored as converted by this instance.
         /// </summary>
-        public override Endian ByteOrder => Endian.Big;
+        public override Endian Endian => Endian.Big;
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 

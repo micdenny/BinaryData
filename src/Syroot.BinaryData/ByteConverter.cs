@@ -50,16 +50,16 @@ namespace Syroot.BinaryData
         public static ByteConverter System { get; }
 
         /// <summary>
-        /// Gets the <see cref="Endian"/> in which data is stored as converted by this instance.
+        /// Gets the <see cref="BinaryData.Endian"/> in which data is stored as converted by this instance.
         /// </summary>
-        public abstract Endian ByteOrder { get; }
+        public abstract Endian Endian { get; }
 
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
         /// Returns a <see cref="ByteConverter"/> for the given <paramref name="byteOrder"/>.
         /// </summary>
-        /// <param name="byteOrder">The <see cref="ByteOrder"/> to retrieve a converter for.</param>
+        /// <param name="byteOrder">The <see cref="Endian"/> to retrieve a converter for.</param>
         /// <returns>The corresponding <see cref="ByteConverter"/> instance.</returns>
         public static ByteConverter GetConverter(Endian byteOrder)
         {
@@ -72,7 +72,7 @@ namespace Syroot.BinaryData
                 case Endian.System:
                     return System;
                 default:
-                    throw new ArgumentException($"Invalid {nameof(ByteOrder)}.", nameof(byteOrder));
+                    throw new ArgumentException($"Invalid {nameof(Endian)}.", nameof(byteOrder));
             }
         }
         
