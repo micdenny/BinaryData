@@ -9,10 +9,6 @@ namespace Syroot.BinaryData
     /// </summary>
     internal static class TypeExtensions
     {
-        // ---- FIELDS -------------------------------------------------------------------------------------------------
-
-        private static readonly Type _iEnumerableType = typeof(IEnumerable);
-
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
         /// <summary>
@@ -23,7 +19,7 @@ namespace Syroot.BinaryData
         /// <returns><c>true</c> if the type is enumerable and not a string; otherwise <c>false</c>.</returns>
         internal static bool IsEnumerable(this Type self)
         {
-            return self.IsArray || _iEnumerableType.IsAssignableFrom(self);
+            return self != typeof(string) && typeof(IEnumerable).IsAssignableFrom(self);
         }
 
         /// <summary>
@@ -47,7 +43,7 @@ namespace Syroot.BinaryData
             }
 
             // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-            if (_iEnumerableType.IsAssignableFrom(self))
+            if (typeof(IEnumerable).IsAssignableFrom(self))
             {
                 foreach (Type interfaceType in self.GetInterfaces())
                 {
@@ -78,7 +74,7 @@ namespace Syroot.BinaryData
             }
 
             // Check for IEnumerable instances. Only the first implementation of IEnumerable<> is returned.
-            if (_iEnumerableType.IsAssignableFrom(self))
+            if (typeof(IEnumerable).IsAssignableFrom(self))
             {
                 foreach (Type interfaceType in self.GetInterfaces())
                 {
