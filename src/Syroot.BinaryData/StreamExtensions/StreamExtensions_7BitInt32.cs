@@ -26,8 +26,6 @@ namespace Syroot.BinaryData
             for (int i = 0; i < sizeof(Int32) + 1; i++)
             {
                 byte readByte = stream.Read1Byte();
-                if (readByte == 0xFF)
-                    throw new EndOfStreamException("Incomplete 7-bit encoded Int32.");
                 value |= (readByte & 0b01111111) << i * 7;
                 if ((readByte & 0b10000000) == 0)
                     return value;
@@ -51,8 +49,6 @@ namespace Syroot.BinaryData
             for (int i = 0; i < sizeof(Int32) + 1; i++)
             {
                 byte readByte = await stream.Read1ByteAsync(cancellationToken);
-                if (readByte == 0xFF)
-                    throw new EndOfStreamException("Incomplete 7-bit encoded Int32.");
                 value |= (readByte & 0b01111111) << i * 7;
                 if ((readByte & 0b10000000) == 0)
                     return value;
@@ -144,16 +140,17 @@ namespace Syroot.BinaryData
 
         // ---- METHODS (PRIVATE) --------------------------------------------------------------------------------------
 
-        private static int Get7BitInt32Bytes(int value, byte[] buffer)
+        private static int Get7BitInt32Bytes(Int32 value, byte[] buffer)
         {
             // The highest bit determines whether to continue writing more bytes to form the Int32 value.
+            UInt32 unsigned = (UInt32)value;
             int i = 0;
-            while (value >= 0b10000000)
+            while (unsigned >= 0b10000000)
             {
-                buffer[i++] = (byte)(value | 0b10000000);
-                value >>= 7;
+                buffer[i++] = (byte)(unsigned | 0b10000000);
+                unsigned >>= 7;
             }
-            buffer[i] = (byte)value;
+            buffer[i] = (byte)unsigned;
             return i + 1;
         }
     }
