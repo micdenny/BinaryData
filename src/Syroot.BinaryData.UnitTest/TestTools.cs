@@ -36,6 +36,14 @@ namespace Syroot.BinaryData.UnitTest
             stream.WriteBytes(buffer);
         }
 
+        internal static void WriteSingle(MemoryStream stream, Single value, bool reverse = false)
+        {
+            byte[] buffer = BitConverter.GetBytes(value);
+            if (reverse)
+                Array.Reverse(buffer);
+            stream.WriteBytes(buffer);
+        }
+
         internal static void WriteUInt16(Stream stream, UInt16 value, bool reverse = false)
         {
             byte[] buffer = BitConverter.GetBytes(value);
