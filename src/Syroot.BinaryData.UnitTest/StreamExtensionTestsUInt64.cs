@@ -12,7 +12,7 @@ namespace Syroot.BinaryData.UnitTest
         // ---- Read ----
 
         [TestMethod]
-        public void ReadUInt64()
+        public void ReadWriteUInt64()
         {
             UInt64[] values = new UInt64[] { 1234567890123456789, 1, 0, 2512581093475885631, UInt64.MinValue,
                 UInt64.MaxValue };

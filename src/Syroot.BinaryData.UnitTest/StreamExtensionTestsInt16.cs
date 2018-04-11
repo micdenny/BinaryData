@@ -12,7 +12,7 @@ namespace Syroot.BinaryData.UnitTest
         // ---- Read ----
 
         [TestMethod]
-        public void ReadInt16()
+        public void ReadWriteInt16()
         {
             Int16[] values = new Int16[] { 12345, -12345, 1, 0, 25125, Int16.MinValue, Int16.MaxValue };
             using (MemoryStream stream = new MemoryStream())

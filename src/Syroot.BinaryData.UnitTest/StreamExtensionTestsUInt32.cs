@@ -12,7 +12,7 @@ namespace Syroot.BinaryData.UnitTest
         // ---- Read ----
 
         [TestMethod]
-        public void ReadUInt32()
+        public void ReadWriteUInt32()
         {
             UInt32[] values = new UInt32[] { 1234567890, 1, 0, 251258109, UInt32.MinValue, UInt32.MaxValue };
             using (MemoryStream stream = new MemoryStream())
