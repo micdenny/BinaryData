@@ -19,7 +19,8 @@ namespace Syroot.BinaryData
         /// <returns>The value read from the current stream.</returns>
         public static SByte ReadSByte(this Stream stream)
         {
-            return (SByte)stream.ReadByte();
+            FillBuffer(stream, sizeof(SByte));
+            return (SByte)Buffer[0];
         }
 
         /// <summary>

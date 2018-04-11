@@ -19,7 +19,8 @@ namespace Syroot.BinaryData
         /// <returns>The value read from the current stream.</returns>
         public static Byte Read1Byte(this Stream stream)
         {
-            return (Byte)stream.ReadByte();
+            FillBuffer(stream, sizeof(Byte));
+            return Buffer[0];
         }
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace Syroot.BinaryData
         public static async Task<Byte> Read1ByteAsync(this Stream stream,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            await FillBufferAsync(stream, 1, cancellationToken);
+            await FillBufferAsync(stream, sizeof(Byte), cancellationToken);
             return Buffer[0];
         }
 
