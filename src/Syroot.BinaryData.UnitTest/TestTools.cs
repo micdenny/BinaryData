@@ -12,6 +12,14 @@ namespace Syroot.BinaryData.UnitTest
 
         // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
+        internal static void WriteDouble(Stream stream, Double value, bool reverse = false)
+        {
+            byte[] buffer = BitConverter.GetBytes(value);
+            if (reverse)
+                Array.Reverse(buffer);
+            stream.WriteBytes(buffer);
+        }
+
         internal static void WriteInt16(Stream stream, Int16 value, bool reverse = false)
         {
             byte[] buffer = BitConverter.GetBytes(value);

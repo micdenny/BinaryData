@@ -9,8 +9,6 @@ namespace Syroot.BinaryData.UnitTest
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
-        // ---- Read ----
-
         [TestMethod]
         public void ReadWriteInt16()
         {

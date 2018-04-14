@@ -250,7 +250,9 @@ namespace Syroot.BinaryData
 
         private static Double GetCTimeTicks(DateTime value)
         {
-            return (_cTimeBase - value).TotalSeconds;
+            if (value < _cTimeBase)
+                throw new ArgumentException($"Date {value} cannot be represented by CTime.");
+            return (value - _cTimeBase).TotalSeconds;
         }
 
         private static DateTime ReadDateTimeAsCTime(Stream stream, ByteConverter converter)

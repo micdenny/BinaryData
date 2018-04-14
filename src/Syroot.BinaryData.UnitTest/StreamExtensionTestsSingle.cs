@@ -9,13 +9,11 @@ namespace Syroot.BinaryData.UnitTest
     {
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
-        // ---- Read ----
-
         [TestMethod]
         public void ReadWriteSingle()
         {
             Single[] values = new Single[] { 1234.567890f, -1234.567890f, 1f, 0.001f, 0f, Single.MinValue,
-                Single.MaxValue };
+                Single.MaxValue, Single.Epsilon, Single.NaN, Single.NegativeInfinity, Single.PositiveInfinity };
             using (MemoryStream stream = new MemoryStream())
             {
                 // Prepare test data.
