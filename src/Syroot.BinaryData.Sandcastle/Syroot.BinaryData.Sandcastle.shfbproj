@@ -31,8 +31,8 @@
       <Argument Key="requestExampleUrl" Value="" />
     </TransformComponentArguments>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net45\Syroot.BinaryData.dll" />
-      <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net45\Syroot.BinaryData.xml" />
+      <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net452\Syroot.BinaryData.dll" />
+      <DocumentationSource sourceFile="..\Syroot.BinaryData\bin\Release\net452\Syroot.BinaryData.xml" />
       <DocumentationSource sourceFile="..\Syroot.BinaryData.Serialization\bin\Release\net45\Syroot.BinaryData.Serialization.dll" />
       <DocumentationSource sourceFile="..\Syroot.BinaryData.Serialization\bin\Release\net45\Syroot.BinaryData.Serialization.xml" />
     </DocumentationSources>
