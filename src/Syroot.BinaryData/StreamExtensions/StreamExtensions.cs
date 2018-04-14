@@ -22,6 +22,7 @@ namespace Syroot.BinaryData
         {
             get
             {
+                // Instantiate here as inline initialization only runs for the first thread requiring the buffer.
                 if (_buffer == null)
                     _buffer = new byte[16];
                 return _buffer;
@@ -31,25 +32,24 @@ namespace Syroot.BinaryData
         // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
 
         /// <summary>
-        /// Aligns the reader to the next given byte multiple.
+        /// Aligns the stream to the given byte multiple.
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
-        /// <param name="alignment">The byte multiple.</param>
+        /// <param name="alignment">The byte multiple to align to. If negative, the position is decreased to the
+        /// previous multiple rather than the next one.</param>
         /// <param name="grow"><c>true</c> to enlarge the stream size to include the final position in case it is larger
         /// than the current stream length.</param>
         /// <returns>The new position within the current stream.</returns>
         public static long Align(this Stream stream, long alignment, bool grow = false)
         {
-            if (alignment < 1)
-                throw new ArgumentOutOfRangeException("Alignment must be bigger than or equal to 0.");
-            if (alignment == 1)
-                return stream.Position;
+            if (alignment == 0)
+                throw new ArgumentOutOfRangeException("Alignment must not be 0.");
 
             long position = stream.Seek((-stream.Position % alignment + alignment) % alignment, SeekOrigin.Current);
+
             if (grow && position > stream.Length)
-            {
                 stream.SetLength(position);
-            }
+
             return position;
         }
 
