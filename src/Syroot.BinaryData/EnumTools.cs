@@ -13,7 +13,7 @@ namespace Syroot.BinaryData
 
         private static Dictionary<Type, bool> _flagEnums = new Dictionary<Type, bool>();
 
-        // ---- METHODS (PUBLIC) ---------------------------------------------------------------------------------------
+        // ---- METHODS (INTERNAL) -------------------------------------------------------------------------------------
 
         /// <summary>
         /// Returns whether <paramref name="value"/> is a defined value in the enum of the given
@@ -23,7 +23,7 @@ namespace Syroot.BinaryData
         /// <param name="enumType">The type of the enum.</param>
         /// <param name="value">The value to check against the enum type.</param>
         /// <returns><c>true</c> if the value is valid; otherwise <c>false</c>.</returns>
-        public static bool IsValid(Type enumType, object value)
+        internal static bool IsValid(Type enumType, object value)
         {
             // For enumerations decorated with the FlagsAttribute, allow sets of flags.
             bool valid = Enum.IsDefined(enumType, value);
