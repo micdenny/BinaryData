@@ -174,14 +174,14 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="length">The length of the string.</param>
+        /// <param name="length">The length of each string.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static String[] ReadStrings(this Stream stream, int count, int length, Encoding encoding = null)
         {
             return ReadMany(stream, count,
-                () => ReadStringWithLength(stream, length, true, encoding));
+                () => ReadStringWithLength(stream, length, true, encoding ?? Encoding.UTF8));
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="stream">The extended <see cref="Stream"/> instance.</param>
         /// <param name="count">The number of values to read.</param>
-        /// <param name="length">The length of the string.</param>
+        /// <param name="length">The length of each string.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to parse the bytes with, or <c>null</c> to use
         /// <see cref="Encoding.UTF8"/>.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
@@ -198,7 +198,7 @@ namespace Syroot.BinaryData
             Encoding encoding = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await ReadManyAsync(stream, count,
-                () => ReadStringWithLengthAsync(stream, length, true, encoding, cancellationToken));
+                () => ReadStringWithLengthAsync(stream, length, true, encoding ?? Encoding.UTF8, cancellationToken));
         }
 
         // ---- Write ----
