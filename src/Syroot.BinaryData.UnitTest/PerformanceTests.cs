@@ -29,7 +29,17 @@ namespace Syroot.BinaryData.UnitTest
         }
 
         // ---- System Endianness ----
-        
+
+        [TestMethod]
+        public void Writing_System_BinaryStream()
+        {
+            using (BinaryStream stream = new BinaryStream(_stream))
+            {
+                for (int i = 0; i < _writeCount; i++)
+                    stream.Write(_random.Next(Int32.MaxValue));
+            }
+        }
+
         [TestMethod]
         public void Writing_System_BinaryWriter()
         {
@@ -55,6 +65,26 @@ namespace Syroot.BinaryData.UnitTest
         }
 
         // ---- Non-System Endianness ----
+
+        [TestMethod]
+        public void Writing_NonSystem_BinaryStream()
+        {
+            using (BinaryStream stream = new BinaryStream(_stream, TestTools.ReverseByteConverter))
+            {
+                for (int i = 0; i < _writeCount; i++)
+                    stream.Write(_random.Next(Int32.MaxValue));
+            }
+        }
+
+        [TestMethod]
+        public void Writing_NonSystem_BinaryStream_ExplicitConverter()
+        {
+            using (BinaryStream stream = new BinaryStream(_stream))
+            {
+                for (int i = 0; i < _writeCount; i++)
+                    stream.Write(_random.Next(Int32.MaxValue), TestTools.ReverseByteConverter);
+            }
+        }
 
         [TestMethod]
         public void Writing_NonSystem_BinaryWriter_BitConverter()
