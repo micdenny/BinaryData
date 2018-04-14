@@ -21,18 +21,18 @@ further code required.
 The library is available in the following NuGet packages:
 
 Core functionality:
-- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
-- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
+- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned, released as beta)
+- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly, released as beta)
 
 Serialization functionality (adds the core package dependency):
-- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned)
-- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly)
+- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned, to be released)
+- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly, to be released)
 
-### Updated from `Syroot.IO.BinaryData`?
-The previous package has been split into the core and the serialization packages. Also, several enumeration members were
-shortened in name and the serialization logic has been completely rewritten with new, separate attributes. Please read
-the [release notes](https://github.com/Syroot/BinaryData/releases/tag/5.0.0) to learn more about the many new features
-and breaking changes.
+### Updated from 4.x.x?
+
+The previous [Syroot.IO.BinaryData](https://www.nuget.org/packages/Syroot.IO.BinaryData) package has been split into the
+core and the serialization packages mentioned above. Beyond many new features, several breaking changes were made.
+Please have a look at the most recent [release notes](https://github.com/Syroot/BinaryData/releases/) for more info.
 
 ## Documentation
 

@@ -17,7 +17,7 @@
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/Syroot/BinaryData</RepositoryUrl>
 		<TargetFrameworks>net452;netstandard20</TargetFrameworks>
-		<VersionPrefix>5.0.0-alpha1</VersionPrefix>
+		<VersionPrefix>5.0.0-beta1</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- Release (Signed) -->
