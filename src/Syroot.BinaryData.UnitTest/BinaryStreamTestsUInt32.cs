@@ -36,9 +36,10 @@ namespace Syroot.BinaryData.UnitTest
                 CollectionAssert.AreEqual(values, binaryStream.ReadUInt32s(values.Length));
                 CollectionAssert.AreEqual(values, binaryStream.ReadUInt32s(values.Length, ByteConverter.Big));
 
-                // Confirm Little endian is initialized by default
+                // Confirm system endian is initialized by default
                 binaryStream.Position = 0;
-                Assert.AreEqual(values[0], binaryStream.ReadUInt32(ByteConverter.Little));
+                foreach (UInt32 value in values)
+                    Assert.AreEqual(value, binaryStream.ReadUInt32(ByteConverter.System));
             }
 
             // Test Binary Stream with big endian initialization.
@@ -60,7 +61,8 @@ namespace Syroot.BinaryData.UnitTest
 
                 // Confirm read and write calls are using big endian.
                 binaryStream.Position = 0;
-                Assert.AreEqual(values[0], binaryStream.ReadUInt32(ByteConverter.Big));
+                foreach (UInt32 value in values)
+                    Assert.AreEqual(value, binaryStream.ReadUInt32(ByteConverter.Big));
             }
 
             // Test Binary Stream with little endian initialization.
@@ -82,7 +84,8 @@ namespace Syroot.BinaryData.UnitTest
 
                 // Confirm read and write calls are using little endian.
                 binaryStream.Position = 0;
-                Assert.AreEqual(values[0], binaryStream.ReadUInt32(ByteConverter.Little));
+                foreach (UInt32 value in values)
+                    Assert.AreEqual(value, binaryStream.ReadUInt32(ByteConverter.Little));
             }
         }
     }
