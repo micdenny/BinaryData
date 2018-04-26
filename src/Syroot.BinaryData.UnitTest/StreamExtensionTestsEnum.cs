@@ -12,7 +12,7 @@ namespace Syroot.BinaryData.UnitTest
         [TestMethod]
         public void ReadWriteEnum()
         {
-            Fruit[] values = new Fruit[] { (Fruit)0/*Apple*/, Fruit.Banana, Fruit.Pineapple, Fruit.Cherry };
+            Fruit[] values = new Fruit[] { 0/*Apple*/, Fruit.Banana, Fruit.Pineapple, Fruit.Cherry };
             using (MemoryStream stream = new MemoryStream())
             {
                 // Prepare test data.
@@ -31,9 +31,9 @@ namespace Syroot.BinaryData.UnitTest
                 // Read test data as integers.
                 stream.Position = 0;
                 foreach (Fruit value in values)
-                    Assert.AreEqual(value, (Fruit)stream.ReadUInt32());
+                    Assert.AreEqual(value, (Fruit)stream.ReadUInt16());
                 foreach (Fruit value in values)
-                    Assert.AreEqual(value, (Fruit)stream.ReadUInt32(TestTools.ReverseByteConverter));
+                    Assert.AreEqual(value, (Fruit)stream.ReadUInt16(TestTools.ReverseByteConverter));
 
                 // Read test data all at once. 
                 stream.Position = 0;
