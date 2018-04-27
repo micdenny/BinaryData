@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Syroot.BinaryData
 {
     /// <summary>
-    /// Represents static extension methods for read and write operations on <see cref="Stream"/> instances.
+    /// Represents extension methods for read and write operations on <see cref="Stream"/> instances.
     /// </summary>
     public static partial class StreamExtensions
     {
