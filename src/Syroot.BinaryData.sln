@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syroot.BinaryData.UnitTest"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syroot.BinaryData.Serialization", "Syroot.BinaryData.Serialization\Syroot.BinaryData.Serialization.csproj", "{CCE887C9-DB18-401A-91F4-DF3BC4442E68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syroot.BinaryData.Serialization.UnitTest", "Syroot.BinaryData.Serialization.UnitTest\Syroot.BinaryData.Serialization.UnitTest.csproj", "{CBB0637C-986F-4399-8689-F4F22027D973}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syroot.BinaryData.Serialization.UnitTest", "Syroot.BinaryData.Serialization.UnitTest\Syroot.BinaryData.Serialization.UnitTest.csproj", "{CBB0637C-986F-4399-8689-F4F22027D973}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,8 +32,8 @@ Global
 		{AEF72396-F3E0-49EB-A45B-3F666B6039E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release (Signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release (Signed)|Any CPU.Build.0 = Release|Any CPU
+		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release (Signed)|Any CPU.ActiveCfg = Release (Signed)|Any CPU
+		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release (Signed)|Any CPU.Build.0 = Release (Signed)|Any CPU
 		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCE887C9-DB18-401A-91F4-DF3BC4442E68}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CBB0637C-986F-4399-8689-F4F22027D973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

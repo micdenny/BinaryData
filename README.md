@@ -21,12 +21,12 @@ further code required.
 The library is available in the following NuGet packages:
 
 Core functionality:
-- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned, released as beta)
-- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly, released as beta)
+- [Syroot.BinaryData](https://www.nuget.org/packages/Syroot.BinaryData) (unsigned)
+- [Syroot.BinaryData.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Signed) (signed assembly)
 
 Serialization functionality (adds the core package dependency):
-- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned, to be released)
-- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly, to be released)
+- [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned)
+- [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly)
 
 ### Updated from 4.x.x?
 
