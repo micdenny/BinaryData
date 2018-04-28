@@ -34,23 +34,23 @@ namespace Syroot.BinaryData
         /// <summary>
         /// Gets or sets the format for <see cref="Boolean"/> members. Defaults to <see cref="BooleanCoding.Byte"/>.
         /// </summary>
-        public BooleanCoding BooleanFormat { get; set; }
+        public BooleanCoding BooleanCoding { get; set; }
 
         /// <summary>
         /// Gets or sets the format for <see cref="DateTime"/> members. Defaults to
         /// <see cref="DateTimeCoding.NetTicks"/>.
         /// </summary>
-        public DateTimeCoding DateTimeFormat { get; set; }
+        public DateTimeCoding DateTimeCoding { get; set; }
 
         /// <summary>
         /// Gets or sets the format for <see cref="String"/> members. Defaults to
         /// <see cref="StringCoding.VariableByteCount"/>.
         /// </summary>
-        public StringCoding StringFormat { get; set; }
+        public StringCoding StringCoding { get; set; }
         
         /// <summary>
         /// Gets or sets the number of elements to read or write. Required for <see cref="IEnumerable"/> members or
-        /// strings when <see cref="StringFormat"/> is <see cref="StringCoding.Raw"/>.
+        /// strings when <see cref="StringCoding"/> is <see cref="StringCoding.Raw"/>.
         /// Multidimensional arrays are not supported.
         /// </summary>
         public int Length { get; set; }

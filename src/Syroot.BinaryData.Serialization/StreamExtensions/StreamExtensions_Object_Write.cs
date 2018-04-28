@@ -66,18 +66,18 @@ namespace Syroot.BinaryData
                 if (value == null)
                     return;
                 else if (type == typeof(String))
-                    stream.Write((String)value, attribute.StringFormat, converter: converter);
+                    stream.Write((String)value, attribute.StringCoding, converter: converter);
                 else if (type.TryGetEnumerableElementType(out Type elementType))
                 {
                     foreach (object element in (IEnumerable)value)
                         WriteObject(stream, null, BinaryMemberAttribute.Default, elementType, element, converter);
                 }
                 else if (type == typeof(Boolean))
-                    stream.Write((Boolean)value, attribute.BooleanFormat, converter);
+                    stream.Write((Boolean)value, attribute.BooleanCoding, converter);
                 else if (type == typeof(Byte))
                     stream.Write((Byte)value);
                 else if (type == typeof(DateTime))
-                    stream.Write((DateTime)value, attribute.DateTimeFormat, converter);
+                    stream.Write((DateTime)value, attribute.DateTimeCoding, converter);
                 else if (type == typeof(Decimal))
                     stream.Write((Decimal)value);
                 else if (type == typeof(Double))

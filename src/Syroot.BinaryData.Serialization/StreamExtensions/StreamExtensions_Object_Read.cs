@@ -89,19 +89,19 @@ namespace Syroot.BinaryData
             {
                 if (type == typeof(String))
                 {
-                    if (attribute.StringFormat == StringCoding.Raw)
+                    if (attribute.StringCoding == StringCoding.Raw)
                         return stream.ReadString(attribute.Length);
                     else
-                        return stream.ReadString(attribute.StringFormat, converter: converter);
+                        return stream.ReadString(attribute.StringCoding, converter: converter);
                 }
                 else if (type.IsEnumerable())
                     throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
                 else if (type == typeof(Boolean))
-                    return stream.ReadBoolean(attribute.BooleanFormat);
+                    return stream.ReadBoolean(attribute.BooleanCoding);
                 else if (type == typeof(Byte))
                     return stream.Read1Byte();
                 else if (type == typeof(DateTime))
-                    return stream.ReadDateTime(attribute.DateTimeFormat, converter);
+                    return stream.ReadDateTime(attribute.DateTimeCoding, converter);
                 else if (type == typeof(Decimal))
                     return stream.ReadDecimal();
                 else if (type == typeof(Double))

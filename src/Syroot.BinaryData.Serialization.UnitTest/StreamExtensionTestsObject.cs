@@ -81,7 +81,7 @@ namespace Syroot.BinaryData.Serialization.UnitTest
             [BinaryMember(Order = -1, Length = 3)] public string[] AnotherArray = new string[] { "Bla", "Two", "Three" };
             [BinaryMember(Order = 0)] public int X = 0x33330000;
             [BinaryMember(Order = 1)] public byte Y = 0x44;
-            [BinaryMember(Order = 2, StringFormat = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
+            [BinaryMember(Order = 2, StringCoding = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
             [BinaryMember(Order = 3)] public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
         }
 
