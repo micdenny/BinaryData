@@ -28,6 +28,9 @@ Serialization functionality (adds the core package dependency):
 - [Syroot.BinaryData.Serialization](https://www.nuget.org/packages/Syroot.BinaryData.Serialization) (unsigned)
 - [Syroot.BinaryData.Serialization.Signed](https://www.nuget.org/packages/Syroot.BinaryData.Serialization.Signed) (signed assembly)
 
+If you want to compile the libraries yourself, Visual Studio 2017 with the 15.7 update is required, as the library uses
+the latest C# 7.3 features not available in earlier versions.
+
 ### Updated from 4.x.x?
 
 The previous [Syroot.IO.BinaryData](https://www.nuget.org/packages/Syroot.IO.BinaryData) package has been split into the
