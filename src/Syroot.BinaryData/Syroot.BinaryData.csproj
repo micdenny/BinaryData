@@ -8,6 +8,7 @@
 		<Copyright>(c) Syroot, licensed under MIT</Copyright>
 		<Description>.NET library extending binary reading and writing functionality.</Description>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<LangVersion>latest</LangVersion>
 		<PackageIconUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/res/Logo.png</PackageIconUrl>
 		<PackageId>Syroot.BinaryData</PackageId>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/Syroot/BinaryData/master/LICENSE</PackageLicenseUrl>

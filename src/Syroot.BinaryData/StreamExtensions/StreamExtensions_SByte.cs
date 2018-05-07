@@ -30,7 +30,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<SByte> ReadSByteAsync(this Stream stream,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             return (SByte)await stream.Read1ByteAsync(cancellationToken);
         }
@@ -55,7 +55,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<SByte[]> ReadSBytesAsync(this Stream stream, int count,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             return await ReadManyAsync(stream, count,
                 () => ReadSByteAsync(stream, cancellationToken));
@@ -93,7 +93,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, SByte value,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             byte[] buffer = Buffer;
             buffer[0] = (byte)value;
@@ -107,7 +107,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, IEnumerable<SByte> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             foreach (var value in values)
                 await WriteAsync(stream, value, cancellationToken);
@@ -130,7 +130,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteSByteAsync(this Stream stream, SByte value,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, value, cancellationToken);
         }
@@ -152,7 +152,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteSBytesAsync(this Stream stream, IEnumerable<SByte> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, values, cancellationToken);
         }

@@ -32,7 +32,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<Single> ReadSingleAsync(this Stream stream, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await FillBufferAsync(stream, sizeof(Single), cancellationToken);
             return (converter ?? ByteConverter.System).ToSingle(Buffer);
@@ -61,7 +61,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<Single[]> ReadSinglesAsync(this Stream stream, int count,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             return await ReadManyAsync(stream, count,
@@ -104,7 +104,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, Single value, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             byte[] buffer = Buffer;
             (converter ?? ByteConverter.System).GetBytes(value, buffer, 0);
@@ -119,7 +119,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, IEnumerable<Single> values,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             foreach (var value in values)
@@ -145,7 +145,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteSingleAsync(this Stream stream, Single value, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, value, converter, cancellationToken);
         }
@@ -169,7 +169,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteSinglesAsync(this Stream stream, IEnumerable<Single> values,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, values, converter, cancellationToken);
         }

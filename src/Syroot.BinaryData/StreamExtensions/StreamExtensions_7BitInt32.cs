@@ -41,7 +41,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<Int32> Read7BitInt32Async(this Stream stream,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             // Endianness should not matter, as this value is stored byte by byte.
             // While the highest bit is set, the integer requires another of a maximum of 5 bytes.
@@ -78,7 +78,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<Int32[]> Read7BitInt32sAsync(this Stream stream, int count,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             return await ReadManyAsync(stream, count,
                 () => Read7BitInt32Async(stream, cancellationToken));
@@ -107,7 +107,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task Write7BitInt32Async(this Stream stream, Int32 value,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             byte[] buffer = Buffer;
             int size = Get7BitInt32Bytes(value, buffer);
@@ -132,7 +132,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task Write7BitInt32Async(this Stream stream, IEnumerable<Int32> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             foreach (var value in values)
                 await Write7BitInt32Async(stream, value, cancellationToken);

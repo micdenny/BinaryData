@@ -75,7 +75,7 @@ namespace Syroot.BinaryData
         /// <returns>The value read from the current stream.</returns>
         public static async Task<String> ReadStringAsync(this Stream stream,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
@@ -134,7 +134,7 @@ namespace Syroot.BinaryData
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<String[]> ReadStringsAsync(this Stream stream, int count,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             return await ReadManyAsync(stream, count,
@@ -164,7 +164,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<String> ReadStringAsync(this Stream stream, int length, Encoding encoding = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             return await ReadStringWithLengthAsync(stream, length, true, encoding ?? Encoding.UTF8, cancellationToken);
         }
@@ -195,7 +195,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<String[]> ReadStringsAsync(this Stream stream, int count, int length,
-            Encoding encoding = null, CancellationToken cancellationToken = default(CancellationToken))
+            Encoding encoding = null, CancellationToken cancellationToken = default)
         {
             return await ReadManyAsync(stream, count,
                 () => ReadStringWithLengthAsync(stream, length, true, encoding ?? Encoding.UTF8, cancellationToken));
@@ -293,7 +293,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, String value,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
@@ -352,7 +352,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, IEnumerable<String> values,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             encoding = encoding ?? Encoding.UTF8;
             converter = converter ?? ByteConverter.System;
@@ -390,7 +390,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteStringAsync(this Stream stream, String value,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, value, coding, encoding, converter, cancellationToken);
         }
@@ -425,7 +425,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteStringsAsync(this Stream stream, IEnumerable<String> values,
             StringCoding coding = StringCoding.VariableByteCount, Encoding encoding = null,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, values, coding, encoding, converter, cancellationToken);
         }

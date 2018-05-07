@@ -23,7 +23,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
-        public async Task<Boolean> ReadBooleanAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Boolean> ReadBooleanAsync(CancellationToken cancellationToken = default)
             => await BaseStream.ReadBooleanAsync(BooleanCoding, cancellationToken);
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public async Task<Boolean[]> ReadBooleans(int count,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.ReadBooleansAsync(count, BooleanCoding, cancellationToken);
 
         // ---- Write ----
@@ -58,7 +58,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public async Task WriteAsync(Boolean value, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task WriteAsync(Boolean value, CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(value, BooleanCoding, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Syroot.BinaryData
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteBooleanAsync(Boolean value,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(value, BooleanCoding, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteAsync(IEnumerable<Boolean> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(values, BooleanCoding, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteBooleansAsync(IEnumerable<Boolean> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(values, BooleanCoding, ByteConverter, cancellationToken);
     }
 }

@@ -23,7 +23,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
-        public async Task<UInt64> ReadUInt64Async(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<UInt64> ReadUInt64Async(CancellationToken cancellationToken = default)
             => await BaseStream.ReadUInt64Async(ByteConverter, cancellationToken);
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public async Task<UInt64[]> ReadUInt64sAsync(int count,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.ReadUInt64sAsync(count, ByteConverter, cancellationToken);
 
         // ---- Write ----
@@ -65,7 +65,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public async Task WriteAsync(UInt64 value, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task WriteAsync(UInt64 value, CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(value, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteAsync(IEnumerable<UInt64> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(values, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Syroot.BinaryData
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        public async Task WriteUInt64Async(UInt64 value, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task WriteUInt64Async(UInt64 value, CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(value, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Syroot.BinaryData
         /// <param name="values">The values to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteUInt64sAsync(IEnumerable<UInt64> values,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteAsync(values, ByteConverter, cancellationToken);
     }
 }

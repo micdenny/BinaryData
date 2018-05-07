@@ -23,7 +23,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <returns>The value read from the current stream.</returns>
         public static T ReadEnum<T>(this Stream stream, bool strict = false, ByteConverter converter = null)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
         {
             return (T)ReadEnum(stream, typeof(T), strict, converter);
         }
@@ -40,8 +40,8 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public static async Task<T> ReadEnumAsync<T>(this Stream stream, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
+            where T : Enum
         {
             return (T)await ReadEnumAsync(stream, typeof(T), strict, converter, cancellationToken);
         }
@@ -59,7 +59,7 @@ namespace Syroot.BinaryData
         /// <returns>The array of values read from the current stream.</returns>
         public static T[] ReadEnums<T>(this Stream stream, int count, bool strict = false,
             ByteConverter converter = null)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
         {
             converter = converter ?? ByteConverter.System;
             return ReadMany(stream, count,
@@ -79,8 +79,8 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<T[]> ReadEnumsAsync<T>(this Stream stream, int count, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
+            where T : Enum
         {
             converter = converter ?? ByteConverter.System;
             return await ReadManyAsync(stream, count,
@@ -169,7 +169,7 @@ namespace Syroot.BinaryData
         /// <returns>The value read from the current stream.</returns>
         public static async Task<object> ReadEnumAsync(this Stream stream, Type type,
             bool strict = false, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
 
@@ -259,7 +259,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<object[]> ReadEnumsAsync(this Stream stream, Type type, int count, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             return await ReadManyAsync(stream, count,
@@ -279,7 +279,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void WriteEnum<T>(this Stream stream, T value, bool strict = false,
             ByteConverter converter = null)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
         {
             WriteEnum(stream, typeof(T), value, strict, converter);
         }
@@ -296,8 +296,8 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteEnumAsync<T>(this Stream stream, T value, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
+            where T : Enum
         {
             await WriteEnumAsync(stream, typeof(T), value, strict, converter, cancellationToken);
         }
@@ -331,7 +331,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteEnumAsync(this Stream stream, Type type, object value, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             byte[] buffer = Buffer;
             int size = GetEnumBytes(type, value, strict, converter ?? ByteConverter.System, buffer);
@@ -350,7 +350,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         public static void WriteEnums<T>(this Stream stream, IEnumerable values, bool strict = false,
             ByteConverter converter = null)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
         {
             Type type = typeof(T);
             converter = converter ?? ByteConverter.System;
@@ -370,8 +370,8 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteEnumsAsync<T>(this Stream stream, IEnumerable values, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
+            where T : Enum
         {
             Type type = typeof(T);
             converter = converter ?? ByteConverter.System;
@@ -409,7 +409,7 @@ namespace Syroot.BinaryData
         /// <param name="converter">The <see cref="ByteConverter"/> to use for converting multibyte data.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteEnumsAsync(this Stream stream, Type type, IEnumerable values, bool strict = false,
-            ByteConverter converter = null, CancellationToken cancellationToken = default(CancellationToken))
+            ByteConverter converter = null, CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             foreach (var value in values)

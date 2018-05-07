@@ -19,7 +19,7 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <returns>The value read from the current stream.</returns>
         public T ReadEnum<T>(bool strict = false)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
             => (T)BaseStream.ReadEnum(typeof(T), strict, ByteConverter);
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public async Task<T> ReadEnumAsync<T>(bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            CancellationToken cancellationToken = default)
+            where T : Enum
             => (T)await BaseStream.ReadEnumAsync(typeof(T), strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public T[] ReadEnums<T>(int count, bool strict = false)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
             => BaseStream.ReadEnums<T>(count, strict, ByteConverter);
 
         /// <summary>
@@ -60,8 +60,8 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public async Task<T[]> ReadEnumsAsync<T>(int count, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            CancellationToken cancellationToken = default)
+            where T : Enum
             => await BaseStream.ReadEnumsAsync<T>(count, strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The value read from the current stream.</returns>
         public async Task<object> ReadEnumAsync(Type type, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.ReadEnumAsync(type, strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The array of values read from the current stream.</returns>
         public async Task<object[]> ReadEnumsAsync(Type type, int count, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.ReadEnumsAsync(type, count, strict, ByteConverter, cancellationToken);
 
         // ---- Write ----
@@ -124,7 +124,7 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         public void WriteEnum<T>(T value, bool strict = false)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
             => BaseStream.WriteEnum(value, strict, ByteConverter);
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteEnumAsync<T>(T value, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            CancellationToken cancellationToken = default)
+            where T : Enum
             => await BaseStream.WriteEnumAsync(value, strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteEnumAsync(Type type, object value, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteEnumAsync(type, value, strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace Syroot.BinaryData
         /// <param name="strict"><c>true</c> to raise an <see cref="ArgumentOutOfRangeException"/> if the value is not
         /// defined in the enum type.</param>
         public void WriteEnums<T>(IEnumerable values, bool strict = false)
-            where T : struct, IComparable, IFormattable
+            where T : Enum
             => BaseStream.WriteEnums(typeof(T), values, strict, ByteConverter);
 
         /// <summary>
@@ -186,8 +186,8 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteEnumsAsync<T>(IEnumerable values, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
-            where T : struct, IComparable, IFormattable
+            CancellationToken cancellationToken = default)
+            where T : Enum
             => await BaseStream.WriteEnumsAsync(typeof(T), values, strict, ByteConverter, cancellationToken);
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Syroot.BinaryData
         /// defined in the enum type.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public async Task WriteEnumsAsync(Type type, IEnumerable values, bool strict = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
             => await BaseStream.WriteEnumsAsync(type, values, strict, ByteConverter, cancellationToken);
     }
 }

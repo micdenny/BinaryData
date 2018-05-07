@@ -49,7 +49,7 @@ namespace Syroot.BinaryData
         /// <returns>The value read from the current stream.</returns>
         public static async Task<DateTime> ReadDateTimeAsync(this Stream stream,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             switch (coding)
             {
@@ -91,7 +91,7 @@ namespace Syroot.BinaryData
         /// <returns>The array of values read from the current stream.</returns>
         public static async Task<DateTime[]> ReadDateTimesAsync(this Stream stream, int count,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             return await ReadManyAsync(stream, count,
@@ -152,7 +152,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, DateTime value,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             switch (coding)
@@ -183,7 +183,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteAsync(this Stream stream, IEnumerable<DateTime> values,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             converter = converter ?? ByteConverter.System;
             foreach (var value in values)
@@ -213,7 +213,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteDateTimeAsync(this Stream stream, DateTime value,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, value, coding, converter, cancellationToken);
         }
@@ -241,7 +241,7 @@ namespace Syroot.BinaryData
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         public static async Task WriteDateTimesAsync(this Stream stream, IEnumerable<DateTime> values,
             DateTimeCoding coding = DateTimeCoding.NetTicks, ByteConverter converter = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             await WriteAsync(stream, values, coding, converter, cancellationToken);
         }
