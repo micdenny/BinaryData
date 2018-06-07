@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Text;
 
 namespace Syroot.BinaryData
 {
@@ -47,7 +48,13 @@ namespace Syroot.BinaryData
         /// <see cref="StringCoding.VariableByteCount"/>.
         /// </summary>
         public StringCoding StringCoding { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the encoding for <see cref="String"/> members. Defaults to
+        /// <see cref="Encoding.UTF8"/>.
+        /// </summary>
+        public string StringEncoding { get; set; }
+
         /// <summary>
         /// Gets or sets the number of elements to read or write. Required for <see cref="IEnumerable"/> members or
         /// strings when <see cref="StringCoding"/> is <see cref="StringCoding.Raw"/>.

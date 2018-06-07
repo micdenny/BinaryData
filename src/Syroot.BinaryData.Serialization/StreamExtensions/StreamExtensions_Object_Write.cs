@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Syroot.BinaryData
 {
@@ -66,7 +67,7 @@ namespace Syroot.BinaryData
                 if (value == null)
                     return;
                 else if (type == typeof(String))
-                    stream.Write((String)value, attribute.StringCoding, converter: converter);
+                    stream.Write((String)value, attribute.StringCoding, encoding: attribute.StringEncoding != null ? Encoding.GetEncoding(attribute.StringEncoding) : null, converter: converter);
                 else if (type.TryGetEnumerableElementType(out Type elementType))
                 {
                     foreach (object element in (IEnumerable)value)

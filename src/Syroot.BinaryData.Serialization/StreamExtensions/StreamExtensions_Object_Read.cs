@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Syroot.BinaryData
 {  
@@ -92,7 +93,7 @@ namespace Syroot.BinaryData
                     if (attribute.StringCoding == StringCoding.Raw)
                         return stream.ReadString(attribute.Length);
                     else
-                        return stream.ReadString(attribute.StringCoding, converter: converter);
+                        return stream.ReadString(attribute.StringCoding, encoding: attribute.StringEncoding != null ? Encoding.GetEncoding(attribute.StringEncoding) : null, converter: converter);
                 }
                 else if (type.IsEnumerable())
                     throw new InvalidOperationException("Multidimensional arrays cannot be read directly.");
