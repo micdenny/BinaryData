@@ -51,7 +51,7 @@ namespace Syroot.BinaryData
 
         /// <summary>
         /// Gets or sets the encoding for <see cref="String"/> members. Defaults to
-        /// <see cref="Encoding.UTF8"/>.
+        /// <see cref="Encoding.UTF8"/> (utf-8).
         /// </summary>
         public string StringEncoding { get; set; }
 

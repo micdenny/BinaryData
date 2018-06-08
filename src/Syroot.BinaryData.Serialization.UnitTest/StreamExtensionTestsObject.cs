@@ -38,6 +38,8 @@ namespace Syroot.BinaryData.Serialization.UnitTest
             Assert.AreEqual(origInstance.Text, readInstance.Text);
             Assert.AreEqual(origInstance.Struct.Green, readInstance.Struct.Green);
             Assert.AreEqual(origInstance.Struct.Red, readInstance.Struct.Red);
+            Assert.AreEqual(origInstance.TextWithDefaultSettings, readInstance.TextWithDefaultSettings);
+            Assert.AreEqual(origInstance.TextWithCustomEncoding, readInstance.TextWithCustomEncoding);
         }
 
         [TestMethod]
@@ -83,6 +85,8 @@ namespace Syroot.BinaryData.Serialization.UnitTest
             [BinaryMember(Order = 1)] public byte Y = 0x44;
             [BinaryMember(Order = 2, StringCoding = StringCoding.Int32CharCount)] public string Text = "Hello, Test!";
             [BinaryMember(Order = 3)] public TestStruct Struct = new TestStruct { Green = 0x0000FF00, Red = 0xFF000000 };
+            [BinaryMember(Order = 4)] public string TextWithDefaultSettings = "I'm using some accents: òàùèìéééé";
+            [BinaryMember(Order = 5, StringEncoding = "iso-8859-1")] public string TextWithCustomEncoding = "I'm using some accents: òàùèìéééé";
         }
 
         private struct TestStruct
